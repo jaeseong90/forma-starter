@@ -1,0 +1,142 @@
+/**
+ * Custom Tree Grid — 매출계획년간 등 커스텀 트리그리드 전용 CSS
+ * FORMA 테마 CSS 변수(var(--*))를 활용하여 테마 변경 시 자동 반영됨
+ */
+
+/* Grid Container */
+.custom-tree-grid.grid-container {
+    width: 100%;
+    overflow: auto;
+    border: 1px solid var(--border);
+    position: sticky;
+    background: var(--bg-card);
+}
+
+/* Table Styles */
+.custom-tree-grid table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    width: max-content !important;
+    table-layout: fixed !important;
+    margin: 0 !important;
+}
+
+.custom-tree-grid th,
+.custom-tree-grid td {
+    border-right: 1px solid var(--border-light) !important;
+    border-bottom: 1px solid var(--border-light) !important;
+    padding: 6px 10px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    font-size: 12px !important;
+    color: var(--text) !important;
+    box-sizing: border-box !important;
+    height: 30px;
+}
+
+/* ==========================================
+   [틀고정 (Sticky) 설정]
+   ========================================== */
+.custom-tree-grid thead {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+.custom-tree-grid th {
+    background-color: var(--bg-header) !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    border-top: 1px solid var(--border-light) !important;
+}
+
+/* 공통 고정 클래스 */
+.custom-tree-grid .frozen {
+    position: sticky !important;
+    z-index: 15;
+}
+.custom-tree-grid thead .frozen {
+    z-index: 30 !important;
+}
+
+/* 각 컬럼별 Left 위치 및 너비 */
+/* 구분 (거래처 - 사업명) */
+.custom-tree-grid .frozen-c1 { left: 0px !important; width: 360px !important; min-width: 360px !important; max-width: 360px !important; }
+/* 사업정보 (담당, 단계, 수주, 매입) */
+.custom-tree-grid .frozen-c2 { left: 360px !important; width: 60px  !important; min-width: 60px  !important; max-width: 60px  !important; }
+.custom-tree-grid .frozen-c3 { left: 420px !important; width: 70px  !important; min-width: 70px  !important; max-width: 70px  !important; }
+.custom-tree-grid .frozen-c4 { left: 490px !important; width: 100px !important; min-width: 100px !important; max-width: 100px !important; }
+.custom-tree-grid .frozen-c5 {
+    left: 590px !important; width: 100px !important; min-width: 100px !important; max-width: 100px !important;
+    border-right: 2px solid var(--border) !important;
+}
+
+/* 계획 (기간, 개월수, 매출, 매입, 이익률) */
+.custom-tree-grid .frozen-c6  { left: 690px  !important; width: 100px !important; min-width: 100px !important; max-width: 100px !important; }
+.custom-tree-grid .frozen-c7  { left: 790px  !important; width: 50px  !important; min-width: 50px  !important; max-width: 50px  !important; }
+.custom-tree-grid .frozen-c8  { left: 840px  !important; width: 100px !important; min-width: 100px !important; max-width: 100px !important; }
+.custom-tree-grid .frozen-c9  { left: 940px  !important; width: 100px !important; min-width: 100px !important; max-width: 100px !important; }
+.custom-tree-grid .frozen-c10 {
+    left: 1040px !important; width: 60px  !important; min-width: 60px  !important; max-width: 60px  !important;
+    border-right: 2px solid var(--border) !important;
+}
+
+/* 실적 (기간, 개월수, 매출, 매입, 이익률) */
+.custom-tree-grid .frozen-c11 { left: 1100px !important; width: 100px !important; min-width: 100px !important; max-width: 100px !important; }
+.custom-tree-grid .frozen-c12 { left: 1200px !important; width: 50px  !important; min-width: 50px  !important; max-width: 50px  !important; }
+.custom-tree-grid .frozen-c13 { left: 1250px !important; width: 100px !important; min-width: 100px !important; max-width: 100px !important; }
+.custom-tree-grid .frozen-c14 { left: 1350px !important; width: 100px !important; min-width: 100px !important; max-width: 100px !important; }
+.custom-tree-grid .frozen-c15 {
+    left: 1450px !important; width: 60px  !important; min-width: 60px  !important; max-width: 60px  !important;
+    border-right: 2px solid var(--border) !important;
+}
+
+/* 헤더 전용: '사업정보' (colspan=4) 묶음 */
+.custom-tree-grid .frozen-group {
+    left: 360px !important;
+    border-right: 2px solid var(--border) !important;
+}
+
+/* 헤더 전용: '계획'/'실적' (colspan=5) 묶음 */
+.custom-tree-grid .frozen-totalP-group {
+    left: 690px !important;
+    border-right: 2px solid var(--border) !important;
+}
+.custom-tree-grid .frozen-totalA-group {
+    left: 1100px !important;
+    border-right: 2px solid var(--border) !important;
+}
+
+/* ==========================================
+   [트리 노드 배경색 — 테마 CSS 변수 활용]
+   ========================================== */
+.custom-tree-grid tr.lv-0, .custom-tree-grid tr.lv-0 td.frozen { background-color: var(--bg-selected) !important; font-weight: 700 !important; }
+.custom-tree-grid tr.lv-1, .custom-tree-grid tr.lv-1 td.frozen { background-color: var(--bg-cell-pnk) !important; font-weight: 700 !important; }
+.custom-tree-grid tr.lv-2, .custom-tree-grid tr.lv-2 td.frozen { background-color: var(--bg-cell-yel) !important; font-weight: 700 !important; }
+.custom-tree-grid tr.lv-3, .custom-tree-grid tr.lv-3 td.frozen { background-color: var(--bg-alt) !important; font-weight: 700 !important; }
+.custom-tree-grid tr.leaf td.frozen { background-color: var(--bg-card) !important; }
+.custom-tree-grid tr.leaf:hover td, .custom-tree-grid tr.leaf:hover td.frozen { background-color: var(--bg-hover) !important; }
+
+/* Typography & Utilities */
+.custom-tree-grid .text-right { text-align: right !important; }
+.custom-tree-grid .text-center { text-align: center !important; }
+.custom-tree-grid .bold { font-weight: bold !important; }
+.custom-tree-grid .hidden { display: none !important; }
+.custom-tree-grid .text-muted { color: var(--text-muted) !important; }
+
+/* Tree Toggle Icon */
+.custom-tree-grid .tree-toggle {
+    cursor: pointer;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    text-align: center;
+    border: 1px solid var(--text-muted);
+    background: var(--bg-card);
+    color: var(--text);
+    line-height: 12px;
+    font-size: 10px;
+    margin-right: 6px;
+    user-select: none;
+    vertical-align: middle;
+}

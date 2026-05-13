@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="frm_code">
+
+    <!-- 코드그룹 -->
+    <select id="selectGroups" parameterType="map" resultType="com.saleson.frame.common.dto.CodeGroupResDto">
+        SELECT grp_code, grp_name
+          FROM tb_code_group
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (grp_code LIKE '%' || #{keyword} || '%' OR grp_name LIKE '%' || #{keyword} || '%')
+            </if>
+        </where>
+         ORDER BY grp_code
+    </select>
+
+    <insert id="insertGroup" parameterType="map">
+        INSERT INTO tb_code_group (grp_code, grp_name)
+        VALUES (#{grpCode}, #{grpName})
+    </insert>
+
+    <update id="updateGroup" parameterType="map">
+        UPDATE tb_code_group SET grp_name = #{grpName}
+         WHERE grp_code = #{grpCode}
+    </update>
+
+    <delete id="deleteGroupCodes" parameterType="map">
+        DELETE FROM tb_code WHERE grp_code = #{grpCode}
+    </delete>
+
+    <delete id="deleteGroup" parameterType="map">
+        DELETE FROM tb_code_group WHERE grp_code = #{grpCode}
+    </delete>
+
+    <!-- 코드상세 -->
+    <select id="selectCodes" parameterType="map" resultType="com.saleson.frame.common.dto.CodeResDto">
+        SELECT grp_code, code, code_name, sort_order, use_yn, attr1, attr2, attr3
+          FROM tb_code
+         WHERE grp_code = #{grpCode}
+         ORDER BY sort_order, code
+    </select>
+
+    <insert id="insertCode" parameterType="map">
+        INSERT INTO tb_code (grp_code, code, code_name, sort_order, use_yn, attr1, attr2, attr3)
+        VALUES (#{grpCode}, #{code}, #{codeName}, #{sortOrder}, COALESCE(#{useYn}, 'Y'), #{attr1}, #{attr2}, #{attr3})
+    </insert>
+
+    <update id="updateCode" parameterType="map">
+        UPDATE tb_code
+           SET code_name = #{codeName},
+               sort_order = #{sortOrder},
+               use_yn = #{useYn},
+               attr1 = #{attr1},
+               attr2 = #{attr2},
+               attr3 = #{attr3}
+         WHERE grp_code = #{grpCode} AND code = #{code}
+    </update>
+
+    <delete id="deleteCode" parameterType="map">
+        DELETE FROM tb_code WHERE grp_code = #{grpCode} AND code = #{code}
+    </delete>
+
+</mapper>

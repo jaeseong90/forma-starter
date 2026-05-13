@@ -1,0 +1,255 @@
+<div class="forma-page">
+    <div class="forma-page-header">
+        <h1 class="forma-page-title" id="title-FRM_CODE"></h1>
+        <div id="toolbar-FRM_CODE"></div>
+    </div>
+    <div class="forma-content">
+        <div id="search-FRM_CODE"></div>
+        <div class="forma-split-h" id="split-FRM_CODE" style="min-height:560px">
+            <div class="forma-split-panel" style="width:320px">
+                <div class="forma-section" style="height:100%">
+                    <div class="forma-section-title">코드그룹</div>
+                    <div id="grid1-FRM_CODE"></div>
+                </div>
+            </div>
+            <div class="forma-split-handle"></div>
+            <div class="forma-split-panel" style="flex:1; display:flex; flex-direction:column; gap:8px;">
+                <div class="forma-section">
+                    <div class="forma-section-title" id="group-title-FRM_CODE">그룹정보</div>
+                    <div id="form-FRM_CODE"></div>
+                </div>
+                <div class="forma-section" style="flex:1">
+                    <div class="forma-section-title" id="code-title-FRM_CODE">코드목록</div>
+                    <div id="grid2-FRM_CODE"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+(async function() {
+    const PGM = 'FRM_CODE';
+    const S = PGM;
+    const listener = platform.initListener(PGM);
+    const ctx = { selectedGrpCode: null, isNew: false };
+
+    await platform.startPage(PGM, listener);
+
+    FormaUtil.initSplit('#split-' + S);
+
+    ctx.searchForm = new FormaForm('#search-' + S, {
+        search: true,
+        elements: [
+            { field: 'keyword', label: '검색어', placeholder: '그룹코드 / 그룹명' }
+        ]
+    });
+
+    // 좌측: 코드그룹 목록 (읽기전용)
+    ctx.grid1 = new FormaGrid('#grid1-' + S, {
+        rowNum: true,
+        columns: [
+            { field: 'grpCode', label: '그룹코드', width: 120 },
+            { field: 'grpName', label: '그룹명', width: 150 }
+        ],
+        onRowClick: function(row) {
+            if (!row || !row.grpCode) return;
+            ctx.selectedGrpCode = row.grpCode;
+            ctx.isNew = false;
+            ctx.groupForm.setData({ grpCode: row.grpCode, grpName: row.grpName });
+            ctx.groupForm.setReadonly('grpCode', true);
+            document.getElementById('group-title-' + S).textContent = '그룹정보 [' + row.grpCode + ']';
+            document.getElementById('code-title-' + S).textContent = '코드목록 [' + row.grpCode + ' - ' + row.grpName + ']';
+            loadCodes(row.grpCode);
+        }
+    });
+
+    // 우측 상단: 그룹 상세 폼
+    ctx.groupForm = new FormaForm('#form-' + S, {
+        columns: 2,
+        elements: [
+            { field: 'grpCode', label: '그룹코드', required: true, maxLength: 20, readOnly: true },
+            { field: 'grpName', label: '그룹명', required: true, maxLength: 100 }
+        ]
+    });
+
+    // 우측 하단: 코드상세 그리드
+    ctx.grid2 = new FormaGrid('#grid2-' + S, {
+        editable: true, checkable: true, rowNum: true,
+        columns: [
+            { field: 'code', label: '코드', width: 130, editor: 'text', required: true },
+            { field: 'codeName', label: '코드명', width: 200, editor: 'text', required: true },
+            { field: 'sortOrder', label: '정렬순서', width: 80, editor: 'text', type: 'number', align: 'center' },
+            { field: 'useYn', label: '사용여부', width: 80, editor: 'switch', align: 'center' },
+            { field: 'attr1', label: '속성1', width: 120, editor: 'text' },
+            { field: 'attr2', label: '속성2', width: 120, editor: 'text' },
+            { field: 'attr3', label: '속성3', width: 120, editor: 'text' }
+        ]
+    });
+
+    // 코드 PK는 INSERT 후 수정 불가
+    listener.gridEditor.beforeEditStart = function(grid, record, curCol) {
+        if (grid === ctx.grid2 && curCol.field === 'code' && record._gstat !== 'I') return false;
+        return true;
+    };
+
+    function loadCodes(grpCode) {
+        platform.post('/frm_code/selectCodes', { grpCode: grpCode }, new Callback(function(result) {
+            if (result.resultCode === RESULT_CODE.OK) ctx.grid2.setData(result.resultData);
+        }));
+    }
+
+    function clearDetail() {
+        ctx.selectedGrpCode = null;
+        ctx.isNew = false;
+        ctx.groupForm.clear();
+        ctx.groupForm.setReadonly('grpCode', true);
+        ctx.grid2.clearData();
+        document.getElementById('group-title-' + S).textContent = '그룹정보';
+        document.getElementById('code-title-' + S).textContent = '코드목록';
+    }
+
+    // 조회
+    listener.button.search.click = function() {
+        clearDetail();
+        platform.post('/frm_code/selectGroups', ctx.searchForm.getData(), new Callback(function(result) {
+            if (result.resultCode === RESULT_CODE.OK) ctx.grid1.setData(result.resultData);
+        }));
+    };
+
+    // 신규 (그룹 추가)
+    listener.button.news.click = function() {
+        ctx.selectedGrpCode = null;
+        ctx.isNew = true;
+        ctx.groupForm.clear();
+        ctx.groupForm.setReadonly('grpCode', false);
+        ctx.grid2.clearData();
+        document.getElementById('group-title-' + S).textContent = '그룹정보 [신규]';
+        document.getElementById('code-title-' + S).textContent = '코드목록';
+        ctx.groupForm.focus('grpCode');
+    };
+
+    // etc1: 코드추가
+    listener.button.etc1.click = function() {
+        if (!ctx.selectedGrpCode) {
+            FormaPopup.alert.show('코드그룹을 먼저 선택하거나 저장하세요.');
+            return;
+        }
+        var maxSort = 0;
+        ctx.grid2.getData().forEach(function(r) {
+            var s = parseInt(r.sortOrder) || 0;
+            if (s > maxSort) maxSort = s;
+        });
+        ctx.grid2.addRow({ grpCode: ctx.selectedGrpCode, code: '', codeName: '', sortOrder: maxSort + 1, useYn: 'Y' });
+    };
+
+    // 저장
+    listener.button.save.click = function() {
+        var groupData = ctx.groupForm.getData();
+        var modCodes = ctx.grid2.getModifiedData();
+        var hasGroupChange = ctx.isNew || ctx.groupForm.isDirty();
+        var hasCodeChange = modCodes && modCodes.length > 0;
+
+        if (!hasGroupChange && !hasCodeChange) {
+            FormaPopup.toast.info('변경된 내용이 없습니다.');
+            return;
+        }
+
+        // 그룹 폼 검증
+        if (hasGroupChange && !ctx.groupForm.validate()) return;
+        // 코드 그리드 검증
+        if (hasCodeChange && !ctx.grid2.checkGridValidation()) return;
+
+        function saveGroupPromise() {
+            if (!hasGroupChange) return Promise.resolve();
+            var groups = [{
+                grpCode: groupData.grpCode,
+                grpName: groupData.grpName,
+                gstat: ctx.isNew ? 'I' : 'U'
+            }];
+            return new Promise(function(resolve, reject) {
+                platform.post('/frm_code/saveGroups', groups, new Callback(function(result) {
+                    if (result.resultCode === RESULT_CODE.OK) resolve();
+                    else reject(result.resultMsg);
+                }));
+            });
+        }
+
+        function saveCodePromise() {
+            if (!hasCodeChange) return Promise.resolve();
+            modCodes.forEach(function(c) { c.grpCode = ctx.selectedGrpCode || groupData.grpCode; });
+            return new Promise(function(resolve, reject) {
+                platform.post('/frm_code/saveCodes', modCodes, new Callback(function(result) {
+                    if (result.resultCode === RESULT_CODE.OK) resolve();
+                    else reject(result.resultMsg);
+                }));
+            });
+        }
+
+        // 그룹 먼저 저장 → 코드 저장 (FK 순서 보장)
+        saveGroupPromise().then(saveCodePromise).then(function() {
+            FormaPopup.toast.success('저장되었습니다.');
+            var savedGrpCode = ctx.selectedGrpCode || groupData.grpCode;
+            ctx.isNew = false;
+            ctx.selectedGrpCode = savedGrpCode;
+            // 그룹 목록 재조회 (검색 조건 없이 전체 조회)
+            ctx.searchForm.clear();
+            platform.post('/frm_code/selectGroups', {}, new Callback(function(result) {
+                if (result.resultCode === RESULT_CODE.OK) {
+                    ctx.grid1.setData(result.resultData);
+                    // 저장한 그룹 재선택
+                    ctx.groupForm.setReadonly('grpCode', true);
+                    loadCodes(savedGrpCode);
+                }
+            }));
+        }).catch(function(msg) {
+            FormaPopup.toast.error(msg || '저장 중 오류가 발생했습니다.');
+        });
+    };
+
+    // 삭제
+    listener.button.del.click = async function() {
+        // 코드 체크된 게 있으면 코드 삭제
+        var checkedCodes = ctx.grid2.getCheckedData();
+        if (checkedCodes && checkedCodes.length > 0) {
+            var ok = await FormaPopup.confirm.show(checkedCodes.length + '건의 코드를 삭제하시겠습니까?');
+            if (!ok) return;
+            var deleteData = checkedCodes.map(function(c) {
+                return { grpCode: ctx.selectedGrpCode, code: c.code };
+            });
+            platform.post('/frm_code/deleteCodes', deleteData, new Callback(function(result) {
+                if (result.resultCode === RESULT_CODE.OK) {
+                    FormaPopup.toast.success('삭제되었습니다.');
+                    loadCodes(ctx.selectedGrpCode);
+                }
+            }));
+            return;
+        }
+
+        // 코드 체크 없으면 그룹 삭제
+        if (!ctx.selectedGrpCode) {
+            FormaPopup.alert.show('삭제할 코드그룹을 선택하세요.');
+            return;
+        }
+        var ok = await FormaPopup.confirm.show('코드그룹 [' + ctx.selectedGrpCode + ']을 삭제하시겠습니까?\n(하위 코드도 함께 삭제됩니다)');
+        if (!ok) return;
+        platform.post('/frm_code/deleteGroups', [{ grpCode: ctx.selectedGrpCode }], new Callback(function(result) {
+            if (result.resultCode === RESULT_CODE.OK) {
+                FormaPopup.toast.success('삭제되었습니다.');
+                clearDetail();
+                listener.button.search.click();
+            }
+        }));
+    };
+
+    // 초기화
+    listener.button.init.click = function() {
+        ctx.searchForm.clear();
+        ctx.grid1.clearData();
+        clearDetail();
+    };
+
+    // 초기 조회
+    listener.button.search.click();
+    listener.initializedPgm = true;
+})();
+</script>

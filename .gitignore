@@ -1,0 +1,51 @@
+# Build
+build/
+.gradle/
+out/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads (runtime)
+uploads/
+
+# One-off scripts / parsed artifacts
+tmp/
+/export/
+__pycache__/
+
+# 실데이터 시드(사내 임직원 명부 등) — 저장소에 포함하지 않음
+/src/main/resources/seed/
+
+# Local business data (not for distribution)
+/2025/
+/2026/
+
+# Env
+.env
+*.log
+
+# 환경별 application.yml — 시크릿(DB 비밀번호, API 키, JWT secret) 평문 커밋 방지
+# .example 파일만 저장소에 두고, 신규 프로젝트는 application-{local,prod}.yml.example 을
+# 복사해 application-{local,prod}.yml 로 만들어 사용한다.
+/src/main/resources/application-local.yml
+/src/main/resources/application-prod.yml
+
+# Claude Code — 공유 자산(commands/skills/settings.json)은 커밋, 개인 로컬만 무시
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+
+# Cookie files
+cookies*.txt
+
+# Business documents (xlsx)
+*.xlsx
+
+/bin

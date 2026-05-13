@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="admin">
+
+    <!-- ═══ 사용자 관리 ═══ -->
+
+    <select id="selectUsers" parameterType="map" resultType="map">
+        SELECT u.user_id, u.user_nm, u.dept_code, u.emp_no, u.email, u.grade_cd, u.use_yn,
+               COALESCE(d.dept_name, '') AS dept_name,
+               COALESCE(g.code_name, '') AS grade_nm,
+               (SELECT STRING_AGG(ur.role_cd, ',' ORDER BY ur.role_cd)
+                FROM tb_user_role ur WHERE ur.user_id = u.user_id) AS role_cds
+        FROM tb_user u
+        LEFT JOIN tb_dept d ON u.dept_code = d.dept_code
+        LEFT JOIN tb_code g ON g.grp_code = 'GRADE' AND g.code = u.grade_cd
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (u.user_id LIKE '%' || #{keyword} || '%'
+                     OR u.user_nm LIKE '%' || #{keyword} || '%'
+                     OR u.emp_no LIKE '%' || #{keyword} || '%'
+                     OR u.email LIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="useYn != null and useYn != ''">
+                AND u.use_yn = #{useYn}
+            </if>
+            <if test="deptCode != null and deptCode != ''">
+                AND u.dept_code = #{deptCode}
+            </if>
+            <if test="gradeCd != null and gradeCd != ''">
+                AND u.grade_cd = #{gradeCd}
+            </if>
+        </where>
+        ORDER BY u.user_id
+    </select>
+
+    <insert id="insertUser" parameterType="map">
+        INSERT INTO tb_user (user_id, user_pw, user_nm, dept_code, emp_no, email, grade_cd, use_yn)
+        VALUES (#{userId}, #{userPw}, #{userNm}, #{deptCode}, #{empNo}, #{email}, #{gradeCd}, #{useYn})
+    </insert>
+
+    <update id="updateUser" parameterType="map">
+        UPDATE tb_user
+        SET user_nm = #{userNm},
+            dept_code = #{deptCode},
+            emp_no = #{empNo},
+            email = #{email},
+            grade_cd = #{gradeCd},
+            use_yn = #{useYn}
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="updateUserEmpEmailPw" parameterType="map">
+        UPDATE tb_user
+        SET emp_no = #{empNo},
+            email = #{email},
+            user_pw = #{userPw}
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="updateAdminPw" parameterType="map">
+        UPDATE tb_user
+        SET user_pw = #{userPw}
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="resetPassword" parameterType="map">
+        UPDATE tb_user SET user_pw = #{userPw} WHERE user_id = #{userId}
+    </update>
+
+    <select id="selectUserEmpNo" parameterType="map" resultType="string">
+        SELECT emp_no FROM tb_user WHERE user_id = #{userId}
+    </select>
+
+    <delete id="deleteUser" parameterType="map">
+        DELETE FROM tb_user WHERE user_id = #{userId}
+    </delete>
+
+    <!-- ═══ 사용자-역할 매핑 ═══ -->
+
+    <select id="selectUserRoles" parameterType="map" resultType="map">
+        SELECT ur.user_id, ur.role_cd, r.role_nm
+        FROM tb_user_role ur
+        JOIN tb_role r ON ur.role_cd = r.role_cd
+        WHERE ur.user_id = #{userId}
+        ORDER BY ur.role_cd
+    </select>
+
+    <select id="selectRolesWithAssign" parameterType="map" resultType="map">
+        SELECT r.role_cd, r.role_nm,
+               CASE WHEN ur.user_id IS NOT NULL THEN 'Y' ELSE 'N' END AS assigned
+          FROM tb_role r
+          LEFT JOIN tb_user_role ur ON r.role_cd = ur.role_cd AND ur.user_id = #{userId}
+         WHERE r.use_yn = 'Y'
+         ORDER BY r.role_cd
+    </select>
+
+    <delete id="deleteUserRoles" parameterType="map">
+        DELETE FROM tb_user_role WHERE user_id = #{userId}
+    </delete>
+
+    <insert id="insertUserRole" parameterType="map">
+        INSERT INTO tb_user_role (user_id, role_cd) VALUES (#{userId}, #{roleCd})
+    </insert>
+
+    <!-- ═══ 역할 관리 ═══ -->
+
+    <select id="selectRoles" parameterType="map" resultType="map">
+        SELECT role_cd, role_nm, description, use_yn
+        FROM tb_role
+        ORDER BY role_cd
+    </select>
+
+    <insert id="insertRole" parameterType="map">
+        INSERT INTO tb_role (role_cd, role_nm, description, use_yn, created_by, created_at)
+        VALUES (#{roleCd}, #{roleNm}, #{description}, #{useYn}, 'admin', NOW())
+    </insert>
+
+    <update id="updateRole" parameterType="map">
+        UPDATE tb_role
+        SET role_nm = #{roleNm}, description = #{description}, use_yn = #{useYn}
+        WHERE role_cd = #{roleCd}
+    </update>
+
+    <delete id="deleteRole" parameterType="map">
+        DELETE FROM tb_role WHERE role_cd = #{roleCd}
+    </delete>
+
+    <!-- ═══ 역할-프로그램 권한 ═══ -->
+
+    <select id="selectRoleAuths" parameterType="map" resultType="map">
+        SELECT pi.pgm_id, pi.pgm_nm,
+               COALESCE(ra.srch_yn, 'N') AS srch_yn,
+               COALESCE(ra.new_yn, 'N') AS new_yn,
+               COALESCE(ra.save_yn, 'N') AS save_yn,
+               COALESCE(ra.del_yn, 'N') AS del_yn,
+               COALESCE(ra.prnt_yn, 'N') AS prnt_yn,
+               COALESCE(ra.upld_yn, 'N') AS upld_yn,
+               COALESCE(ra.init_yn, 'N') AS init_yn,
+               pi.etc_desc1, pi.etc_desc2, pi.etc_desc3,
+               COALESCE(ra.etc1_yn, 'N') AS etc1_yn,
+               COALESCE(ra.etc2_yn, 'N') AS etc2_yn,
+               COALESCE(ra.etc3_yn, 'N') AS etc3_yn
+        FROM tb_pgm_info pi
+        LEFT JOIN tb_role_auth ra ON pi.pgm_id = ra.pgm_id AND ra.role_cd = #{roleCd}
+        WHERE COALESCE(pi.use_yn, 'Y') = 'Y'
+        ORDER BY pi.pgm_id
+    </select>
+
+    <delete id="deleteRoleAuth" parameterType="map">
+        DELETE FROM tb_role_auth WHERE role_cd = #{roleCd} AND pgm_id = #{pgmId}
+    </delete>
+
+    <insert id="insertRoleAuth" parameterType="map">
+        INSERT INTO tb_role_auth (role_cd, pgm_id, srch_yn, new_yn, save_yn, del_yn, prnt_yn, upld_yn, init_yn, etc1_yn, etc2_yn, etc3_yn)
+        VALUES (#{roleCd}, #{pgmId}, #{srchYn}, #{newYn}, #{saveYn}, #{delYn}, #{prntYn}, #{upldYn}, #{initYn},
+                COALESCE(#{etc1Yn}, 'N'), COALESCE(#{etc2Yn}, 'N'), COALESCE(#{etc3Yn}, 'N'))
+    </insert>
+
+    <!-- ═══ 메뉴 관리 ═══ -->
+
+    <select id="selectMenus" parameterType="map" resultType="map">
+        SELECT m.menu_id, m.menu_nm, m.parent_id, m.menu_type, m.pgm_id, m.url,
+               COALESCE(pi.icon, '') AS icon, m.sort_order, m.use_yn,
+               COALESCE(p.menu_nm, '') AS parent_nm
+        FROM tb_menu m
+        LEFT JOIN tb_menu p ON m.parent_id = p.menu_id
+        LEFT JOIN tb_pgm_info pi ON m.pgm_id = pi.pgm_id
+        ORDER BY m.sort_order, m.menu_id
+    </select>
+
+    <insert id="insertMenu" parameterType="map">
+        INSERT INTO tb_menu (menu_id, menu_nm, parent_id, menu_type, pgm_id, url, sort_order, use_yn)
+        VALUES (#{menuId}, #{menuNm}, #{parentId}, #{menuType}, #{pgmId}, #{url}, #{sortOrder}, #{useYn})
+    </insert>
+
+    <update id="updateMenu" parameterType="map">
+        UPDATE tb_menu
+        SET menu_nm = #{menuNm}, parent_id = #{parentId}, menu_type = #{menuType},
+            pgm_id = #{pgmId}, url = #{url}, sort_order = #{sortOrder}, use_yn = #{useYn}
+        WHERE menu_id = #{menuId}
+    </update>
+
+    <delete id="deleteMenu" parameterType="map">
+        DELETE FROM tb_menu WHERE menu_id = #{menuId}
+    </delete>
+
+    <!-- ═══ 프로그램 관리 ═══ -->
+
+    <select id="selectPrograms" parameterType="map" resultType="map">
+        SELECT pgm_id, pgm_nm, icon, srch_yn, new_yn, save_yn, del_yn, prnt_yn, upld_yn, init_yn,
+               etc_desc1, etc_desc2, etc_desc3, etc_desc4, etc_desc5, use_yn
+        FROM tb_pgm_info
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (pgm_id LIKE '%' || #{keyword} || '%' OR pgm_nm LIKE '%' || #{keyword} || '%')
+            </if>
+        </where>
+        ORDER BY pgm_id
+    </select>
+
+    <insert id="insertProgram" parameterType="map">
+        INSERT INTO tb_pgm_info (pgm_id, pgm_nm, icon, srch_yn, new_yn, save_yn, del_yn, prnt_yn, upld_yn, init_yn,
+                                  etc_desc1, etc_desc2, etc_desc3, etc_desc4, etc_desc5, use_yn)
+        VALUES (#{pgmId}, #{pgmNm}, #{icon}, #{srchYn}, #{newYn}, #{saveYn}, #{delYn}, #{prntYn}, #{upldYn}, #{initYn},
+                #{etcDesc1}, #{etcDesc2}, #{etcDesc3}, #{etcDesc4}, #{etcDesc5}, COALESCE(#{useYn}, 'Y'))
+    </insert>
+
+    <update id="updateProgram" parameterType="map">
+        UPDATE tb_pgm_info
+        SET pgm_nm=#{pgmNm}, icon=#{icon}, srch_yn=#{srchYn}, new_yn=#{newYn}, save_yn=#{saveYn}, del_yn=#{delYn},
+            prnt_yn=#{prntYn}, upld_yn=#{upldYn}, init_yn=#{initYn},
+            etc_desc1=#{etcDesc1}, etc_desc2=#{etcDesc2}, etc_desc3=#{etcDesc3}, etc_desc4=#{etcDesc4}, etc_desc5=#{etcDesc5},
+            use_yn=COALESCE(#{useYn}, 'Y')
+        WHERE pgm_id = #{pgmId}
+    </update>
+
+    <delete id="deleteProgram" parameterType="map">
+        DELETE FROM tb_pgm_info WHERE pgm_id = #{pgmId}
+    </delete>
+
+    <!-- ═══ 부서 목록 ═══ -->
+
+    <select id="selectDepts" resultType="map">
+        SELECT dept_code, dept_name, parent_code, dept_level
+        FROM tb_dept WHERE use_yn = 'Y'
+        ORDER BY sort_order, dept_code
+    </select>
+
+</mapper>

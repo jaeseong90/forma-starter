@@ -1,0 +1,377 @@
+<style>
+    .ref-tbl { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 4px; }
+    .ref-tbl th { background: var(--bg-group); padding: 4px 8px; text-align: left; border: 1px solid var(--border-group); font-weight: 600; white-space: nowrap; color: var(--text); }
+    .ref-tbl td { padding: 3px 8px; border: 1px solid var(--border-light); color: var(--text); }
+    .ref-tbl tr:hover td { background: var(--bg-alt); }
+    .ref-tbl code { background: var(--bg-alt); padding: 1px 4px; border-radius: 2px; font-size: 11px; }
+    details summary { outline: none; cursor: pointer; }
+    .demo-section { background: var(--bg-card); border: 1px solid var(--border-group); border-radius: 6px; padding: 16px; margin-bottom: 12px; }
+    .demo-title { font-weight: 700; font-size: 14px; margin-bottom: 10px; }
+    .demo-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+    .demo-output { font-size: 11px; background: var(--bg-alt); border: 1px solid var(--border); padding: 8px; margin-top: 8px; max-height: 200px; overflow: auto; display: none; white-space: pre-wrap; font-family: 'Consolas', monospace; }
+</style>
+<div class="forma-page" style="max-width:1400px">
+    <div class="forma-page-header">
+        <h1 class="forma-page-title">FormaSheet 데모</h1>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:4px">
+            jspreadsheet CE v4 래퍼 |
+            <a href="/pages/dev/GRID_DEMO.html">Grid 데모</a> |
+            <a href="/pages/dev/FORM_DEMO.html">Form 데모</a> |
+            <a href="/pages/dev/COMP_DEMO.html">컴포넌트 데모</a> |
+            <a href="/">홈</a>
+        </div>
+    </div>
+    <div class="forma-content">
+
+        <!-- API 레퍼런스 -->
+        <div class="demo-section">
+            <details>
+                <summary class="demo-title">API 레퍼런스</summary>
+                <table class="ref-tbl">
+                    <tr><th>생성자 옵션</th><th>타입</th><th>기본값</th><th>설명</th></tr>
+                    <tr><td>data</td><td>Array</td><td>null</td><td>2D 배열 데이터</td></tr>
+                    <tr><td>columns</td><td>Array</td><td>null</td><td>컬럼 정의 [{label, width, type, readOnly}]</td></tr>
+                    <tr><td>template</td><td>String</td><td>null</td><td>사전 정의 템플릿명 ('weekly-report')</td></tr>
+                    <tr><td>templateData</td><td>Object</td><td>null</td><td>템플릿 바인딩 데이터</td></tr>
+                    <tr><td>width</td><td>String</td><td>'100%'</td><td>시트 너비</td></tr>
+                    <tr><td>height</td><td>Number</td><td>400</td><td>시트 높이 (px)</td></tr>
+                    <tr><td>minRows</td><td>Number</td><td>5</td><td>최소 행 수</td></tr>
+                    <tr><td>minCols</td><td>Number</td><td>6</td><td>최소 열 수</td></tr>
+                    <tr><td>editable</td><td>Boolean</td><td>true</td><td>편집 가능 여부</td></tr>
+                    <tr><td>showToolbar</td><td>Boolean</td><td>true</td><td>서식 툴바 표시</td></tr>
+                    <tr><td>onCellChange</td><td>Function</td><td>null</td><td>(instance, cell, col, row, value)</td></tr>
+                    <tr><td>onSelectionChange</td><td>Function</td><td>null</td><td>({x1, y1, x2, y2})</td></tr>
+                    <tr><td>onReady</td><td>Function</td><td>null</td><td>(sheet) 초기화 완료</td></tr>
+                </table>
+                <table class="ref-tbl" style="margin-top:8px">
+                    <tr><th>메서드</th><th>설명</th></tr>
+                    <tr><td><code>getData()</code></td><td>전체 데이터 2D 배열 반환</td></tr>
+                    <tr><td><code>setData(data)</code></td><td>2D 배열 데이터 세팅</td></tr>
+                    <tr><td><code>getJsonData()</code></td><td>템플릿 데이터 영역을 [{field:value}] 객체 배열로 반환</td></tr>
+                    <tr><td><code>setJsonData(items)</code></td><td>객체 배열로 데이터 영역 채우기</td></tr>
+                    <tr><td><code>loadTemplate(name, data)</code></td><td>템플릿 로드 + 데이터 바인딩</td></tr>
+                    <tr><td><code>getCellValue(row, col)</code></td><td>셀 값 조회</td></tr>
+                    <tr><td><code>setCellValue(row, col, value)</code></td><td>셀 값 설정</td></tr>
+                    <tr><td><code>setCellStyle(row, col, style)</code></td><td>셀 스타일 {background, fontWeight, color, textAlign}</td></tr>
+                    <tr><td><code>mergeCells(row, col, colspan, rowspan)</code></td><td>셀 병합</td></tr>
+                    <tr><td><code>setReadonly(row, col, bool)</code></td><td>읽기 전용 설정</td></tr>
+                    <tr><td><code>insertRow(idx, data)</code></td><td>행 삽입 (템플릿: 객체, 일반: 배열)</td></tr>
+                    <tr><td><code>deleteRow(idx)</code></td><td>행 삭제</td></tr>
+                    <tr><td><code>findDataRow(field, value)</code></td><td>데이터 행 검색 (템플릿 모드)</td></tr>
+                    <tr><td><code>updateDataField(rowIdx, field, value)</code></td><td>특정 필드 업데이트 (템플릿 모드)</td></tr>
+                    <tr><td><code>getDataRow(rowIdx)</code></td><td>행 데이터 객체 반환 (템플릿 모드)</td></tr>
+                    <tr><td><code>getDataRowCount()</code></td><td>데이터 행 수</td></tr>
+                    <tr><td><code>exportCsv(filename)</code></td><td>CSV 다운로드</td></tr>
+                    <tr><td><code>print(title)</code></td><td>인쇄 미리보기</td></tr>
+                    <tr><td><code>undo() / redo()</code></td><td>실행 취소 / 다시 실행</td></tr>
+                    <tr><td><code>clear()</code></td><td>전체 데이터 초기화</td></tr>
+                    <tr><td><code>destroy()</code></td><td>인스턴스 제거</td></tr>
+                </table>
+            </details>
+        </div>
+
+        <!-- 1. 기본 시트 -->
+        <div class="demo-section">
+            <div class="demo-title">1. 기본 시트 (Plain Mode)</div>
+            <div class="demo-btns">
+                <button class="forma-btn forma-btn-sm" id="btn-p-getdata">getData()</button>
+                <button class="forma-btn forma-btn-sm" id="btn-p-setdata">setData(샘플)</button>
+                <button class="forma-btn forma-btn-sm" id="btn-p-style">첫 행 헤더 스타일</button>
+                <button class="forma-btn forma-btn-sm" id="btn-p-merge">B2:C3 셀 병합</button>
+                <button class="forma-btn forma-btn-sm" id="btn-p-addrow">행 추가</button>
+                <button class="forma-btn forma-btn-sm" id="btn-p-delrow">마지막 행 삭제</button>
+                <button class="forma-btn forma-btn-sm" id="btn-p-readonly">A1 읽기전용</button>
+                <button class="forma-btn forma-btn-sm" id="btn-p-print">인쇄</button>
+                <button class="forma-btn forma-btn-sm" id="btn-p-csv">CSV 내보내기</button>
+            </div>
+            <div id="sheet-plain"></div>
+            <pre class="demo-output" id="out-plain"></pre>
+        </div>
+
+        <!-- 2. 컬럼 정의 시트 -->
+        <div class="demo-section">
+            <div class="demo-title">2. 컬럼 정의 시트 (columns 옵션)</div>
+            <div class="demo-btns">
+                <button class="forma-btn forma-btn-sm" id="btn-c-getdata">getData()</button>
+                <button class="forma-btn forma-btn-sm" id="btn-c-cellstyle">금액 셀 강조</button>
+            </div>
+            <div id="sheet-columns"></div>
+            <pre class="demo-output" id="out-columns"></pre>
+        </div>
+
+        <!-- 3. 주간보고 템플릿 -->
+        <div class="demo-section">
+            <div class="demo-title">3. 주간보고 템플릿 (weekly-report)</div>
+            <div class="demo-btns">
+                <button class="forma-btn forma-btn-sm forma-btn-primary" id="btn-t-load">템플릿 로드</button>
+                <button class="forma-btn forma-btn-sm" id="btn-t-json">getJsonData()</button>
+                <button class="forma-btn forma-btn-sm" id="btn-t-addrow">행 추가 (KT 신규)</button>
+                <button class="forma-btn forma-btn-sm" id="btn-t-find">findDataRow('기타')</button>
+                <button class="forma-btn forma-btn-sm" id="btn-t-update">기타 행 금주 append</button>
+                <button class="forma-btn forma-btn-sm" id="btn-t-count">데이터 행 수</button>
+                <button class="forma-btn forma-btn-sm" id="btn-t-csv">CSV 내보내기</button>
+                <button class="forma-btn forma-btn-sm" id="btn-t-print">인쇄</button>
+            </div>
+            <div id="sheet-template"></div>
+            <pre class="demo-output" id="out-template"></pre>
+        </div>
+
+        <!-- 4. 읽기전용 시트 -->
+        <div class="demo-section">
+            <div class="demo-title">4. 읽기전용 시트 (editable: false)</div>
+            <div id="sheet-readonly"></div>
+        </div>
+
+        <!-- 5. 이벤트 콜백 -->
+        <div class="demo-section">
+            <div class="demo-title">5. 이벤트 콜백 (onCellChange, onSelectionChange)</div>
+            <p style="font-size:11px;color:var(--text-muted);margin-bottom:6px">셀을 편집하거나 선택 영역을 변경하면 아래 로그에 기록됩니다.</p>
+            <div id="sheet-events"></div>
+            <pre class="demo-output" id="out-events" style="display:block;max-height:120px"></pre>
+        </div>
+
+    </div>
+</div>
+
+<script>
+(function() {
+    // ═══════════════════════════════════════════════════════
+    // 독립 실행 시 의존성 자동 로드
+    // ═══════════════════════════════════════════════════════
+    function loadScript(src) {
+        return new Promise(function(resolve) {
+            if (document.querySelector('script[src="' + src + '"]')) { resolve(); return; }
+            var s = document.createElement('script'); s.src = src;
+            s.onload = resolve; s.onerror = resolve;
+            document.head.appendChild(s);
+        });
+    }
+    function loadCSS(href) {
+        if (!document.querySelector('link[href="' + href + '"]')) {
+            var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = href;
+            document.head.appendChild(l);
+        }
+    }
+
+    if (typeof FormaSheet === 'undefined') {
+        loadCSS('/assets/css/forma.css');
+        loadScript('/assets/js/framework/forma.sheet.js').then(initDemo);
+        return;
+    }
+    initDemo();
+
+    function initDemo() {
+
+    // ═══════════════════════════════════════════════════════
+    // 유틸: 출력 영역에 텍스트 표시
+    // ═══════════════════════════════════════════════════════
+    function show(id, text) {
+        var el = document.getElementById(id);
+        el.style.display = 'block';
+        el.textContent = text;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // 1. 기본 시트
+    // ═══════════════════════════════════════════════════════
+    var s1 = new FormaSheet('#sheet-plain', {
+        data: [
+            ['이름', '부서', '직급', '연락처', '이메일'],
+            ['홍길동', '영업팀', '과장', '010-1234-5678', 'hong@example.com'],
+            ['김영희', 'R&D', '대리', '010-2345-6789', 'kim@example.com'],
+            ['이철수', '기획팀', '차장', '010-3456-7890', 'lee@example.com'],
+            ['박지은', '디자인팀', '사원', '010-4567-8901', 'park@example.com'],
+            ['', '', '', '', '']
+        ],
+        height: 220,
+        editable: true,
+        showToolbar: true
+    });
+
+    document.getElementById('btn-p-getdata').onclick = function() {
+        show('out-plain', 'getData() → ' + JSON.stringify(s1.getData(), null, 2));
+    };
+    document.getElementById('btn-p-setdata').onclick = function() {
+        s1.setData([
+            ['제품', '수량', '단가', '금액', '비고'],
+            ['노트북 Pro', '10', '1,500,000', '15,000,000', '재고 확인'],
+            ['모니터 27"', '20', '500,000', '10,000,000', ''],
+            ['무선 키보드', '50', '80,000', '4,000,000', '대량 할인'],
+            ['합계', '', '', '29,000,000', '']
+        ]);
+        show('out-plain', 'setData() 완료 — 제품/수량/단가 데이터로 교체');
+    };
+    document.getElementById('btn-p-style').onclick = function() {
+        for (var i = 0; i < 5; i++) {
+            s1.setCellStyle(0, i, { fontWeight: 'bold', background: '#e3effa', textAlign: 'center' });
+        }
+        show('out-plain', 'setCellStyle() — 첫 행에 헤더 스타일 적용 (굵게, 파란 배경, 중앙)');
+    };
+    document.getElementById('btn-p-merge').onclick = function() {
+        s1.mergeCells(1, 1, 2, 2);
+        show('out-plain', 'mergeCells(1, 1, 2, 2) — B2:C3 영역 병합');
+    };
+    document.getElementById('btn-p-addrow').onclick = function() {
+        s1.insertRow(null, ['신규', '영업팀', '사원', '010-0000-0000', 'new@example.com']);
+        show('out-plain', 'insertRow() — 마지막 위치에 새 행 추가');
+    };
+    document.getElementById('btn-p-delrow').onclick = function() {
+        var data = s1.getData();
+        if (data.length > 1) {
+            s1.deleteRow(data.length - 1);
+            show('out-plain', 'deleteRow(' + (data.length - 1) + ') — 마지막 행 삭제');
+        }
+    };
+    document.getElementById('btn-p-readonly').onclick = function() {
+        s1.setReadonly(0, 0, true);
+        show('out-plain', 'setReadonly(0, 0, true) — A1 셀 읽기전용 설정');
+    };
+    document.getElementById('btn-p-print').onclick = function() { s1.print('기본 시트'); };
+    document.getElementById('btn-p-csv').onclick = function() { s1.exportCsv('기본시트'); };
+
+    // ═══════════════════════════════════════════════════════
+    // 2. 컬럼 정의 시트
+    // ═══════════════════════════════════════════════════════
+    var s2 = new FormaSheet('#sheet-columns', {
+        columns: [
+            { label: '품목코드', width: 100 },
+            { label: '품목명', width: 200 },
+            { label: '수량', width: 80, type: 'text' },
+            { label: '단가', width: 120, type: 'text' },
+            { label: '금액', width: 120, type: 'text', readOnly: true },
+            { label: '비고', width: 150 }
+        ],
+        data: [
+            ['ITM001', '서버 장비', '2', '15,000,000', '30,000,000', ''],
+            ['ITM002', '네트워크 스위치', '5', '2,000,000', '10,000,000', ''],
+            ['ITM003', '보안 솔루션', '1', '8,000,000', '8,000,000', '라이선스'],
+            ['', '', '', '', '', ''],
+        ],
+        height: 180,
+        editable: true,
+        showToolbar: false
+    });
+
+    document.getElementById('btn-c-getdata').onclick = function() {
+        show('out-columns', 'getData() → ' + JSON.stringify(s2.getData(), null, 2));
+    };
+    document.getElementById('btn-c-cellstyle').onclick = function() {
+        for (var r = 0; r < 3; r++) {
+            s2.setCellStyle(r, 4, { background: '#fff3cd', fontWeight: 'bold', textAlign: 'right' });
+        }
+        show('out-columns', '금액 컬럼(E1:E3) 강조 스타일 적용');
+    };
+
+    // ═══════════════════════════════════════════════════════
+    // 3. 주간보고 템플릿
+    // ═══════════════════════════════════════════════════════
+    var s3 = new FormaSheet('#sheet-template', {
+        template: 'weekly-report',
+        height: 420,
+        editable: true,
+        showToolbar: true
+    });
+
+    var sampleItems = [
+        { includeYn: true, custNm: '삼성전자', bizNm: 'ABC 프로젝트', prevPlan: '- 제안서 제출\n- 기술 미팅', thisWeek: '- 1차 미팅 완료\n- 요구사항 확인', nextWeek: '- 2차 기술 검토\n- 견적서 작성' },
+        { includeYn: true, custNm: 'LG전자', bizNm: 'DEF 프로젝트', prevPlan: '- 현황 파악', thisWeek: '- 담당자 미팅\n- 범위 협의', nextWeek: '- 제안서 초안 작성' },
+        { includeYn: true, custNm: 'SK텔레콤', bizNm: 'GHI 프로젝트', prevPlan: '', thisWeek: '- 신규 문의 접수\n- 니즈 파악', nextWeek: '- 방문 미팅 예정' },
+        { includeYn: true, custNm: '', bizNm: '기타', prevPlan: '', thisWeek: '- 내부 교육 참석\n- 시스템 점검', nextWeek: '- 팀 회의' }
+    ];
+
+    document.getElementById('btn-t-load').onclick = function() {
+        s3.loadTemplate('weekly-report', {
+            period: '2026.04.06(월) ~ 2026.04.10(금)',
+            ownerNm: '홍길동',
+            rptWeek: '2026-W15',
+            remark: '',
+            items: sampleItems
+        });
+        show('out-template', '템플릿 로드 완료 — ' + sampleItems.length + '건 데이터');
+    };
+    document.getElementById('btn-t-json').onclick = function() {
+        var data = s3.getJsonData();
+        show('out-template', 'getJsonData() 결과 (' + data.length + '건):\n' + JSON.stringify(data, null, 2));
+    };
+    document.getElementById('btn-t-addrow').onclick = function() {
+        s3.insertRow(null, { includeYn: true, custNm: 'KT', bizNm: '신규 사업', prevPlan: '', thisWeek: '- 첫 미팅', nextWeek: '- 후속 조치' });
+        show('out-template', '행 추가 완료. 현재 데이터 행 수: ' + s3.getDataRowCount());
+    };
+    document.getElementById('btn-t-find').onclick = function() {
+        var idx = s3.findDataRow('bizNm', '기타');
+        if (idx >= 0) {
+            show('out-template', 'findDataRow("bizNm", "기타") → row=' + idx + '\n' + JSON.stringify(s3.getDataRow(idx), null, 2));
+        } else {
+            show('out-template', 'findDataRow 결과: 없음 (-1). 먼저 "템플릿 로드"를 클릭하세요.');
+        }
+    };
+    document.getElementById('btn-t-update').onclick = function() {
+        var idx = s3.findDataRow('bizNm', '기타');
+        if (idx >= 0) {
+            var cur = s3.getCellValue(idx, 4) || '';
+            s3.updateDataField(idx, 'thisWeek', cur ? cur + '\n- 추가 활동 기록' : '- 추가 활동 기록');
+            show('out-template', '기타 행 금주실적에 "- 추가 활동 기록" append 완료');
+        } else {
+            show('out-template', '기타 행을 찾을 수 없습니다. 먼저 "템플릿 로드"를 클릭하세요.');
+        }
+    };
+    document.getElementById('btn-t-count').onclick = function() {
+        show('out-template', 'getDataRowCount() → ' + s3.getDataRowCount());
+    };
+    document.getElementById('btn-t-csv').onclick = function() { s3.exportCsv('주간보고'); };
+    document.getElementById('btn-t-print').onclick = function() { s3.print('주간보고서'); };
+
+    // 자동 로드
+    setTimeout(function() { document.getElementById('btn-t-load').click(); }, 600);
+
+    // ═══════════════════════════════════════════════════════
+    // 4. 읽기전용 시트
+    // ═══════════════════════════════════════════════════════
+    new FormaSheet('#sheet-readonly', {
+        data: [
+            ['구분', '1분기', '2분기', '3분기', '4분기', '합계'],
+            ['매출', '2,500', '3,100', '2,800', '3,500', '11,900'],
+            ['비용', '1,800', '2,100', '1,900', '2,300', '8,100'],
+            ['영업이익', '700', '1,000', '900', '1,200', '3,800']
+        ],
+        height: 160,
+        editable: false,
+        showToolbar: false,
+        onReady: function(sheet) {
+            // 첫 행, 첫 열 스타일
+            for (var c = 0; c < 6; c++) sheet.setCellStyle(0, c, { fontWeight: 'bold', background: '#e8ecf0', textAlign: 'center' });
+            for (var r = 1; r < 4; r++) sheet.setCellStyle(r, 0, { fontWeight: 'bold', background: '#f0f4f8' });
+            // 합계 열
+            for (var r = 0; r < 4; r++) sheet.setCellStyle(r, 5, { fontWeight: 'bold', background: '#fff3cd' });
+        }
+    });
+
+    // ═══════════════════════════════════════════════════════
+    // 5. 이벤트 콜백
+    // ═══════════════════════════════════════════════════════
+    var eventLog = [];
+    new FormaSheet('#sheet-events', {
+        data: [
+            ['셀을 편집해 보세요', '', ''],
+            ['', '', ''],
+            ['', '', '']
+        ],
+        height: 140,
+        minCols: 3,
+        editable: true,
+        showToolbar: false,
+        onCellChange: function(instance, cell, col, row, value) {
+            eventLog.unshift('[CellChange] row=' + row + ', col=' + col + ', value="' + value + '"');
+            if (eventLog.length > 20) eventLog.pop();
+            document.getElementById('out-events').textContent = eventLog.join('\n');
+        },
+        onSelectionChange: function(range) {
+            eventLog.unshift('[Selection] (' + range.x1 + ',' + range.y1 + ') → (' + range.x2 + ',' + range.y2 + ')');
+            if (eventLog.length > 20) eventLog.pop();
+            document.getElementById('out-events').textContent = eventLog.join('\n');
+        }
+    });
+
+    } // end initDemo
+})();
+</script>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SalesOn - 로그인</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+        .login-container {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            padding: 48px 40px 36px;
+            width: 400px;
+        }
+        .login-logo {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+        .login-logo-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+        .login-logo-icon span {
+            color: #fff;
+            font-size: 24px;
+            font-weight: 800;
+        }
+        .login-logo h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1a1a2e;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+        .login-logo p {
+            color: #999;
+            font-size: 13px;
+        }
+        .form-group {
+            margin-bottom: 14px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 6px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            background: #f5f6fa;
+            transition: box-shadow 0.15s;
+        }
+        .form-group input:focus {
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.4);
+        }
+        .form-group input::placeholder {
+            color: #bbb;
+        }
+        .save-id {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+        .save-id label {
+            font-size: 13px;
+            color: #888;
+            cursor: pointer;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.15s, transform 0.1s;
+        }
+        .login-btn:hover { opacity: 0.92; }
+        .login-btn:active { transform: scale(0.99); }
+        .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .error-msg {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #f0f0f0;
+            color: #bbb;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <div class="login-logo">
+        <div class="login-logo-icon"><span>S</span></div>
+        <h1>SalesOn</h1>
+        <p>SJINC 영업관리시스템</p>
+    </div>
+
+    <div id="error-msg" class="error-msg"></div>
+
+    <div class="form-group">
+        <label for="userId">사용자 ID</label>
+        <input type="text" id="userId" placeholder="사용자 ID를 입력하세요" autocomplete="username">
+    </div>
+
+    <div class="form-group">
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" placeholder="비밀번호를 입력하세요" autocomplete="current-password">
+    </div>
+
+    <div class="save-id">
+        <input type="checkbox" id="saveId">
+        <label for="saveId">아이디 저장</label>
+    </div>
+
+    <button class="login-btn" id="loginBtn">로그인</button>
+
+    <div class="footer">
+        © SJINC. All rights reserved.
+    </div>
+</div>
+
+<script>
+(function() {
+    // 이미 로그인된 상태면 무조건 메인으로 이동
+    fetch('/login/userInfo').then(function(r) { return r.json(); }).then(function(d) {
+        if (d.resultCode === 'OK') location.replace('/main.html');
+    }).catch(function() {});
+
+    const userIdEl = document.getElementById('userId');
+    const passwordEl = document.getElementById('password');
+    const loginBtn = document.getElementById('loginBtn');
+    const saveIdEl = document.getElementById('saveId');
+    const errorEl = document.getElementById('error-msg');
+
+    // URL 파라미터 에러 메시지 표시
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    if (error === 'token_missing') showError('로그인이 필요합니다.');
+    else if (error === 'token_expired') showError('세션이 만료되었습니다. 다시 로그인해주세요.');
+
+    // 저장된 아이디 복원
+    const savedId = localStorage.getItem('forma_saved_id');
+    if (savedId) {
+        userIdEl.value = savedId;
+        saveIdEl.checked = true;
+        passwordEl.focus();
+    } else {
+        userIdEl.focus();
+    }
+
+    // 로그인 처리
+    function doLogin() {
+        const userId = userIdEl.value.trim();
+        const password = passwordEl.value;
+
+        if (!userId) { showError('사용자 ID를 입력하세요.'); userIdEl.focus(); return; }
+
+        loginBtn.disabled = true;
+        loginBtn.textContent = '로그인 중...';
+
+        fetch('/login/loginProcess', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: userId, password: password })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.resultCode === 'OK') {
+                // 아이디 저장
+                if (saveIdEl.checked) localStorage.setItem('forma_saved_id', userId);
+                else localStorage.removeItem('forma_saved_id');
+                // 메인 페이지 이동
+                location.href = '/main.html';
+            } else {
+                showError(data.resultMessage || '로그인에 실패했습니다.');
+                passwordEl.value = '';
+                passwordEl.focus();
+            }
+        })
+        .catch(function() {
+            showError('서버에 연결할 수 없습니다.');
+        })
+        .finally(function() {
+            loginBtn.disabled = false;
+            loginBtn.textContent = '로그인';
+        });
+    }
+
+    loginBtn.addEventListener('click', doLogin);
+
+    // 엔터 키 로그인
+    userIdEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') passwordEl.focus(); });
+    passwordEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
+
+    function showError(msg) {
+        errorEl.textContent = msg;
+        errorEl.style.display = 'block';
+    }
+})();
+</script>
+</body>
+</html>

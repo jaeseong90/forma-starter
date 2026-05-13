@@ -1,0 +1,84 @@
+<div class="forma-popup-page" style="padding: 12px;">
+    <div id="form-area"></div>
+    <div style="margin-top: 8px; padding: 8px 10px; background: var(--bg-alt); border: 1px solid var(--border-light); border-radius: 4px; color: var(--text-sub); font-size: 11px; line-height: 1.6;">
+        <b>비밀번호 정책</b>
+        <ul style="margin: 4px 0 0 18px; padding: 0;">
+            <li>7자 이상 64자 이내, 공백 불가</li>
+            <li>영문 / 숫자 / 특수문자 중 2종 이상 조합</li>
+            <li>사용자 ID 포함 금지</li>
+            <li>같은 문자 4회 이상 연속 금지</li>
+        </ul>
+    </div>
+    <div style="text-align: right; margin-top: 16px;">
+        <button class="forma-btn" id="btn-ok">변경</button>
+        <button class="forma-btn" id="btn-cancel" style="margin-left: 6px;">취소</button>
+    </div>
+</div>
+<script>
+(function() {
+    const modal = FormaModal.current();
+
+    const form = new FormaForm('#form-area', {
+        columns: 1,
+        labelWidth: 110,
+        elements: [
+            { field: 'currentPassword', label: '현재 비밀번호', widget: 'password', required: true },
+            { field: 'newPassword',     label: '새 비밀번호',   widget: 'password', required: true, maxLength: 64 },
+            { field: 'confirmPassword', label: '새 비밀번호 확인', widget: 'password', required: true, maxLength: 64 }
+        ],
+        onEnter: function() { submit(); }
+    });
+
+    function validatePolicy(pw, userId) {
+        if (!pw) return '새 비밀번호를 입력하세요.';
+        if (pw.length < 7)  return '비밀번호는 7자 이상 입력하세요.';
+        if (pw.length > 64) return '비밀번호는 64자 이내로 입력하세요.';
+        if (/\s/.test(pw))  return '비밀번호에 공백을 포함할 수 없습니다.';
+        var kinds = 0;
+        if (/[A-Za-z]/.test(pw)) kinds++;
+        if (/[0-9]/.test(pw))    kinds++;
+        if (/[^A-Za-z0-9]/.test(pw)) kinds++;
+        if (kinds < 2) return '비밀번호는 영문/숫자/특수문자 중 2종 이상을 조합해야 합니다.';
+        if (userId && pw.toLowerCase().indexOf(String(userId).toLowerCase()) >= 0) {
+            return '비밀번호에 사용자 ID를 포함할 수 없습니다.';
+        }
+        if (/(.)\1{3,}/.test(pw)) return '동일한 문자를 4회 이상 연속 사용할 수 없습니다.';
+        return null;
+    }
+
+    document.getElementById('btn-ok').onclick = submit;
+    document.getElementById('btn-cancel').onclick = function() { if (modal) modal.cancel(); };
+
+    async function submit() {
+        if (!form.validate()) return;
+        const data = form.getData();
+        if (data.newPassword !== data.confirmPassword) {
+            FormaPopup.toast.error('새 비밀번호가 일치하지 않습니다.');
+            form.focus('confirmPassword');
+            return;
+        }
+        if (data.currentPassword === data.newPassword) {
+            FormaPopup.toast.error('새 비밀번호는 현재 비밀번호와 달라야 합니다.');
+            return;
+        }
+        const userId = (window.platform && platform.user && platform.user.userId) || '';
+        const err = validatePolicy(data.newPassword, userId);
+        if (err) {
+            FormaPopup.toast.error(err);
+            form.focus('newPassword');
+            return;
+        }
+        platform.post('/login/changePassword', {
+            currentPassword: data.currentPassword,
+            newPassword: data.newPassword
+        }, new Callback(function(r) {
+            if (r.resultCode === RESULT_CODE.OK) {
+                FormaPopup.toast.success('비밀번호가 변경되었습니다.');
+                if (modal) modal.ok({});
+            } else {
+                FormaPopup.toast.error(r.resultMessage || '변경 실패');
+            }
+        }));
+    }
+})();
+</script>

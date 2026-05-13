@@ -1,0 +1,31 @@
+/* FormaSheet — Material Icons 로드 + 최소 보조 스타일 */
+
+/* Material Icons — jspreadsheet 툴바 아이콘 의존성 */
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+/* FORMA body 테마 상속 차단 — jspreadsheet 자체 스타일이 적용되도록 */
+.jexcel_container {
+    color: initial;
+    background: initial;
+}
+
+/* 인쇄용 스타일 */
+@media print {
+    .jexcel_toolbar,
+    .jexcel_pagination,
+    .jexcel_container .jexcel_corner,
+    .jexcel_container thead td:first-child,
+    .jexcel_container tbody td:first-child {
+        display: none !important;
+    }
+    .jexcel_container {
+        border: none;
+        overflow: visible !important;
+    }
+    .jexcel_container table {
+        page-break-inside: auto;
+    }
+    .jexcel_container tr {
+        page-break-inside: avoid;
+    }
+}

@@ -1,0 +1,164 @@
+<div class="forma-page">
+    <div class="forma-page-header">
+        <h1 class="forma-page-title" id="title-FRM_ROLE"></h1>
+        <div id="toolbar-FRM_ROLE"></div>
+    </div>
+    <div class="forma-content">
+        <div class="forma-split-h" id="split-FRM_ROLE" style="min-height:500px">
+            <div class="forma-split-panel" style="width:400px">
+                <div class="forma-section" style="height:100%">
+                    <div class="forma-section-title">역할 목록</div>
+                    <div id="role-grid-FRM_ROLE"></div>
+                </div>
+            </div>
+            <div class="forma-split-handle"></div>
+            <div class="forma-split-panel" style="flex:1">
+                <div class="forma-section" style="height:100%">
+                    <div class="forma-section-title">프로그램별 권한</div>
+                    <div id="perm-grid-FRM_ROLE"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+(async function() {
+    const PGM = 'FRM_ROLE';
+    const S = PGM;
+    const listener = platform.initListener(PGM);
+    const ctx = { selectedRole: null };
+
+    await platform.startPage(PGM, listener);
+
+    FormaUtil.initSplit('#split-' + S);
+
+    ctx.roleGrid = new FormaGrid('#role-grid-' + S, {
+        editable: true,
+        checkable: true,
+        columns: [
+            { field: 'roleCd', label: '역할코드', width: 100, editor: 'text' },
+            { field: 'roleNm', label: '역할명', width: 140, editor: 'text' },
+            { field: 'description', label: '설명', width: 160, editor: 'text' },
+            { field: 'useYn', label: '사용', width: 60, editor: 'check', align: 'center' }
+        ],
+        onRowClick: function(row) {
+            ctx.selectedRole = row;
+            loadRoleAuths(row.roleCd);
+        }
+    });
+
+    ctx.permGrid = new FormaGrid('#perm-grid-' + S, {
+        editable: true,
+        checkable: true,
+        columns: [
+            { field: 'pgmId', label: '프로그램ID', width: 110 },
+            { field: 'pgmNm', label: '프로그램명', width: 160 },
+            { field: 'srchYn', label: '조회', width: 60, editor: 'check', align: 'center', headerCheck: true },
+            { field: 'newYn', label: '신규', width: 60, editor: 'check', align: 'center', headerCheck: true },
+            { field: 'saveYn', label: '저장', width: 60, editor: 'check', align: 'center', headerCheck: true },
+            { field: 'delYn', label: '삭제', width: 60, editor: 'check', align: 'center', headerCheck: true },
+            { field: 'prntYn', label: '출력', width: 60, editor: 'check', align: 'center', headerCheck: true },
+            { field: 'upldYn', label: '업로드', width: 60, editor: 'check', align: 'center', headerCheck: true },
+            { field: 'initYn', label: '초기화', width: 60, editor: 'check', align: 'center', headerCheck: true },
+            { field: 'etcDesc1', label: '기타1명', width: 80, align: 'center',
+              renderer: function(v) { return v || '-'; } },
+            { field: 'etc1Yn', label: '기타1', width: 50, editor: 'check', align: 'center' },
+            { field: 'etcDesc2', label: '기타2명', width: 80, align: 'center',
+              renderer: function(v) { return v || '-'; } },
+            { field: 'etc2Yn', label: '기타2', width: 50, editor: 'check', align: 'center' },
+            { field: 'etcDesc3', label: '기타3명', width: 80, align: 'center',
+              renderer: function(v) { return v || '-'; } },
+            { field: 'etc3Yn', label: '기타3', width: 50, editor: 'check', align: 'center' }
+        ]
+    });
+
+    // 기타명이 없는 행은 기타 체크박스 편집 차단
+    listener.gridEditor.beforeEditStart = function(grid, record, curCol) {
+        if (grid !== ctx.permGrid) return true;
+        if (curCol.field === 'etc1Yn' && !record.etcDesc1) return false;
+        if (curCol.field === 'etc2Yn' && !record.etcDesc2) return false;
+        if (curCol.field === 'etc3Yn' && !record.etcDesc3) return false;
+        return true;
+    };
+
+    function loadRoleAuths(roleCd) {
+        platform.post('/api/admin/roleAuths', { roleCd: roleCd }, new Callback(function(r) {
+            if (r.resultCode === RESULT_CODE.OK) ctx.permGrid.setData(r.resultData);
+        }));
+    }
+
+    listener.button.search.click = function() {
+        platform.post('/api/admin/roles', {}, new Callback(function(result) {
+            if (result.resultCode === RESULT_CODE.OK) {
+                ctx.roleGrid.setData(result.resultData);
+                ctx.permGrid.clearData();
+                ctx.selectedRole = null;
+            }
+        }));
+    };
+
+    listener.button.news.click = function() {
+        ctx.roleGrid.addRow({ useYn: 'Y' });
+    };
+
+    listener.button.save.click = function() {
+        const roleData = ctx.roleGrid.getModifiedData();
+        const menuData = ctx.permGrid.getModifiedData();
+
+        if (roleData.length === 0 && menuData.length === 0) {
+            FormaPopup.alert.show('변경된 데이터가 없습니다.');
+            return;
+        }
+
+        FormaPopup.confirm.show('저장하시겠습니까?').then(function(ok) {
+            if (!ok) return;
+
+            let saveCount = 0;
+            const totalSaves = (roleData.length > 0 ? 1 : 0) + (menuData.length > 0 ? 1 : 0);
+
+            function onSaved() {
+                saveCount++;
+                if (saveCount >= totalSaves) {
+                    FormaPopup.toast.success('저장되었습니다.');
+                    listener.button.search.click();
+                }
+            }
+
+            if (roleData.length > 0) {
+                platform.post('/api/admin/roles/save', roleData, new Callback(function(r) {
+                    if (r.resultCode === RESULT_CODE.OK) onSaved();
+                }));
+            }
+
+            if (menuData.length > 0 && ctx.selectedRole) {
+                menuData.forEach(function(item) { item.roleCd = ctx.selectedRole.roleCd; });
+                platform.post('/api/admin/roleAuths/save', menuData, new Callback(function(r) {
+                    if (r.resultCode === RESULT_CODE.OK) onSaved();
+                }));
+            }
+        });
+    };
+
+    listener.button.del.click = function() {
+        const data = ctx.roleGrid.getCheckedData();
+        if (data.length === 0) { FormaPopup.alert.show('삭제할 역할을 선택하세요.'); return; }
+        FormaPopup.confirm.show(data.length + '건 삭제하시겠습니까?').then(function(ok) {
+            if (ok) platform.post('/api/admin/roles/delete', data, new Callback(function(r) {
+                if (r.resultCode === RESULT_CODE.OK) {
+                    FormaPopup.toast.success('삭제되었습니다.');
+                    listener.button.search.click();
+                }
+            }));
+        });
+    };
+
+    listener.button.init.click = function() {
+        ctx.roleGrid.clearData();
+        ctx.permGrid.clearData();
+        ctx.selectedRole = null;
+    };
+
+    listener.button.search.click();
+    listener.initializedPgm = true;
+})();
+</script>

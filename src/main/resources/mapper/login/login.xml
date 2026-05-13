@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="login">
+
+    <select id="selectUserById" parameterType="map" resultType="com.saleson.login.dto.LoginUserResDto">
+        SELECT u.user_id, u.user_pw, u.user_nm, u.dept_code, u.use_yn,
+               COALESCE(d.dept_name, '') AS dept_name
+        FROM tb_user u
+        LEFT JOIN tb_dept d ON u.dept_code = d.dept_code
+        WHERE u.user_id = #{userId}
+    </select>
+
+    <!-- 사용자의 역할 목록 -->
+    <select id="selectUserRoles" parameterType="map" resultType="map">
+        SELECT r.role_cd, r.role_nm
+        FROM tb_user_role ur
+        JOIN tb_role r ON ur.role_cd = r.role_cd AND r.use_yn = 'Y'
+        WHERE ur.user_id = #{userId}
+    </select>
+
+    <!-- 전체조회 권한 여부 (ADMIN/MANAGER 중 하나라도 보유하면 Y) -->
+    <select id="selectViewAll" parameterType="map" resultType="string">
+        SELECT CASE WHEN EXISTS (
+            SELECT 1 FROM tb_user_role ur
+             WHERE ur.user_id = #{userId}
+               AND ur.role_cd IN ('ADMIN', 'MANAGER')
+        ) THEN 'Y' ELSE 'N' END
+    </select>
+
+    <!-- 역할 기반 메뉴별 권한 조회 (가장 넓은 권한 적용) -->
+    <select id="selectPgmAuthByUser" parameterType="map" resultType="com.saleson.frame.common.dto.PgmAuthResDto">
+        SELECT
+            MAX(CASE WHEN ra.srch_yn = 'Y' THEN 'Y' ELSE 'N' END) AS srch_yn,
+            MAX(CASE WHEN ra.new_yn  = 'Y' THEN 'Y' ELSE 'N' END) AS new_yn,
+            MAX(CASE WHEN ra.save_yn = 'Y' THEN 'Y' ELSE 'N' END) AS save_yn,
+            MAX(CASE WHEN ra.del_yn  = 'Y' THEN 'Y' ELSE 'N' END) AS del_yn,
+            MAX(CASE WHEN ra.prnt_yn = 'Y' THEN 'Y' ELSE 'N' END) AS prnt_yn,
+            MAX(CASE WHEN ra.upld_yn = 'Y' THEN 'Y' ELSE 'N' END) AS upld_yn,
+            MAX(CASE WHEN ra.init_yn = 'Y' THEN 'Y' ELSE 'N' END) AS init_yn,
+            MAX(CASE WHEN ra.etc1_yn = 'Y' THEN 'Y' ELSE 'N' END) AS etc1_yn,
+            MAX(CASE WHEN ra.etc2_yn = 'Y' THEN 'Y' ELSE 'N' END) AS etc2_yn,
+            MAX(CASE WHEN ra.etc3_yn = 'Y' THEN 'Y' ELSE 'N' END) AS etc3_yn
+        FROM tb_user_role ur
+        JOIN tb_role_auth ra ON ur.role_cd = ra.role_cd AND ra.pgm_id = #{pgmId}
+        WHERE ur.user_id = #{userId}
+    </select>
+
+    <!-- 사용자의 데이터 권한 -->
+    <select id="selectDataAuth" parameterType="map" resultType="map">
+        SELECT da.auth_type, da.auth_target, da.table_name
+        FROM tb_user_role ur
+        JOIN tb_data_auth da ON ur.role_cd = da.role_cd
+        WHERE ur.user_id = #{userId}
+        ORDER BY
+            CASE da.auth_type
+                WHEN 'ALL' THEN 1
+                WHEN 'DEPT_SUB' THEN 2
+                WHEN 'DEPT' THEN 3
+                WHEN 'USER' THEN 4
+            END
+    </select>
+
+    <!-- 사용자의 접근 가능 메뉴 목록 (하위 권한 없는 그룹은 제외) -->
+    <select id="selectMenusByUser" parameterType="map" resultType="com.saleson.frame.common.dto.MenuResDto">
+        WITH RECURSIVE authorized_menus AS (
+            /* 사용자가 권한을 가진 리프 메뉴 */
+            SELECT m.menu_id, COALESCE(pi.pgm_nm, m.menu_nm) AS menu_nm, m.parent_id, m.menu_type,
+                   m.pgm_id, m.url, COALESCE(pi.icon, '') AS icon, m.sort_order
+            FROM tb_menu m
+            LEFT JOIN tb_pgm_info pi ON m.pgm_id = pi.pgm_id
+            JOIN tb_role_auth ra ON m.pgm_id = ra.pgm_id
+            JOIN tb_user_role ur ON ra.role_cd = ur.role_cd AND ur.user_id = #{userId}
+            WHERE m.use_yn = 'Y' AND m.menu_type != 'G'
+              AND COALESCE(pi.use_yn, 'Y') = 'Y'
+            UNION
+            /* 권한 있는 하위 메뉴의 상위 그룹을 재귀적으로 포함 */
+            SELECT p.menu_id, COALESCE(pi2.pgm_nm, p.menu_nm) AS menu_nm, p.parent_id, p.menu_type,
+                   p.pgm_id, p.url, COALESCE(pi2.icon, '') AS icon, p.sort_order
+            FROM tb_menu p
+            LEFT JOIN tb_pgm_info pi2 ON p.pgm_id = pi2.pgm_id
+            JOIN authorized_menus c ON p.menu_id = c.parent_id
+            WHERE p.use_yn = 'Y'
+        )
+        SELECT DISTINCT menu_id, menu_nm, parent_id, menu_type,
+               pgm_id, url, icon, sort_order
+        FROM authorized_menus
+        ORDER BY sort_order
+    </select>
+
+    <!-- 전체 사용자 ID 조회 (비밀번호 일괄 초기화 러너용) -->
+    <select id="selectAllUserIds" parameterType="map" resultType="map">
+        SELECT user_id FROM tb_user
+    </select>
+
+    <!-- 비밀번호 변경 -->
+    <update id="updatePassword" parameterType="map">
+        UPDATE tb_user
+        SET user_pw = #{userPw}
+        WHERE user_id = #{userId}
+    </update>
+
+</mapper>

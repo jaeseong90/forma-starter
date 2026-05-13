@@ -1,0 +1,129 @@
+# DEMO_BIZ — 영업기회-마일스톤 (master-detail + 입력폼)
+# FORMA 방식 A(YAML 1장) 학습용 샘플. 실 서비스 화면 아님 (실 화면은 pages/business/BIZ010.html).
+# 타겟: tb_business(마스터) + tb_business_milestone(디테일). 계산 로직은 YAML이 못 하므로 CRUD 범위만.
+
+screen:
+  id: DEMO_BIZ
+  name: 영업기회-마일스톤 (학습샘플)
+  module: demo/business
+  type: master-detail
+  description: 마스터 그리드 → 입력폼 → 디테일 그리드 3층 구조. master-detail YAML 모델의 대표 예제.
+
+auth:
+  search: true
+  new: true
+  save: true
+  delete: true
+  init: true
+
+search:
+  - field: biz_nm
+    label: 사업명
+    widget: text
+    placeholder: 사업명 일부
+  - field: stage
+    label: 단계
+    widget: combo
+    code: BIZ_STAGE
+  - field: cust_cd
+    label: 거래처
+    widget: codePopup
+    popup:
+      url: /pages/popup/CUS_P01.html
+      codeField: cust_cd
+      nameField: cust_nm
+      width: 800
+      height: 600
+  - field: plan_ym
+    label: 계획 연월
+    widget: yearMonth
+    default: THIS_MONTH
+
+grids:
+  grid1:                              # 상단 마스터: 영업기회
+    checkable: true
+    rowNum: true
+    columns:
+      - { field: biz_no,          label: 사업번호, width: 110, required: true, frozen: true }
+      - { field: biz_nm,          label: 사업명,   width: 250, required: true }
+      - { field: cust_cd,         label: 거래처,   width: 110 }
+      - { field: stage,           label: 단계,     width: 90,  editor: select, code: BIZ_STAGE }
+      - { field: probability,     label: 확률,     width: 70,  align: right, suffix: '%' }
+      - { field: owner_nm,        label: 담당자,   width: 90 }
+      - { field: plan_order_amt,  label: 계획금액, width: 130, type: number, format: currency, align: right, footer: sum }
+      - { field: actual_order_amt,label: 실적금액, width: 130, type: number, format: currency, align: right, footer: sum }
+
+  grid2:                              # 하단 디테일: 마일스톤
+    editable: true
+    checkable: true
+    rowNum: true
+    columns:
+      - { field: seq,            label: 순번,     width: 60,  type: number, readOnly: true }
+      - { field: milestone_type, label: 유형,     width: 100, editor: select, code: MILESTONE_TYPE }
+      - { field: milestone_nm,   label: 마일스톤, width: 200, required: true }
+      - { field: milestone_ym,   label: 대상월,   width: 90,  editor: text }
+      - { field: expected_date,  label: 예정일,   width: 110, editor: date }
+      - { field: actual_date,    label: 실행일,   width: 110, editor: date }
+      - { field: amount,         label: 금액,     width: 130, type: number, format: currency, align: right, footer: sum }
+      - { field: done_yn,        label: 완료,     width: 60,  editor: check, align: center }
+      - { field: owner_nm,       label: 담당자,   width: 90 }
+
+form:
+  masterForm:                         # 중간 입력폼: 마스터 상세 편집
+    columns: 3
+    labelWidth: 100
+    elements:
+      - { field: biz_no,     label: 사업번호, widget: text, readOnly: true }
+      - { field: biz_nm,     label: 사업명,   widget: text, required: true, colspan: 2 }
+      - { field: cust_cd,    label: 거래처,   widget: codePopup,
+          popup: { url: /pages/popup/CUS_P01.html, codeField: cust_cd, nameField: cust_nm } }
+      - { field: stage,      label: 단계,     widget: combo, code: BIZ_STAGE }
+      - { field: probability,label: 확률,     widget: number, suffix: '%', min: 0, max: 100 }
+      - { field: owner_nm,   label: 담당자,   widget: text }
+      - { field: plan_from,  label: 계획시작, widget: yearMonth }
+      - { field: plan_to,    label: 계획종료, widget: yearMonth }
+      - { field: plan_order_amt,   label: 계획금액, widget: currency, suffix: 원 }
+      - { field: actual_order_amt, label: 실적금액, widget: currency, suffix: 원 }
+      - { field: remark,     label: 비고,     widget: textarea, colspan: 3 }
+
+layout:
+  type: full
+
+sql:
+  tables:
+    - { name: tb_business,           alias: b }
+    - { name: tb_business_milestone, alias: m }
+  selectGrid1:
+    table: tb_business b
+    columns: b.biz_no, b.biz_nm, b.cust_cd, b.stage, b.probability, b.owner_nm, b.plan_order_amt, b.actual_order_amt, b.plan_from, b.plan_to, b.remark
+    orderBy: b.biz_no DESC
+  selectGrid2:                        # 마스터 키(biz_no)로 필터
+    table: tb_business_milestone m
+    columns: m.biz_no, m.seq, m.milestone_type, m.milestone_nm, m.milestone_ym, m.expected_date, m.actual_date, m.amount, m.done_yn, m.owner_id, m.owner_nm, m.remark
+    where: m.biz_no = #{biz_no}
+    orderBy: m.seq
+  insertGrid1:
+    table: tb_business
+  updateGrid1:
+    table: tb_business
+    where: biz_no = #{biz_no}
+  deleteGrid1:
+    table: tb_business
+    where: biz_no = #{biz_no}
+  insertGrid2:
+    table: tb_business_milestone
+  updateGrid2:
+    table: tb_business_milestone
+    where: biz_no = #{biz_no} AND seq = #{seq}
+  deleteGrid2:
+    table: tb_business_milestone
+    where: biz_no = #{biz_no} AND seq = #{seq}
+
+behavior:
+  - type: limitation
+    description: |
+      실 BIZ010 화면은 이 YAML을 넘어서는 로직을 가진다:
+      - 확률(probability)과 계획금액으로 가중 합계 계산
+      - 단계 변경 시 마일스톤 자동 생성
+      - 영업기회→견적→계약 상태 전이
+      이런 로직은 방식 B(커스텀 Controller+Service)로 구현. 이 샘플은 YAML 경계를 보여주는 교재용.

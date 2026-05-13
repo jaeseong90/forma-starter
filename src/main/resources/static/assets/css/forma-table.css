@@ -1,0 +1,82 @@
+/* ══════════════════════════════════════════════════════════════
+   FormaTable — 순수 HTML <table> 스타일
+   Usage: <table class="forma-table"> 또는 래퍼:
+          <div class="forma-table-wrap"><table class="forma-table">...
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Base ── */
+.forma-table { width: 100%; border-collapse: collapse; font-size: 12px; background: var(--bg-card); color: var(--text); }
+.forma-table th { background: var(--bg-header); padding: 6px 10px; text-align: left; font-weight: 600; font-size: 12px; color: var(--text-sub); border-bottom: 2px solid var(--border); white-space: nowrap; }
+.forma-table thead tr + tr th { border-bottom: 1px solid var(--border); }
+.forma-table thead tr:last-child th { border-bottom: 2px solid var(--border); }
+.forma-table td { padding: 5px 10px; border-bottom: 1px solid var(--border-light); font-size: 12px; color: var(--text); }
+.forma-table tfoot td { background: var(--bg-header); font-weight: 600; border-top: 2px solid var(--border); border-bottom: none; padding: 6px 10px; }
+.forma-table tbody tr:hover { background: var(--bg-hover); }
+
+/* ── Bordered ── */
+.forma-table-bordered th, .forma-table-bordered td { border: 1px solid var(--border); }
+.forma-table-bordered thead tr:last-child th { border-bottom: 2px solid var(--border); }
+.forma-table-bordered tfoot td { border-top: 2px solid var(--border); }
+
+/* ── Borderless ── */
+.forma-table-borderless th, .forma-table-borderless td { border: none; }
+.forma-table-borderless thead tr:last-child th { border-bottom: 2px solid var(--border); }
+
+/* ── Striped ── */
+.forma-table-striped tbody tr:nth-child(even) { background: var(--bg-alt); }
+.forma-table-striped tbody tr:nth-child(even):hover { background: var(--bg-hover); }
+
+/* ── Compact ── */
+.forma-table-sm th { padding: 3px 8px; font-size: 11px; }
+.forma-table-sm td { padding: 3px 8px; font-size: 11px; }
+.forma-table-sm tfoot td { padding: 3px 8px; font-size: 11px; }
+
+/* ── Scroll Wrapper ── */
+.forma-table-wrap { overflow: auto; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-card); }
+.forma-table-wrap .forma-table { border-radius: 0; }
+.forma-table-wrap::-webkit-scrollbar { width: 8px; height: 8px; }
+.forma-table-wrap::-webkit-scrollbar-track { background: var(--bg-scrollbar-track); }
+.forma-table-wrap::-webkit-scrollbar-thumb { background: var(--bg-scrollbar-thumb); border-radius: 4px; }
+.forma-table-wrap::-webkit-scrollbar-thumb:hover { background: var(--bg-scrollbar-hover); }
+
+/* ── Sticky Header/Footer ── */
+.forma-table-sticky thead th { position: sticky; z-index: 2; background: var(--bg-header); }
+.forma-table-sticky thead tr:nth-child(1) th { top: 0; }
+.forma-table-sticky thead tr:nth-child(2) th { top: 29px; }
+.forma-table-sticky thead tr:nth-child(3) th { top: 58px; }
+.forma-table-sticky thead tr:nth-child(4) th { top: 87px; }
+.forma-table-sticky tfoot td { position: sticky; bottom: 0; z-index: 2; background: var(--bg-header); }
+
+/* ── Frozen Column ── */
+.forma-table .ft-frozen { position: sticky; z-index: 3; background: inherit; }
+.forma-table thead .ft-frozen { z-index: 4; }
+.forma-table .ft-frozen-last::after { content: ''; position: absolute; right: -4px; top: 0; bottom: 0; width: 4px; background: linear-gradient(to right, var(--frozen-shadow), transparent); pointer-events: none; }
+
+/* ── Cell Alignment & Text ── */
+.forma-table .ft-num { text-align: right; font-variant-numeric: tabular-nums; }
+.forma-table .ft-center { text-align: center; }
+.forma-table .ft-left { text-align: left; }
+.forma-table .ft-nowrap { white-space: nowrap; }
+.forma-table .ft-wrap { white-space: normal; word-break: break-word; }
+.forma-table .ft-ellipsis { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.forma-table .ft-muted { color: var(--text-muted); }
+.forma-table .ft-bold { font-weight: 600; }
+.forma-table .ft-mono { font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; }
+
+/* ── Row States ── */
+.forma-table tbody tr.ft-selected { background: var(--bg-selected) !important; }
+.forma-table tbody tr.ft-total td { font-weight: 700; background: var(--bg-cell-yel) !important; border-top: 2px solid var(--border); }
+.forma-table tbody tr.ft-subtotal td { font-weight: 600; background: var(--bg-group-footer) !important; border-top: 1px solid var(--border-group); }
+.forma-table tbody tr.ft-category td { font-weight: 600; background: var(--bg-group) !important; color: var(--text); border-bottom: 1px solid var(--border-group); }
+
+/* ── Editable Cell ── */
+.forma-table td input, .forma-table td select { width: 100%; height: 24px; padding: 0 4px; border: 1px solid var(--border); border-radius: 2px; font-size: 12px; background: var(--bg-input); color: var(--text); outline: none; }
+.forma-table td input:focus, .forma-table td select:focus { border-color: var(--primary); }
+.forma-table-sm td input, .forma-table-sm td select { height: 22px; font-size: 11px; }
+
+/* ── Print ── */
+@media print {
+    .forma-table-wrap { overflow: visible !important; max-height: none !important; border: none !important; }
+    .forma-table-sticky thead th { position: static; }
+    .forma-table .ft-frozen { position: static; }
+}

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <title>SalesOn</title>
+    <link rel="stylesheet" href="/assets/css/forma.css">
+    <link rel="stylesheet" href="/assets/css/forma-table.css">
+    <link rel="stylesheet" href="/assets/css/custom-tree-grid.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+
+        /* ===== 전체 레이아웃 ===== */
+        .erp-layout { display: flex; flex-direction: column; height: 100vh; }
+
+        /* ===== 상단 헤더 ===== */
+        .erp-header {
+            height: 44px; min-height: 44px;
+            background: var(--header-bg); color: var(--header-text);
+            display: flex; align-items: center; padding: 0 16px;
+            z-index: 100;
+        }
+        .erp-header-logo { font-size: 16px; font-weight: 700; color: var(--header-logo); letter-spacing: -0.5px; }
+        .erp-header-search { width: 280px; margin-left: 20px; position: relative; }
+        .erp-header-spacer { flex: 1; }
+        .erp-header-user { font-size: 12px; color: var(--header-sub); margin-right: 12px; }
+        .erp-header-btn {
+            background: none; border: 1px solid var(--header-border); color: var(--header-sub);
+            padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;
+        }
+        .erp-header-btn:hover { background: var(--header-hover); color: var(--header-text); }
+
+        /* ===== 바디 (메뉴 + 콘텐츠) ===== */
+        .erp-body { display: flex; flex: 1; overflow: hidden; }
+
+        /* ===== 좌측 메뉴 ===== */
+        .erp-sidebar {
+            width: 220px; min-width: 220px;
+            background: var(--bg-card); border-right: 1px solid var(--border);
+            overflow-y: auto; overflow-x: hidden;
+        }
+        .erp-sidebar.collapsed { width: 0; min-width: 0; overflow: hidden; }
+
+        /* ===== 메뉴 스타일 ===== */
+        .forma-menu { padding: 8px 0; }
+        .forma-menu-root, .forma-menu-sub { list-style: none; padding: 0; margin: 0; }
+        .forma-menu-item {
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 12px; cursor: pointer;
+            color: var(--text); text-decoration: none; font-size: 13px;
+            border-left: 3px solid transparent;
+            transition: all 0.12s;
+        }
+        .forma-menu-item:hover { background: var(--bg-hover); }
+        .forma-menu-item.active { background: var(--bg-selected); border-left-color: var(--primary); font-weight: 600; }
+        .forma-menu-toggle { font-size: 9px; color: var(--text-muted); width: 12px; text-align: center; }
+        .forma-menu-icon { font-size: 14px; }
+        .forma-menu-badge { font-size: 10px; color: var(--text-muted); margin-left: auto; }
+        .forma-menu-group {
+            font-size: 11px; font-weight: 700; color: var(--text-sub);
+            padding: 16px 12px 4px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        /* ===== MDI 탭바 ===== */
+        .forma-mdi-tabs {
+            display: flex; background: var(--bg-header); border-bottom: 1px solid var(--border);
+            min-height: 32px; overflow-x: auto; flex-shrink: 0;
+        }
+        .forma-mdi-tab {
+            display: flex; align-items: center; gap: 4px;
+            padding: 6px 12px; cursor: pointer;
+            font-size: 12px; color: var(--text-sub); white-space: nowrap;
+            border-right: 1px solid var(--border-light);
+            transition: all 0.12s;
+        }
+        .forma-mdi-tab:hover { background: var(--bg-hover); }
+        .forma-mdi-tab.active { background: var(--bg-card); color: var(--primary); font-weight: 600; border-bottom: 2px solid var(--primary); }
+        .forma-mdi-tab-close { font-size: 14px; color: var(--text-muted); margin-left: 4px; line-height: 1; }
+        .forma-mdi-tab-close:hover { color: var(--danger); }
+
+        /* ===== 콘텐츠 영역 ===== */
+        .erp-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
+        .erp-content-body { flex: 1; position: relative; overflow: hidden; }
+        .forma-mdi-panel { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: auto; padding: 2px 4px; background: var(--bg); }
+
+        /* ===== 빈 화면 ===== */
+        .erp-welcome {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            height: 100%; color: var(--text-muted); font-size: 14px;
+        }
+        .erp-welcome-logo { font-size: 36px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; }
+
+        /* ===== 메뉴 토글 버튼 ===== */
+        .erp-menu-toggle {
+            background: none; border: none; color: var(--header-sub); cursor: pointer;
+            font-size: 18px; margin-right: 12px; padding: 2px 6px;
+        }
+        .erp-menu-toggle:hover { color: var(--header-text); }
+        /* ===== 반응형 ===== */
+        @media (max-width: 1024px) {
+            .erp-sidebar { width: 180px; min-width: 180px; }
+        }
+        @media (max-width: 768px) {
+            .erp-sidebar { position: fixed; left: 0; top: 44px; bottom: 0; width: 240px; min-width: 240px; z-index: 90; transform: translateX(-100%); transition: transform 0.2s; box-shadow: 4px 0 16px var(--shadow); }
+            .erp-sidebar.mobile-open { transform: translateX(0); }
+            .erp-sidebar.collapsed { transform: translateX(-100%); }
+            .erp-header-user { display: none; }
+            .erp-header-search { width: 160px; margin-left: 10px; }
+            .forma-mdi-tab { padding: 6px 8px; font-size: 11px; }
+        }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<div class="erp-layout">
+    <!-- 상단 헤더 -->
+    <div class="erp-header">
+        <button class="erp-menu-toggle" id="menuToggle" title="메뉴 접기/펼치기">☰</button>
+        <div class="erp-header-logo">SalesOn</div>
+        <div class="erp-header-search" id="header-menu-search"></div>
+        <div class="erp-header-spacer"></div>
+        <div class="erp-header-user" id="headerUser"></div>
+        <a class="erp-header-btn" href="/manual/index.html" target="_blank" rel="noopener" title="사용자 매뉴얼" style="text-decoration:none;display:inline-flex;align-items:center;">📘</a>
+        <button class="erp-header-btn" id="changePwBtn" title="비밀번호 변경">🔑</button>
+        <button class="erp-header-btn" id="themeBtn" title="테마 전환">🌙</button>
+        <button class="erp-header-btn" id="logoutBtn">로그아웃</button>
+    </div>
+
+    <!-- 바디 -->
+    <div class="erp-body">
+        <!-- 좌측 메뉴 -->
+        <div class="erp-sidebar" id="sidebar">
+            <div id="menu-area"></div>
+        </div>
+
+        <!-- 우측 콘텐츠 -->
+        <div class="erp-content">
+            <div id="mdi-tabs" class="forma-mdi-tabs"></div>
+            <div id="content-area" class="erp-content-body">
+                <div class="erp-welcome" id="welcome">
+                    <div class="erp-welcome-logo">SalesOn</div>
+                    <div>좌측 메뉴에서 화면을 선택하세요</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/assets/js/framework/forma.core.js?v=20260421a"></script>
+<script src="/assets/js/framework/forma.popup.js?v=20260421a"></script>
+<script src="/assets/js/framework/forma.util.js?v=20260421a"></script>
+<script src="/assets/js/framework/forma.grid.js?v=20260422b"></script>
+<script src="/assets/js/framework/forma.form.js?v=20260422b"></script>
+<script src="/assets/js/framework/forma.toolbar.js?v=20260421a"></script>
+<script src="/assets/js/framework/forma.tab.js?v=20260421a"></script>
+<script src="/assets/js/framework/forma.modal.js?v=20260421a"></script>
+<script src="/assets/js/framework/forma.drawer.js?v=20260423a"></script>
+<script src="/assets/js/framework/forma.theme.js?v=20260421a"></script>
+<script src="/assets/js/framework/forma.chart.js?v=20260421a"></script>
+<script src="/assets/js/lib/xlsx.bundle.js?v=20260421a"></script>
+<script src="/assets/js/framework/forma.export.js?v=20260421a"></script>
+<script src="/assets/js/framework/forma.sheet.js?v=20260421a"></script>
+<script src="/assets/js/framework/forma.i18n.js?v=20260421a"></script>
+<script src="/assets/js/framework/forma.mdi.js?v=20260421a"></script>
+<script src="/assets/js/framework/forma.menu.js?v=20260423b"></script>
+<script src="/assets/js/framework/forma.releasenote.js?v=20260425a"></script>
+<script>
+(async function() {
+    // 1. 사용자 정보 조회
+    try {
+        const userRes = await platform.get('/login/userInfo');
+        if (userRes.resultCode === RESULT_CODE.OK) {
+            const u = userRes.resultData;
+            document.getElementById('headerUser').textContent = u.userName + ' (' + u.userId + ')';
+        }
+    } catch (e) {
+        // 로그인 안 됨 → 로그인 페이지로
+        location.href = '/login.html';
+        return;
+    }
+
+    // 2. 메뉴 데이터 조회
+    const menuRes = await platform.get('/api/pgm/menus');
+    if (!menuRes || menuRes.resultCode !== RESULT_CODE.OK) {
+        location.href = '/login.html';
+        return;
+    }
+
+    // 3. 플랫 메뉴 → 트리 구조 변환
+    const menuData = buildMenuTree(menuRes.resultData);
+
+    // 4. MDI + 메뉴 초기화
+    FormaMdi.init('#mdi-tabs', '#content-area');
+
+    // YAML 등록 화면만 screen.html 경로로 변환 (커스텀 HTML 화면은 원본 URL 유지)
+    const screenRes = await platform.get('/api/screen/_reload');
+    const yamlScreenIds = (screenRes.resultCode === RESULT_CODE.OK && screenRes.resultData)
+        ? (screenRes.resultData.screenIds || []) : [];
+    const yamlSet = {};
+    yamlScreenIds.forEach(function(id) { yamlSet[id] = true; });
+    convertMenuUrls(menuData, yamlSet);
+    FormaMenu.init('#menu-area', menuData, { searchTarget: '#header-menu-search' });
+
+    // hash에서 화면 복원
+    const flatMenus = menuRes.resultData.filter(function(m) { return m.pgmId; });
+    FormaMdi.restoreFromHash(flatMenus);
+
+    // 즐겨찾기 로드
+    FormaMenu.reloadFavorites();
+
+    // 개인 설정 로드
+    const settingsRes = await platform.get('/api/user/settings');
+    if (settingsRes.resultCode === RESULT_CODE.OK && settingsRes.resultData) {
+        const settings = settingsRes.resultData;
+        if (settings.theme) FormaTheme.set(settings.theme);
+        if (settings.menuCollapsed === 'Y') document.getElementById('sidebar').classList.add('collapsed');
+    }
+
+    function convertMenuUrls(items, yamlSet) {
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            if (item.children && item.children.length > 0) {
+                convertMenuUrls(item.children, yamlSet);
+            } else if (item.url && item.id && yamlSet[item.id]) {
+                // YAML 정의가 있는 화면만 screen.html로 변환
+                item.url = '/pages/screen.html?id=' + item.id;
+            }
+            // YAML이 없는 화면(SYS010, SYS020, SDB010 등)은 원본 URL 유지
+        }
+    }
+
+    // 5. 이벤트
+    document.getElementById('logoutBtn').onclick = function() { location.href = '/login/logout'; };
+    document.getElementById('changePwBtn').onclick = function() {
+        const modal = new FormaModal({
+            title: '비밀번호 변경',
+            url: '/pages/popup/USR_CHPW.html',
+            width: 460,
+            height: 480
+        });
+        modal.show({});
+    };
+    document.getElementById('themeBtn').onclick = function() {
+        FormaTheme.toggle();
+        const theme = FormaTheme.get();
+        const icons = { light: '🌙', dark: '☀️', blue: '💧' };
+        document.getElementById('themeBtn').textContent = icons[theme] || '🌙';
+        platform.post('/api/user/settings', { theme: theme }, { loading: false });
+    };
+    // 테마 버튼 초기 아이콘
+    const themeIcons = { light: '🌙', dark: '☀️', blue: '💧' };
+    document.getElementById('themeBtn').textContent = themeIcons[FormaTheme.get()] || '🌙';
+
+    document.getElementById('menuToggle').onclick = function() {
+        const sidebar = document.getElementById('sidebar');
+        if (window.innerWidth <= 768) {
+            sidebar.classList.toggle('mobile-open');
+            sidebar.classList.remove('collapsed');
+        } else {
+            sidebar.classList.toggle('collapsed');
+            sidebar.classList.remove('mobile-open');
+            const collapsed = sidebar.classList.contains('collapsed') ? 'Y' : 'N';
+            platform.post('/api/user/settings', { menuCollapsed: collapsed }, { loading: false });
+        }
+    };
+
+    // 6. 릴리즈노트 자동 표시 (마지막 본 버전 이후 새 노트 있을 때)
+    if (typeof FormaReleaseNote !== 'undefined') {
+        FormaReleaseNote.show({ target: 'DESKTOP' });
+    }
+
+    function buildMenuTree(flatMenus) {
+        const map = {};
+        const roots = [];
+        // 1차: 맵 구성
+        flatMenus.forEach(function(m) {
+            map[m.menuId] = {
+                id: m.pgmId || m.menuId,
+                label: m.menuNm,
+                icon: m.icon,
+                url: m.url,
+                menuType: m.menuType,
+                parentId: m.parentId,
+                children: []
+            };
+        });
+        // 2차: 트리 구성
+        flatMenus.forEach(function(m) {
+            const node = map[m.menuId];
+            if (m.parentId && map[m.parentId]) {
+                map[m.parentId].children.push(node);
+            } else {
+                roots.push(node);
+            }
+        });
+        return roots;
+    }
+})();
+</script>
+</body>
+</html>

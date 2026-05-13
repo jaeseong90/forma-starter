@@ -1,0 +1,62 @@
+# DEMO_DEPT — 부서관리 (단일 테이블 list)
+# FORMA 방식 A(YAML 1장) 학습용 샘플. 실 서비스 화면 아님.
+# 타겟: tb_dept (부서 트리 테이블). 상위부서는 parent_code로 연결.
+
+screen:
+  id: DEMO_DEPT
+  name: 부서관리 (학습샘플)
+  module: demo/dept
+  type: list
+  description: 단일 테이블 CRUD의 가장 단순한 형태. AI가 방식 A를 학습할 때의 기준 예제.
+
+auth:
+  search: true
+  new: true
+  save: true
+  delete: true
+  init: true
+
+search:
+  - field: dept_name
+    label: 부서명
+    widget: text
+    placeholder: 부서명 일부
+  - field: use_yn
+    label: 사용여부
+    widget: combo
+    default: Y
+    options:
+      - { value: Y, label: 사용 }
+      - { value: N, label: 미사용 }
+
+grids:
+  grid1:
+    editable: true
+    checkable: true
+    rowNum: true
+    columns:
+      - { field: dept_code,   label: 부서코드,   width: 120, required: true }
+      - { field: dept_name,   label: 부서명,     width: 200, required: true }
+      - { field: parent_code, label: 상위부서,   width: 120 }
+      - { field: dept_level,  label: 레벨,       width: 70,  type: number, align: right }
+      - { field: sort_order,  label: 정렬,       width: 70,  type: number, align: right }
+      - { field: use_yn,      label: 사용,       width: 70,  editor: check, align: center }
+
+layout:
+  type: full
+
+sql:
+  tables:
+    - { name: tb_dept, alias: d }
+  selectGrid1:
+    table: tb_dept d
+    columns: d.dept_code, d.dept_name, d.parent_code, d.dept_level, d.sort_order, d.use_yn, d.created_at, d.updated_at
+    orderBy: d.dept_level, d.sort_order, d.dept_code
+  insertGrid1:
+    table: tb_dept
+  updateGrid1:
+    table: tb_dept
+    where: dept_code = #{dept_code}
+  deleteGrid1:
+    table: tb_dept
+    where: dept_code = #{dept_code}

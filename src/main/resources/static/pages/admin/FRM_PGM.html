@@ -1,0 +1,76 @@
+<div class="forma-page">
+    <div class="forma-page-header">
+        <h1 class="forma-page-title" id="title-FRM_PGM"></h1>
+        <div id="toolbar-FRM_PGM"></div>
+    </div>
+    <div class="forma-content">
+        <div id="search-FRM_PGM"></div>
+        <div id="grid-FRM_PGM"></div>
+    </div>
+</div>
+<script>
+(async function() {
+    const PGM = 'FRM_PGM';
+    const S = PGM;
+    const listener = platform.initListener(PGM);
+    const ctx = {};
+
+    await platform.startPage(PGM, listener);
+
+    ctx.searchForm = new FormaForm('#search-' + S, {
+        search: true,
+        elements: [
+            { field: 'keyword', label: '검색어', placeholder: '프로그램ID / 프로그램명' }
+        ]
+    });
+
+    ctx.grid1 = new FormaGrid('#grid-' + S, {
+        editable: true,
+        columns: [
+            { field: 'pgmId', label: '프로그램ID', width: 100, editor: 'text' },
+            { field: 'pgmNm', label: '프로그램명', width: 180, editor: 'text' },
+            { field: 'icon', label: '아이콘', width: 60, editor: 'text', align: 'center' },
+            { field: 'srchYn', label: '조회', width: 50, editor: 'check', align: 'center', headerCheck: true },
+            { field: 'newYn', label: '신규', width: 50, editor: 'check', align: 'center', headerCheck: true },
+            { field: 'saveYn', label: '저장', width: 50, editor: 'check', align: 'center', headerCheck: true },
+            { field: 'delYn', label: '삭제', width: 50, editor: 'check', align: 'center', headerCheck: true },
+            { field: 'prntYn', label: '출력', width: 50, editor: 'check', align: 'center', headerCheck: true },
+            { field: 'upldYn', label: '업로드', width: 55, editor: 'check', align: 'center', headerCheck: true },
+            { field: 'initYn', label: '초기화', width: 55, editor: 'check', align: 'center', headerCheck: true },
+            { field: 'useYn', label: '사용', width: 50, editor: 'check', align: 'center' },
+            { field: 'etcDesc1', label: '기타1', width: 100, editor: 'text' },
+            { field: 'etcDesc2', label: '기타2', width: 100, editor: 'text' },
+            { field: 'etcDesc3', label: '기타3', width: 100, editor: 'text' }
+        ]
+    });
+
+    listener.button.search.click = function() {
+        platform.post('/api/admin/programs', ctx.searchForm.getData(), new Callback(function(r) {
+            if (r.resultCode === RESULT_CODE.OK) ctx.grid1.setData(r.resultData);
+        }));
+    };
+
+    listener.button.news.click = function() {
+        ctx.grid1.addRow({ srchYn: 'Y', newYn: 'Y', saveYn: 'Y', delYn: 'Y', prntYn: 'N', upldYn: 'N', initYn: 'Y', useYn: 'Y' });
+    };
+
+    listener.button.save.click = async function() {
+        const data = ctx.grid1.getModifiedData();
+        if (!data.length) { FormaPopup.alert.show('변경사항이 없습니다.'); return; }
+        const ok = await FormaPopup.confirm.show('저장하시겠습니까?');
+        if (ok) {
+            platform.post('/api/admin/programs/save', data, new Callback(function(r) {
+                if (r.resultCode === RESULT_CODE.OK) {
+                    FormaPopup.toast.success('저장되었습니다.');
+                    listener.button.search.click();
+                }
+            }));
+        }
+    };
+
+    listener.button.init.click = function() { ctx.searchForm.clear(); ctx.grid1.clearData(); };
+
+    listener.button.search.click();
+    listener.initializedPgm = true;
+})();
+</script>

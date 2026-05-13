@@ -1,0 +1,174 @@
+<div class="forma-page">
+    <div class="forma-page-header">
+        <h1 class="forma-page-title" id="title-FRM_DEPT"></h1>
+        <div id="toolbar-FRM_DEPT"></div>
+    </div>
+    <div class="forma-content">
+        <div class="forma-split-h" id="split-FRM_DEPT" style="min-height:520px">
+            <div class="forma-split-panel" style="width:320px">
+                <div class="forma-section" style="height:100%">
+                    <div class="forma-section-title">조직도</div>
+                    <div id="grid1-FRM_DEPT"></div>
+                </div>
+            </div>
+            <div class="forma-split-handle"></div>
+            <div class="forma-split-panel" style="flex:1">
+                <div class="forma-section">
+                    <div class="forma-section-title">부서 정보</div>
+                    <div id="form-FRM_DEPT"></div>
+                </div>
+                <div class="forma-section" style="margin-top:10px">
+                    <div class="forma-section-title" id="member-title-FRM_DEPT">소속 직원</div>
+                    <div id="grid2-FRM_DEPT"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+(async function() {
+    const PGM = 'FRM_DEPT';
+    const listener = platform.initListener(PGM);
+    const ctx = { selectedDeptCode: null };
+
+    await platform.startPage(PGM, listener);
+
+    FormaUtil.initSplit('#split-' + PGM);
+
+    // 좌측: 조직 트리 그리드
+    ctx.grid1 = new FormaGrid('#grid1-' + PGM, {
+        treeField: 'deptName',
+        treeIdField: 'deptCode',
+        treeParentField: 'parentCode',
+        columns: [
+            { field: 'deptName', label: '부서명', width: 200 },
+            { field: 'useYn', label: '사용', width: 50, align: 'center' }
+        ],
+        onRowClick: function(row) {
+            loadDept(row.deptCode);
+        }
+    });
+
+    // 우측: 부서 정보 폼
+    ctx.detailForm = new FormaForm('#form-' + PGM, {
+        columns: 2, labelWidth: 85,
+        elements: [
+            { field: 'deptCode', label: '부서코드', required: true, maxLength: 20 },
+            { field: 'parentCode', label: '상위부서', widget: 'codePopup',
+              popup: { url: '/pages/popup/DEPT_P01.html', codeField: 'deptCode', nameField: 'deptName', width: 600, height: 500 } },
+            { field: 'deptName', label: '부서명', required: true, maxLength: 100 },
+            { field: 'deptLevel', label: '레벨', type: 'number' },
+            { field: 'sortOrder', label: '정렬순서', type: 'number' },
+            { field: 'useYn', label: '사용여부', widget: 'switch' }
+        ]
+    });
+
+    // 소속 직원 그리드
+    ctx.grid2 = new FormaGrid('#grid2-' + PGM, {
+        rowNum: true,
+        columns: [
+            { field: 'empNm', label: '이름', width: 200 }
+        ]
+    });
+
+    // === form lock/unlock ===
+    function lockForms() { ctx.detailForm.formReadonly(true); }
+    function unlockForms() { ctx.detailForm.formReadonly(false); ctx.detailForm.setReadonly('deptCode', true); }
+
+    lockForms();
+
+    function loadTree() {
+        platform.post('/frm_dept/selectDeptTree', {}, new Callback(function(result) {
+            if (result.resultCode === RESULT_CODE.OK) {
+                ctx.grid1.setData(result.resultData);
+                ctx.grid1.expandAllTree();
+            }
+        }));
+    }
+
+    function loadDept(deptCode) {
+        ctx.selectedDeptCode = deptCode;
+        ctx.detailForm.setMode(FORM_MODE.EDIT);
+        platform.post('/frm_dept/selectDept', { deptCode: deptCode }, new Callback(function(result) {
+            if (result.resultCode === RESULT_CODE.OK && result.resultData) {
+                ctx.detailForm.setData(result.resultData);
+                unlockForms();
+            }
+        }));
+        platform.post('/frm_dept/selectDeptMembers', { deptCode: deptCode }, new Callback(function(result) {
+            if (result.resultCode === RESULT_CODE.OK) {
+                ctx.grid2.setData(result.resultData);
+                document.getElementById('member-title-' + PGM).textContent = '소속 직원 (' + result.resultData.length + '명)';
+            }
+        }));
+    }
+
+    listener.button.search.click = function() {
+        ctx.selectedDeptCode = null;
+        ctx.detailForm.clear();
+        ctx.grid2.clearData();
+        lockForms();
+        document.getElementById('member-title-' + PGM).textContent = '소속 직원';
+        loadTree();
+    };
+
+    listener.button.news.click = function() {
+        ctx.selectedDeptCode = null;
+        ctx.detailForm.clear();
+        ctx.detailForm.setMode(FORM_MODE.NEW);
+        ctx.detailForm.setData({ useYn: 'Y', deptLevel: 0, sortOrder: 0 });
+        unlockForms();
+        ctx.detailForm.setReadonly('deptCode', false);
+        ctx.detailForm.focus('deptCode');
+        if (ctx.grid1.getSelectedItem()) {
+            const parent = ctx.grid1.getSelectedItem();
+            ctx.detailForm.setField('parentCode', parent.deptCode);
+            ctx.detailForm.setField('deptLevel', (parseInt(parent.deptLevel) || 0) + 1);
+        }
+    };
+
+    listener.button.save.click = function() {
+        if (!ctx.detailForm.getMode()) { FormaPopup.alert.show('저장할 대상이 없습니다.'); return; }
+        if (!ctx.detailForm.validate()) return;
+        const data = ctx.detailForm.getData();
+        data._gstat = ctx.detailForm.getMode() === FORM_MODE.NEW ? 'I' : 'U';
+        platform.post('/frm_dept/saveDept', data, new Callback(function(result) {
+            if (result.resultCode === RESULT_CODE.OK) {
+                FormaPopup.toast.success('저장되었습니다.');
+                ctx.detailForm.setMode(FORM_MODE.EDIT);
+                ctx.selectedDeptCode = data.deptCode;
+                loadTree();
+                if (data.deptCode) loadDept(data.deptCode);
+            }
+        }));
+    };
+
+    listener.button.del.click = async function() {
+        if (!ctx.selectedDeptCode) {
+            FormaPopup.alert.show('삭제할 부서를 선택하세요.');
+            return;
+        }
+        const ok = await FormaPopup.confirm.show('선택한 부서를 삭제하시겠습니까?');
+        if (!ok) return;
+        platform.post('/frm_dept/deleteDept', { deptCode: ctx.selectedDeptCode }, new Callback(function(result) {
+            if (result.resultCode === RESULT_CODE.OK) {
+                FormaPopup.toast.success('삭제되었습니다.');
+                ctx.selectedDeptCode = null;
+                ctx.detailForm.clear();
+                ctx.grid2.clearData();
+                loadTree();
+            }
+        }));
+    };
+
+    listener.button.init.click = function() {
+        ctx.selectedDeptCode = null;
+        ctx.detailForm.clear();
+        ctx.grid2.clearData();
+        ctx.grid1.clearData();
+        lockForms();
+    };
+
+    loadTree();
+})();
+</script>

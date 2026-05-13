@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>SalesOn</title>
+    <script>
+        // 로그인 상태 확인 후 분기
+        fetch('/login/userInfo').then(function(r) { return r.json(); }).then(function(d) {
+            location.replace(d.resultCode === 'OK' ? '/main.html' : '/login.html');
+        }).catch(function() {
+            location.replace('/login.html');
+        });
+    </script>
+</head>
+<body></body>
+</html>

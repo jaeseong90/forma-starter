@@ -1,0 +1,40 @@
+<div class="forma-popup-page">
+    <div id="search-area" style="margin-bottom: 8px;"></div>
+    <div id="grid-area"></div>
+</div>
+<script>
+(function() {
+    const modal = FormaModal.current();
+    const param = FormaModal.getParam() || {};
+
+    const searchForm = new FormaForm('#search-area', {
+        search: true,
+        elements: [
+            { field: 'keyword', label: '검색어', widget: 'text', placeholder: '사용자ID / 사용자명' }
+        ],
+        onEnter: function() { doSearch(); }
+    });
+
+    const grid = new FormaGrid('#grid-area', {
+        sortable: true,
+        columns: [
+            { field: 'userId', label: '사용자ID', width: 100 },
+            { field: 'userNm', label: '사용자명', width: 120 },
+            { field: 'deptName', label: '부서', width: 120 }
+        ],
+        onRowDblClick: function(row) {
+            if (modal) modal.ok({ userId: row.userId, userNm: row.userNm });
+        }
+    });
+
+    if (param.keyword) searchForm.setField('keyword', param.keyword);
+
+    function doSearch() {
+        platform.post('/api/admin/users', searchForm.getData(), new Callback(function(r) {
+            if (r.resultCode === RESULT_CODE.OK) grid.setData(r.resultData);
+        }));
+    }
+
+    doSearch();
+})();
+</script>

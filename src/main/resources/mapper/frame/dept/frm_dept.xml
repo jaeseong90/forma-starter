@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="frm_dept">
+
+    <select id="selectDeptTree" parameterType="map" resultType="com.saleson.frame.common.dto.DeptResDto">
+        SELECT d.dept_code, d.dept_name, d.parent_code, d.dept_level, d.sort_order, d.use_yn
+          FROM tb_dept d
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (d.dept_code ILIKE '%' || #{keyword} || '%' OR d.dept_name ILIKE '%' || #{keyword} || '%')
+            </if>
+        </where>
+         ORDER BY d.dept_level, d.sort_order, d.dept_code
+    </select>
+
+    <select id="selectDept" parameterType="map" resultType="com.saleson.frame.common.dto.DeptResDto">
+        SELECT d.dept_code, d.dept_name, d.parent_code, p.dept_name AS parent_name,
+               d.dept_level, d.sort_order, d.use_yn,
+               d.created_by, d.created_at, d.updated_by, d.updated_at
+          FROM tb_dept d
+          LEFT JOIN tb_dept p ON p.dept_code = d.parent_code
+         WHERE d.dept_code = #{deptCode}
+    </select>
+
+    <select id="selectDeptMembers" parameterType="map" resultType="map">
+        SELECT user_id AS emp_id,
+               user_nm AS emp_nm
+          FROM tb_user
+         WHERE dept_code = #{deptCode}
+         ORDER BY user_nm
+    </select>
+
+<insert id="insertDept" parameterType="map">
+        INSERT INTO tb_dept (dept_code, dept_name, parent_code, dept_level, sort_order, use_yn, created_by, created_at)
+        VALUES (#{deptCode}, #{deptName}, #{parentCode}, #{deptLevel}, #{sortOrder},
+                COALESCE(#{useYn}, 'Y'), #{userId}, NOW())
+    </insert>
+
+    <update id="updateDept" parameterType="map">
+        UPDATE tb_dept
+           SET dept_name = #{deptName},
+               parent_code = #{parentCode},
+               dept_level = #{deptLevel},
+               sort_order = #{sortOrder},
+               use_yn = #{useYn},
+               updated_by = #{userId},
+               updated_at = NOW()
+         WHERE dept_code = #{deptCode}
+    </update>
+
+    <delete id="deleteDept" parameterType="map">
+        DELETE FROM tb_dept WHERE dept_code = #{deptCode}
+    </delete>
+
+</mapper>

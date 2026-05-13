@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="common">
+
+    <select id="selectCodeList" parameterType="map" resultType="map">
+        SELECT code AS "value", code_name AS "label", sort_order
+        FROM tb_code
+        WHERE grp_code = #{grpCode} AND use_yn = 'Y'
+        ORDER BY sort_order, code
+    </select>
+
+    <insert id="insertLog" parameterType="map">
+        INSERT INTO tb_log (log_type, pgm_id, user_id, user_ip, log_dt)
+        VALUES (#{logType}, #{pgmId}, #{userId}, #{userIp}, NOW())
+    </insert>
+
+    <!-- ═══ 데이터 권한 ═══ -->
+
+    <!-- 전체 부서 목록 (Java에서 트리 탐색) -->
+    <select id="selectAllDepts" resultType="map">
+        SELECT dept_code, parent_code FROM tb_dept WHERE use_yn = 'Y'
+    </select>
+
+    <!--
+        데이터 권한 SQL 프래그먼트.
+        업무 매퍼에서 <include refid="common.dataAuth"/> 로 삽입.
+        테이블에 created_by 또는 dept_code 컬럼이 있을 때 사용.
+    -->
+    <sql id="dataAuth">
+        <if test="_isAdmin == null or _isAdmin == false">
+            <choose>
+                <when test="_dataAuthType == 'USER'">
+                    AND created_by = #{_userId}
+                </when>
+                <when test="_dataAuthType == 'DEPT'">
+                    AND dept_code = #{_userDept}
+                </when>
+                <when test="_dataAuthType == 'DEPT_SUB'">
+                    AND dept_code IN
+                    <foreach item="dc" collection="_deptList" open="(" separator="," close=")">#{dc}</foreach>
+                </when>
+                <!-- ALL: 필터 없음 -->
+            </choose>
+        </if>
+    </sql>
+
+    <!-- ═══ 파일 첨부 ═══ -->
+
+    <insert id="insertFile" parameterType="map">
+        INSERT INTO tb_file (file_id, ref_type, ref_id, ref_id2, ref_id3,
+                             file_name, file_path,
+                             file_size, content_type, sort_order, created_by, created_at)
+        VALUES (#{fileId}, #{refType}, #{refId}, #{refId2}, #{refId3},
+                #{fileName}, #{filePath},
+                #{fileSize}, #{contentType}, #{sortOrder}, #{userId}, NOW())
+    </insert>
+
+    <select id="selectFiles" parameterType="map" resultType="map">
+        SELECT file_id, ref_type, ref_id, ref_id2, ref_id3,
+               file_name, file_path,
+               file_size, content_type, sort_order, created_by, created_at
+        FROM tb_file
+        WHERE ref_type = #{refType} AND ref_id = #{refId}
+        <choose>
+            <when test="refId2 != null and refId2 != ''">AND ref_id2 = #{refId2}</when>
+            <otherwise>AND ref_id2 IS NULL</otherwise>
+        </choose>
+        <choose>
+            <when test="refId3 != null and refId3 != ''">AND ref_id3 = #{refId3}</when>
+            <otherwise>AND ref_id3 IS NULL</otherwise>
+        </choose>
+        ORDER BY sort_order
+    </select>
+
+    <select id="selectFileById" parameterType="map" resultType="map">
+        SELECT file_id, ref_type, ref_id, ref_id2, ref_id3,
+               file_name, file_path,
+               file_size, content_type, created_by
+        FROM tb_file WHERE file_id = #{fileId}
+    </select>
+
+    <delete id="deleteFile" parameterType="map">
+        DELETE FROM tb_file WHERE file_id = #{fileId}
+    </delete>
+
+    <select id="selectFileIdsByRef" parameterType="map" resultType="string">
+        SELECT file_id FROM tb_file
+         WHERE ref_type = #{refType} AND ref_id = #{refId}
+    </select>
+
+    <!-- ═══ 감사 로그 ═══ -->
+
+    <insert id="insertAuditLog" parameterType="map">
+        INSERT INTO tb_audit_log (trace_id, pgm_id, table_name, action, row_key,
+                                  before_data, after_data, user_id, user_ip, audit_dt)
+        VALUES (#{traceId}, #{pgmId}, #{tableName}, #{action}, #{rowKey},
+                #{beforeData}, #{afterData}, #{userId}, #{userIp}, NOW())
+    </insert>
+
+    <!-- ═══ 감사 로그 조회 ═══ -->
+
+    <sql id="whereAuditLog">
+        <if test="searchPgmId != null and searchPgmId != ''">AND a.pgm_id LIKE '%' || #{searchPgmId} || '%'</if>
+        <if test="searchUserId != null and searchUserId != ''">AND a.user_id LIKE '%' || #{searchUserId} || '%'</if>
+        <if test="searchTableName != null and searchTableName != ''">AND a.table_name LIKE '%' || #{searchTableName} || '%'</if>
+        <if test="searchAction != null and searchAction != ''">AND a.action = #{searchAction}</if>
+        <if test="auditDtFrom != null and auditDtFrom != ''">AND a.audit_dt &gt;= #{auditDtFrom}</if>
+        <if test="auditDtTo != null and auditDtTo != ''">AND a.audit_dt &lt;= #{auditDtTo} || ' 23:59:59'</if>
+    </sql>
+
+    <select id="selectAuditLog" parameterType="map" resultType="map">
+        SELECT a.audit_seq, a.trace_id, a.pgm_id, a.table_name, a.action, a.row_key,
+               a.before_data,
+               a.after_data,
+               a.user_id, a.user_ip,
+               TO_CHAR(a.audit_dt, 'YYYY-MM-DD HH24:MI:SS') AS audit_dt
+        FROM tb_audit_log a
+        <where><include refid="whereAuditLog"/></where>
+        ORDER BY a.audit_seq DESC
+    </select>
+
+</mapper>

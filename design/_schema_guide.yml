@@ -1,0 +1,163 @@
+# FORMA 화면 설계서 스키마 가이드
+# 이 파일은 AI가 화면 설계서를 해석할 때 참조하는 규칙 문서
+
+screen:
+  id: String          # 화면ID (예: SDA010)
+  name: String        # 화면명 (예: 거래처관리)
+  module: String      # 모듈 경로 (예: base/customer, sales/order)
+  type: String        # 화면 유형: list, master-detail, split-detail, split-tab
+  description: String # 설명
+
+auth:
+  search: Boolean     # 조회 버튼
+  new: Boolean        # 신규 버튼
+  save: Boolean       # 저장 버튼
+  delete: Boolean     # 삭제 버튼
+  print: Boolean      # 출력 버튼
+  upload: Boolean     # 업로드 버튼
+  init: Boolean       # 초기화 버튼
+  etc:                # 커스텀 버튼 (최대 10개)
+    - label: String   # 버튼명
+      key: String     # etc1~etc10
+
+search:
+  - field: String     # 검색 필드명
+    label: String     # 표시명
+    widget: String    # text, combo, date, dateRange, codePopup, multiCombo, yearMonth, year
+    code: String      # 코드 그룹 (combo/multiCombo용, 서버 조회)
+    options: Array    # 직접 옵션 [{value, label}]
+    default: String   # 기본값 (dateRange: THIS_MONTH/TODAY/THIS_YEAR, yearMonth: THIS_MONTH/PREV_MONTH, year: THIS_YEAR)
+    placeholder: String # placeholder 텍스트
+    popup: Object     # codePopup용 {url, codeField, nameField, width, height}
+    dependsOn: Object # 의존 콤보 {field, paramKey}
+
+grids:
+  grid1:              # 그리드 ID (grid1, grid2, grid3 ...)
+    type: String      # grid (기본) — FormaForm의 widget과 무관. 여기 type은 "그리드 모드" 지정용
+    editable: Boolean
+    checkable: Boolean
+    rowNum: Boolean
+    sortable: Boolean
+    paging: Boolean
+    pageSize: Number
+    columns:
+      - field: String
+        label: String # 단일 헤더 또는 Array (멀티헤더: [{text, colspan}, {text}])
+        width: Number
+        type: String  # 데이터 타입 힌트 (text, number) — 정렬·포맷·align:right 자동 적용용. 편집 위젯 아님.
+        format: String # currency, date
+        editor: String # FormaGrid의 편집 위젯 지정 (text, select, combo, check, switch, date, currency, textarea)
+                       # ※ FormaForm의 'widget'과 같은 역할 — 이름만 다름 (용어 불일치 주의)
+        code: String  # select 에디터용 코드 그룹
+        options: Array # select 에디터용 직접 옵션 [{value, label}]
+        frozen: Boolean
+        readOnly: Boolean
+        required: Boolean
+        footer: String # sum, count, avg
+        align: String  # left, center, right
+        maxLength: Number # 입력 최대 글자수 (text/currency 에디터에 적용, DDL VARCHAR(N)의 N을 그대로)
+
+form:
+  masterForm:         # 폼 ID (masterForm, searchForm 등)
+    columns: Number   # 컬럼 수 (기본 2)
+    labelWidth: Number # 라벨 너비 (px)
+    elements:
+      - field: String
+        label: String
+        widget: String  # text, number, combo, date, dateRange, codePopup, textarea, checkbox,
+                        # radio, currency, multiCombo, yearMonth, year, switch, divider, display, password
+        readOnly: Boolean
+        required: Boolean
+        # type: String  # DEPRECATED — widget: 'number' 를 대신 사용. 하위호환으로만 남아있음.
+        placeholder: String
+        maxLength: Number # 입력 최대 글자수 (text/password/textarea 위젯에 적용, DDL VARCHAR(N)의 N을 그대로)
+        options: Array  # combo/multiCombo/radio/display용 [{value, label}]
+        popup: Object   # codePopup용 {url, codeField, nameField}
+        default: String # dateRange: THIS_MONTH/TODAY/THIS_YEAR, yearMonth: THIS_MONTH/PREV_MONTH, year: THIS_YEAR
+        colspan: Number # 차지할 컬럼 수
+        # === 새 속성 ===
+        prefix: String  # 입력 앞 표시 텍스트 (예: '₩', '$')
+        suffix: String  # 입력 뒤 표시 텍스트 (예: '원', 'kg', '%')
+        min: Number     # 숫자 최소값
+        max: Number     # 숫자 최대값
+        step: Number    # 숫자 증감 단위
+        helpText: String # 필드 아래 도움말 텍스트
+        dependsOn: Object # 의존 콤보 {field: '상위필드명', paramKey: 'API파라미터키'}
+        onChange: String  # 변경 시 동작 힌트 (코드 생성 시 참고)
+        onLabel: String   # switch용 ON 라벨
+        offLabel: String  # switch용 OFF 라벨
+        badge: Boolean    # display용 뱃지 스타일
+        badgeColors: Object # display용 값별 색상 맵 {DRAFT: '#4a90d9', ...}
+        checkLabel: String  # checkbox용 라벨 텍스트
+
+tabs:                 # 탭 정의 (split-tab 유형)
+  - id: String        # 탭 패널 ID
+    label: String     # 탭 헤더 텍스트
+    content: String   # grid ID 또는 form ID
+
+layout:
+  type: String        # full, split-h, split-v
+  splitWidth: Number  # 좌측 패널 기본 너비 (split-h, px)
+
+sql:
+  tables:             # 사용하는 테이블 목록
+    - name: String    # 테이블명
+      alias: String   # 별칭
+  selectGrid1:
+    type: String      # select
+    table: String     # 메인 테이블
+    joins:            # JOIN 정의
+      - table: String
+        alias: String
+        on: String    # JOIN 조건
+        type: String  # LEFT, INNER (기본 LEFT)
+    columns: String   # SELECT 컬럼 (생략 시 * 사용)
+    where: String     # 기본 WHERE (동적 조건 외)
+    orderBy: String   # ORDER BY
+  insertGrid1:
+    type: String      # insert
+    table: String
+  updateGrid1:
+    type: String      # update
+    table: String
+    where: String     # WHERE 조건
+  deleteGrid1:
+    type: String      # delete
+    table: String
+    where: String     # WHERE 조건
+
+behavior:             # 특수 동작 힌트 (코드 생성 시 참고)
+  - type: String      # autoCalc, statusChange, lazyLoad, validation, etc.
+    description: String
+    trigger: String   # 트리거 조건
+    action: String    # 실행 동작
+
+# --- 규칙 요약 ---
+#
+# 1. screen.type이 코드 구조를 결정:
+#    - list: 검색폼 + 단일 그리드
+#    - master-detail: 검색폼 + 마스터그리드 + 입력폼 + 디테일그리드
+#    - split-detail: 좌우분할 + 좌측그리드 + 우측그리드
+#    - split-tab: 좌우분할 + 좌측그리드 + 우측탭(폼/그리드)
+#
+# 2. grids의 key(grid1, grid2 등)는 SQL의 selectGrid1, saveGrid1 등과 매핑
+#
+# 3. form은 master-detail, split-tab 유형에서 사용
+#    검색폼은 search 섹션으로 별도 정의
+#
+# 4. tabs는 split-tab 유형에서만 사용
+#    content 값이 grids 또는 form의 key를 참조
+#
+# 5. sql 섹션은 MyBatis XML 생성의 힌트
+#    실제 SQL은 AI가 테이블 구조를 참고하여 생성
+#
+# 6. behavior 섹션은 선택사항
+#    특수 동작이 있을 때만 기술 (자동계산, 상태전이 등)
+#
+# 7. form widget 목록:
+#    기본: text, number, combo, date, dateRange, codePopup, textarea, checkbox, radio, hidden
+#    확장: currency, multiCombo, yearMonth, year, switch, divider, display, password
+#
+# 8. form 새 속성:
+#    prefix, suffix, min, max, step, helpText, dependsOn, onChange,
+#    onLabel, offLabel, badge, badgeColors, checkLabel

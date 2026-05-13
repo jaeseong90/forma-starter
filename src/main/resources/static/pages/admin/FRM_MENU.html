@@ -1,0 +1,464 @@
+<style>
+        .menu-tree { padding: 4px; font-size: 12px; }
+        .menu-tree ul { list-style: none; padding-left: 20px; margin: 0; }
+        .menu-tree > ul { padding-left: 0; }
+        .menu-tree li { padding: 0; }
+        .menu-tree-item {
+            display: flex; align-items: center; gap: 4px;
+            padding: 3px 6px; cursor: pointer; border-radius: 3px;
+            border-left: 3px solid transparent; white-space: nowrap;
+        }
+        .menu-tree-item:hover { background: var(--bg-hover); }
+        .menu-tree-item.selected { background: var(--bg-selected); border-left-color: var(--primary); font-weight: 600; }
+        .menu-tree-item .toggle { width: 14px; min-width: 14px; text-align: center; font-size: 9px; color: var(--text-muted); cursor: pointer; }
+        .menu-tree-item .icon { font-size: 13px; min-width: 16px; }
+        .menu-tree-item .label { white-space: nowrap; color: var(--text); }
+        .menu-tree-item .id-badge { font-size: 10px; color: var(--text-muted); margin-left: 4px; }
+        .menu-tree-item .type-badge { display: none; }
+        .menu-tree-item.disabled { opacity: 0.4; }
+        .menu-tree-item.disabled .label { text-decoration: line-through; }
+    </style>
+<div class="forma-page">
+    <div class="forma-page-header">
+        <h1 class="forma-page-title" id="title-FRM_MENU"></h1>
+        <div id="toolbar-FRM_MENU"></div>
+    </div>
+    <div class="forma-content">
+        <div class="forma-split-h" id="split-FRM_MENU" style="min-height:500px;">
+            <div class="forma-split-panel" style="width:340px;overflow:auto;">
+                <div class="forma-section" style="height:100%;overflow:auto;">
+                    <div class="forma-section-title" style="display:flex;justify-content:space-between;align-items:center;">
+                        메뉴 트리
+                        <button type="button" class="forma-btn" style="font-size:11px;height:22px;padding:0 8px;" onclick="document.dispatchEvent(new CustomEvent('sy010-add-root'))">+ 최상위 그룹</button>
+                    </div>
+                    <div style="font-size:11px;color:#888;margin-bottom:6px;">메뉴 우클릭 → 하위 추가/이동/삭제</div>
+                    <div id="menu-tree-FRM_MENU" class="menu-tree"></div>
+                </div>
+            </div>
+            <div class="forma-split-handle"></div>
+            <div class="forma-split-panel" style="flex:1;">
+                <div class="forma-section">
+                    <div class="forma-section-title" id="detail-title-FRM_MENU">메뉴 상세 (메뉴를 선택하세요)</div>
+                    <div id="menu-form-FRM_MENU"></div>
+                </div>
+                <div class="forma-section" style="margin-top:8px;">
+                    <div class="forma-section-title">하위 메뉴</div>
+                    <div id="child-grid-FRM_MENU"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+(async function() {
+    const PGM = 'FRM_MENU';
+    const S = PGM;
+    const listener = platform.initListener(PGM);
+    const ctx = { allMenus: [], selectedMenu: null, groupOptions: [] };
+
+    await platform.startPage(PGM, listener);
+
+    FormaUtil.initSplit('#split-' + S);
+
+    // 상세 폼
+    ctx.menuForm = new FormaForm('#menu-form-' + S, {
+        columns: 2, labelWidth: 90,
+        elements: [
+            { field: 'menuId', label: '메뉴ID', required: true },
+            { field: 'menuNm', label: '메뉴명', required: true },
+            { field: 'parentId', label: '상위메뉴', widget: 'combo', options: [] },
+            { field: 'menuType', label: '유형', widget: 'combo',
+              options: [{ value: 'G', label: '그룹' }, { value: 'P', label: '화면' }],
+              onChange: function(v) { toggleFieldsByType(v); } },
+            { field: 'pgmId', label: '프로그램', widget: 'codePopup',
+              popup: { url: '/pages/popup/PGM_P01.html', codeField: 'pgmId', nameField: 'pgmNm', width: 600, height: 400 } },
+            { field: 'url', label: 'URL' },
+            { field: 'sortOrder', label: '정렬순서', widget: 'number' },
+            { field: 'useYn', label: '사용', widget: 'combo',
+              options: [{ value: 'Y', label: '사용' }, { value: 'N', label: '미사용' }] }
+        ],
+        onChange: function(field, value) {
+            if (field === 'pgmId' && ctx.menuForm.getField('menuType') === 'P') {
+                var el = document.querySelector('#menu-form-' + S + ' .forma-codepopup-name');
+                if (el && el.textContent) {
+                    ctx.menuForm.setField('menuNm', el.textContent);
+                }
+            }
+        }
+    });
+
+    function toggleFieldsByType(type) {
+        if (type === 'P') {
+            ctx.menuForm.hideField('menuNm');
+            ctx.menuForm.setRequired('menuNm', false);
+            ctx.menuForm.showField('pgmId');
+            ctx.menuForm.showField('url');
+        } else {
+            ctx.menuForm.showField('menuNm');
+            ctx.menuForm.setRequired('menuNm', true);
+            ctx.menuForm.hideField('pgmId');
+            ctx.menuForm.hideField('url');
+        }
+    }
+
+    // 하위 메뉴 그리드
+    ctx.childGrid = new FormaGrid('#child-grid-' + S, {
+        sortable: true,
+        columns: [
+            { field: 'menuId', label: '메뉴ID', width: 80 },
+            { field: 'menuNm', label: '메뉴명', width: 150 },
+            { field: 'menuType', label: '유형', width: 50, align: 'center',
+              renderer: function(v) { return v === 'G' ? '그룹' : '화면'; } },
+            { field: 'pgmId', label: '프로그램', width: 80 },
+            { field: 'sortOrder', label: '정렬', width: 50, type: 'number', align: 'center' },
+            { field: 'useYn', label: '사용', width: 40, align: 'center' }
+        ],
+        onRowClick: function(row) { selectMenu(row.menuId); }
+    });
+
+    // ═══ 트리 렌더링 ═══
+    function buildTree(menus) {
+        const map = {};
+        const roots = [];
+        menus.forEach(function(m) { map[m.menuId] = { data: m, children: [] }; });
+        menus.forEach(function(m) {
+            if (m.parentId && map[m.parentId]) {
+                map[m.parentId].children.push(map[m.menuId]);
+            } else {
+                roots.push(map[m.menuId]);
+            }
+        });
+        return roots;
+    }
+
+    function renderTree(nodes, container) {
+        container.innerHTML = '';
+        const ul = document.createElement('ul');
+        nodes.forEach(function(node) { ul.appendChild(renderNode(node)); });
+        container.appendChild(ul);
+    }
+
+    function renderNode(node) {
+        const m = node.data;
+        const li = document.createElement('li');
+
+        const div = document.createElement('div');
+        div.className = 'menu-tree-item' + (m.useYn === 'N' ? ' disabled' : '');
+        div.dataset.menuId = m.menuId;
+
+        const toggle = document.createElement('span');
+        toggle.className = 'toggle';
+        if (node.children.length > 0) {
+            toggle.textContent = '\u25BC';
+            toggle.onclick = function(e) {
+                e.stopPropagation();
+                const sub = li.querySelector('ul');
+                if (sub) {
+                    const open = sub.style.display !== 'none';
+                    sub.style.display = open ? 'none' : '';
+                    toggle.textContent = open ? '\u25B6' : '\u25BC';
+                }
+            };
+        }
+        div.appendChild(toggle);
+
+        if (m.icon) {
+            const icon = document.createElement('span');
+            icon.className = 'icon';
+            icon.textContent = m.icon;
+            div.appendChild(icon);
+        }
+
+        const label = document.createElement('span');
+        label.className = 'label';
+        label.textContent = m.menuNm;
+        div.appendChild(label);
+
+        const idBadge = document.createElement('span');
+        idBadge.className = 'id-badge';
+        idBadge.textContent = m.menuId;
+        div.appendChild(idBadge);
+
+        div.onclick = function() { selectMenu(m.menuId); };
+        div.oncontextmenu = function(e) {
+            e.preventDefault();
+            selectMenu(m.menuId);
+            showTreeContextMenu(e, m);
+        };
+
+        li.appendChild(div);
+
+        if (node.children.length > 0) {
+            const sub = document.createElement('ul');
+            node.children.forEach(function(child) { sub.appendChild(renderNode(child)); });
+            li.appendChild(sub);
+        }
+
+        return li;
+    }
+
+    function selectMenu(menuId) {
+        ctx.selectedMenu = ctx.allMenus.find(function(m) { return m.menuId === menuId; });
+        if (!ctx.selectedMenu) return;
+
+        const m = ctx.selectedMenu;
+        document.getElementById('detail-title-' + S).textContent = m.menuNm + ' (' + m.menuId + ')';
+
+        ctx.menuForm.setData({
+            menuId: m.menuId, menuNm: m.menuNm, parentId: m.parentId || '',
+            menuType: m.menuType, pgmId: m.pgmId || '', url: m.url || '',
+            sortOrder: m.sortOrder != null ? m.sortOrder : 0, useYn: m.useYn || 'Y'
+        });
+        ctx.menuForm.setReadonly('menuId', true);
+        toggleFieldsByType(m.menuType);
+        ctx.menuForm.setMode(FORM_MODE.EDIT);
+
+        const children = ctx.allMenus.filter(function(c) { return c.parentId === menuId; });
+        ctx.childGrid.setData(children);
+
+        const items = document.querySelectorAll('#menu-tree-' + S + ' .menu-tree-item');
+        items.forEach(function(el) { el.classList.toggle('selected', el.dataset.menuId === menuId); });
+    }
+
+    // ═══ 우클릭 컨텍스트 메뉴 ═══
+    function showTreeContextMenu(e, menu) {
+        const old = document.querySelector('.menu-ctx');
+        if (old) old.remove();
+
+        const div = document.createElement('div');
+        div.className = 'menu-ctx';
+        div.style.cssText = 'position:fixed;z-index:9999;background:var(--bg-card);color:var(--text);border:1px solid var(--border);border-radius:6px;box-shadow:0 4px 16px var(--shadow);padding:4px 0;font-size:12px;min-width:160px;';
+        div.style.left = e.clientX + 'px';
+        div.style.top = e.clientY + 'px';
+
+        const items = [
+            { label: '+ 하위 그룹 추가', icon: '📁', action: function() { addChild(menu, 'G'); } },
+            { label: '+ 하위 화면 추가', icon: '📄', action: function() { addChild(menu, 'P'); } },
+            { sep: true },
+            { label: '+ 같은 레벨에 추가', icon: '➕', action: function() { addSibling(menu); } },
+            { sep: true },
+            { label: '▲ 위로 이동', action: function() { moveMenu(menu, -1); } },
+            { label: '▼ 아래로 이동', action: function() { moveMenu(menu, 1); } },
+            { sep: true },
+            { label: '삭제', icon: '🗑️', action: function() { listener.button.del.click(); }, danger: true }
+        ];
+
+        items.forEach(function(item) {
+            if (item.sep) {
+                const hr = document.createElement('div');
+                hr.style.cssText = 'height:1px;background:var(--border-light);margin:4px 0;';
+                div.appendChild(hr);
+                return;
+            }
+            const row = document.createElement('div');
+            row.style.cssText = 'padding:6px 14px;cursor:pointer;display:flex;align-items:center;gap:6px;' + (item.danger ? 'color:#e53935;' : '');
+            row.innerHTML = (item.icon ? '<span>' + item.icon + '</span>' : '') + '<span>' + item.label + '</span>';
+            row.onmouseover = function() { row.style.background = 'var(--bg-hover)'; };
+            row.onmouseout = function() { row.style.background = ''; };
+            row.onclick = function() { div.remove(); item.action(); };
+            div.appendChild(row);
+        });
+
+        document.body.appendChild(div);
+        setTimeout(function() {
+            document.addEventListener('click', function handler() { div.remove(); document.removeEventListener('click', handler); });
+        }, 0);
+    }
+
+    function getMaxSort(parentId) {
+        let max = 0;
+        var pid = parentId || null;
+        ctx.allMenus.forEach(function(m) {
+            if ((m.parentId || null) === pid && (m.sortOrder || 0) > max) max = m.sortOrder;
+        });
+        return max;
+    }
+
+    function addChild(parentMenu, type) {
+        ctx.menuForm.setMode(FORM_MODE.NEW);
+        ctx.selectedMenu = null;
+        ctx.menuForm.clear();
+        ctx.menuForm.setData({
+            parentId: parentMenu.menuId,
+            menuType: type,
+            useYn: 'Y',
+            sortOrder: getMaxSort(parentMenu.menuId) + 1
+        });
+        ctx.menuForm.setReadonly('menuId', false);
+        ctx.menuForm.focus('menuId');
+        toggleFieldsByType(type);
+        document.getElementById('detail-title-' + S).textContent = (type === 'G' ? '신규 그룹' : '신규 화면') + ' (상위: ' + parentMenu.menuNm + ')';
+    }
+
+    function addSibling(menu) {
+        ctx.menuForm.setMode(FORM_MODE.NEW);
+        ctx.selectedMenu = null;
+        ctx.menuForm.clear();
+        ctx.menuForm.setData({
+            parentId: menu.parentId || '',
+            menuType: 'P',
+            useYn: 'Y',
+            sortOrder: getMaxSort(menu.parentId) + 1
+        });
+        ctx.menuForm.setReadonly('menuId', false);
+        ctx.menuForm.focus('menuId');
+        toggleFieldsByType('P');
+        document.getElementById('detail-title-' + S).textContent = '신규 메뉴 (같은 레벨)';
+    }
+
+    function menuToSaveRow(m, overrides) {
+        var row = {
+            gstat: 'U', menuId: m.menuId, menuNm: m.menuNm,
+            parentId: m.parentId || null, menuType: m.menuType,
+            pgmId: m.pgmId || null, url: m.url || null,
+            sortOrder: m.sortOrder || 0, useYn: m.useYn || 'Y'
+        };
+        if (overrides) Object.assign(row, overrides);
+        return row;
+    }
+
+    async function moveMenu(menu, direction) {
+        const parentId = menu.parentId || null;
+        const siblings = ctx.allMenus.filter(function(m) { return (m.parentId || null) === parentId; });
+        siblings.sort(function(a, b) { return (a.sortOrder || 0) - (b.sortOrder || 0); });
+        const idx = siblings.findIndex(function(m) { return m.menuId === menu.menuId; });
+        const targetIdx = idx + direction;
+        if (targetIdx < 0 || targetIdx >= siblings.length) return;
+
+        const mySort = siblings[idx].sortOrder || 0;
+        let targetSort = siblings[targetIdx].sortOrder || 0;
+        if (mySort === targetSort) targetSort = mySort + direction;
+
+        await platform.post('/api/admin/menus/save', [
+            menuToSaveRow(siblings[idx], { sortOrder: targetSort }),
+            menuToSaveRow(siblings[targetIdx], { sortOrder: mySort })
+        ]);
+        listener.button.search.click();
+    }
+
+    function updateGroupOptions() {
+        const opts = [{ value: '', label: '(최상위)' }];
+        ctx.allMenus.filter(function(m) { return m.menuType === 'G'; }).forEach(function(m) {
+            opts.push({ value: m.menuId, label: m.menuNm + ' (' + m.menuId + ')' });
+        });
+        ctx.groupOptions = opts;
+        ctx.menuForm.setOptions('parentId', opts);
+    }
+
+    // ═══ 버튼 ═══
+    listener.button.search.click = function() {
+        platform.post('/api/admin/menus', {}, new Callback(function(r) {
+            if (r.resultCode === RESULT_CODE.OK) {
+                ctx.allMenus = r.resultData;
+                const tree = buildTree(ctx.allMenus);
+                renderTree(tree, document.getElementById('menu-tree-' + S));
+                updateGroupOptions();
+                ctx.menuForm.clear();
+                ctx.childGrid.clearData();
+                ctx.selectedMenu = null;
+                document.getElementById('detail-title-' + S).textContent = '메뉴 상세 (메뉴를 선택하세요)';
+            }
+        }));
+    };
+
+    listener.button.news.click = function() {
+        ctx.menuForm.setMode(FORM_MODE.NEW);
+        ctx.selectedMenu = null;
+        const defaults = { menuType: 'P', useYn: 'Y', sortOrder: 0 };
+
+        const sel = document.querySelector('#menu-tree-' + S + ' .menu-tree-item.selected');
+        if (sel) {
+            const selMenu = ctx.allMenus.find(function(m) { return m.menuId === sel.dataset.menuId; });
+            if (selMenu && selMenu.menuType === 'G') {
+                defaults.parentId = selMenu.menuId;
+            }
+        }
+
+        ctx.menuForm.clear();
+        ctx.menuForm.setData(defaults);
+        ctx.menuForm.setReadonly('menuId', false);
+        ctx.menuForm.focus('menuId');
+        toggleFieldsByType(defaults.menuType);
+        ctx.childGrid.clearData();
+        document.getElementById('detail-title-' + S).textContent = '신규 메뉴';
+
+        document.querySelectorAll('#menu-tree-' + S + ' .menu-tree-item').forEach(function(el) { el.classList.remove('selected'); });
+    };
+
+    function normalizeMenuData(data) {
+        if (data.parentId === '' || data.parentId === undefined) data.parentId = null;
+        if (data.pgmId === '') data.pgmId = null;
+        if (data.url === '') data.url = null;
+        if (data.sortOrder != null) data.sortOrder = Number(data.sortOrder) || 0;
+        return data;
+    }
+
+    listener.button.save.click = async function() {
+        if (!ctx.menuForm.getMode()) { FormaPopup.alert.show('저장할 대상이 없습니다.'); return; }
+        if (!ctx.menuForm.validate()) return;
+        const data = normalizeMenuData(ctx.menuForm.getData());
+        data.gstat = ctx.menuForm.getMode() === FORM_MODE.NEW ? 'I' : 'U';
+
+        // 화면 유형일 때 프로그램명을 메뉴명으로 자동 세팅
+        if (data.menuType === 'P' && !data.menuNm) {
+            var el = document.querySelector('#menu-form-' + S + ' .forma-codepopup-name');
+            if (el && el.textContent) data.menuNm = el.textContent;
+        }
+
+        if (data.pgmId && !data.url) {
+            data.url = '/pages/screen.html?id=' + data.pgmId;
+        }
+
+        const ok = await FormaPopup.confirm.show('저장하시겠습니까?');
+        if (ok) {
+            var res = await platform.post('/api/admin/menus/save', [data]);
+            if (res && res.resultCode === RESULT_CODE.OK) {
+                FormaPopup.toast.success('저장되었습니다.');
+                listener.button.search.click();
+            }
+        }
+    };
+
+    listener.button.del.click = async function() {
+        if (!ctx.selectedMenu) { FormaPopup.alert.show('삭제할 메뉴를 선택하세요.'); return; }
+        var sm = ctx.selectedMenu;
+        const children = ctx.allMenus.filter(function(c) { return c.parentId === sm.menuId; });
+        if (children.length > 0) {
+            FormaPopup.alert.show('하위 메뉴가 ' + children.length + '개 있습니다. 하위 메뉴를 먼저 삭제하세요.');
+            return;
+        }
+        const ok = await FormaPopup.confirm.show('\'' + sm.menuNm + '\' 메뉴를 삭제하시겠습니까?');
+        if (ok) {
+            var res = await platform.post('/api/admin/menus/delete', [{ menuId: sm.menuId }]);
+            if (res && res.resultCode === RESULT_CODE.OK) {
+                FormaPopup.toast.success('삭제되었습니다.');
+                listener.button.search.click();
+            }
+        }
+    };
+
+    listener.button.init.click = function() {
+        ctx.menuForm.clear();
+        ctx.childGrid.clearData();
+        ctx.selectedMenu = null;
+        ctx.menuForm.setMode(null);
+        document.getElementById('detail-title-' + S).textContent = '메뉴 상세 (메뉴를 선택하세요)';
+        document.querySelectorAll('#menu-tree-' + S + ' .menu-tree-item').forEach(function(el) { el.classList.remove('selected'); });
+    };
+
+    document.addEventListener('sy010-add-root', function() {
+        ctx.menuForm.setMode(FORM_MODE.NEW);
+        ctx.selectedMenu = null;
+        ctx.menuForm.clear();
+        ctx.menuForm.setData({ parentId: '', menuType: 'G', useYn: 'Y', sortOrder: getMaxSort(null) + 1 });
+        ctx.menuForm.setReadonly('menuId', false);
+        ctx.menuForm.focus('menuId');
+        toggleFieldsByType('G');
+        document.getElementById('detail-title-' + S).textContent = '신규 최상위 그룹';
+        document.querySelectorAll('#menu-tree-' + S + ' .menu-tree-item').forEach(function(el) { el.classList.remove('selected'); });
+    });
+
+    listener.button.search.click();
+    listener.initializedPgm = true;
+})();
+</script>

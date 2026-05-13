@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <title>SalesOn - 오류</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Pretendard', -apple-system, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .error-container { background: #fff; border-radius: 12px; box-shadow: 0 2px 16px rgba(0,0,0,0.08); padding: 48px 40px; width: 480px; text-align: center; }
+        .error-code { font-size: 72px; font-weight: 800; color: #e0e4e8; line-height: 1; margin-bottom: 12px; }
+        .error-title { font-size: 20px; font-weight: 700; color: #333; margin-bottom: 8px; }
+        .error-desc { font-size: 14px; color: #888; line-height: 1.6; margin-bottom: 24px; }
+        .error-btn { display: inline-block; padding: 10px 28px; background: #4a90d9; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; transition: background 0.15s; }
+        .error-btn:hover { background: #3a7bc8; }
+        .error-btn-outline { background: none; color: #4a90d9; border: 1px solid #4a90d9; margin-left: 8px; }
+        .error-btn-outline:hover { background: rgba(74,144,217,0.05); }
+    </style>
+</head>
+<body>
+<div class="error-container">
+    <div class="error-code" id="error-code">오류</div>
+    <div class="error-title" id="error-title">요청을 처리할 수 없습니다</div>
+    <div class="error-desc" id="error-desc">페이지를 찾을 수 없거나 서버에서 오류가 발생했습니다.</div>
+    <a class="error-btn" href="/main.html">메인으로</a>
+    <a class="error-btn error-btn-outline" href="javascript:history.back()">뒤로가기</a>
+</div>
+<script>
+(function() {
+    var params = new URLSearchParams(window.location.search);
+    var status = params.get('status') || '';
+    var codeEl = document.getElementById('error-code');
+    var titleEl = document.getElementById('error-title');
+    var descEl = document.getElementById('error-desc');
+
+    if (status === '404') {
+        codeEl.textContent = '404';
+        titleEl.textContent = '페이지를 찾을 수 없습니다';
+        descEl.textContent = '요청하신 페이지가 존재하지 않거나 이동되었습니다.';
+    } else if (status === '403') {
+        codeEl.textContent = '403';
+        titleEl.textContent = '접근 권한이 없습니다';
+        descEl.textContent = '이 페이지에 접근할 권한이 없습니다. 관리자에게 문의하세요.';
+    } else if (status === '500') {
+        codeEl.textContent = '500';
+        titleEl.textContent = '서버 오류가 발생했습니다';
+        descEl.textContent = '잠시 후 다시 시도해주세요. 문제가 지속되면 관리자에게 문의하세요.';
+    } else if (status) {
+        codeEl.textContent = status;
+    }
+})();
+</script>
+</body>
+</html>

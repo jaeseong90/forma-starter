@@ -51,14 +51,14 @@ FORMA 기반 ERP 스타터킷. 백엔드 코어(`frame/`, `login/`) + 표준 관
 
 ### 4. DB 스키마 적용
 
-> **starter v0.1 주의**: 본 starter 는 `src/main/resources/schema/` 가 아직 포함되어 있지 않다.
-> 후속 릴리스에서 프레임워크 공통 테이블 전용 `01-tables.sql` / `02-codes.sql` 을 제공할 예정.
-> 임시로는 FORMA 의 원본 프로젝트(SalesOn) 리포의 `schema/` 를 참고해 아래 공통 테이블 DDL 만 추출해 적용하라.
+- [ ] PostgreSQL DB 생성 (예: `createdb my_erp`)
+- [ ] `src/main/resources/schema/01-tables.sql` 실행 — 프레임워크 공통 테이블 (`tb_user` / `tb_dept` / `tb_role` / `tb_menu` / `tb_pgm_info` / `tb_code_group` / `tb_code` / `tb_audit_log` / `tb_log` / `tb_file` 등 16개) + FK 제약조건
+- [ ] `src/main/resources/schema/02-codes.sql` 실행 — 예시 코드 그룹(직급) 1건. 자기 도메인 코드는 자유롭게 추가/수정
+- [ ] `src/main/resources/schema/04-pgm.sql` 실행 — 표준 관리자 화면(FRM_*) 7건 + 개발자 가이드 데모 5건 의 `tb_pgm_info` 등록
 
-- [ ] PostgreSQL DB 생성
-- [ ] 프레임워크 공통 테이블 DDL 적용 — `tb_user`, `tb_user_role`, `tb_user_settings`, `tb_user_favorite`, `tb_dept`, `tb_role`, `tb_menu`, `tb_role_menu`, `tb_role_auth`, `tb_data_auth`, `tb_pgm_info`, `tb_code_group`, `tb_code`, `tb_audit_log`, `tb_log`, `tb_file`
-- [ ] 프레임워크 공통 코드 그룹 시드 — 메뉴 카테고리·역할 코드·기본 사용여부 등
-- [ ] (있을 때) `schema/migrations/` 의 프레임워크 공통 마이그레이션 적용
+> **DB 호환성**: starter 의 DDL 은 H2 / MySQL 친화(`AUTO_INCREMENT`, `CLOB`). PostgreSQL 사용 시
+> `AUTO_INCREMENT` → `BIGSERIAL`, `CLOB` → `TEXT` 로 치환해 실행하라(starter v0.3 에서 PostgreSQL
+> 전용 DDL 분리 예정).
 
 ### 5. 초기 사용자 시드
 

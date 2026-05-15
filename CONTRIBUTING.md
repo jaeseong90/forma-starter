@@ -55,6 +55,15 @@ Breaking-Change: ... (선택)
 
 존중과 명확한 의사소통. 기술적 비평은 코드/설계 대상이지 사람 대상이 아니다.
 
+## 릴리즈
+
+메인테이너 전용. 절차:
+
+1. `CHANGELOG.md` 의 `[Unreleased]` 섹션을 `[X.Y.Z] - YYYY-MM-DD` 로 잘라낸다. 새 `[Unreleased]` 빈 헤더를 위에 둔다.
+2. 비교 링크(`[X.Y.Z]: ...compare/...`) 갱신.
+3. 커밋 후 `git tag vX.Y.Z && git push --tags`.
+4. `.github/workflows/release.yml` 가 자동으로 GitHub Release 를 만들고 CHANGELOG 의 해당 버전 섹션을 본문으로, `build/libs/*.jar` 를 첨부물로 올린다.
+
 ## 라이선스
 
 기여한 코드는 본 저장소의 [MIT 라이선스](LICENSE) 로 배포된다.

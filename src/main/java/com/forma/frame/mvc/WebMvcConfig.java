@@ -37,7 +37,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/docs/**",
                         "/pages/**",
                         "/manual/**",
-                        "/actuator/**"
+                        "/actuator/**",
+                        // OpenAPI / Swagger UI — application.yml 의 springdoc.* 로 토글. 운영 OFF.
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/swagger-resources/**",
+                        "/webjars/**"
                 );
     }
 

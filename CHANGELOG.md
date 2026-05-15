@@ -39,6 +39,8 @@ FORMA 는 **단방향(starter → 프로젝트)** 배포 정책을 따른다(`CL
 
 ### Added (Dev experience)
 - **OpenAPI / Swagger UI** — `springdoc-openapi-starter-webmvc-ui:2.7.0` 추가. 기본값으로 ON, `/swagger-ui.html` + `/v3/api-docs` 노출. 운영 프로파일(`application-prod.yml.example`)에선 명시적으로 OFF.
+- `WebMvcConfig` TokenInterceptor excludes 에 `/swagger-ui/**`, `/v3/api-docs/**`, `/swagger-resources/**`, `/webjars/**` 추가 — 비로그인 상태에서도 API 문서 탐색 가능 (dev).
+- **`ARCHITECTURE.md`** 루트 신설 — 전체 흐름·핵심 컨벤션·SPI·AI 워크플로 한 화면 다이어그램. 첫 방문자가 README 이전에 시스템 구조 파악 가능.
 
 ### Security
 - `JwtTokenProvider` 기동 시 `forma.jwt.secret` 가 starter 기본값으로 남아 있으면 로그 WARN(local/test) 또는 ERROR(그 외 프로파일) 출력. 운영 전환 시 시크릿 교체 강제하기 위한 안전장치.

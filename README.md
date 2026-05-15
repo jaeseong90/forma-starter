@@ -27,9 +27,11 @@ cp src/main/resources/application-local.yml.example src/main/resources/applicati
 
 기동 후 http://localhost:18080 접속 → **admin / admin1!** 로 로그인. 최초 로그인 후 비밀번호 변경 권장.
 
+API 탐색: http://localhost:18080/swagger-ui.html (dev 기본 ON, prod OFF).
+
 > **로그인이 안되면**: postgres 볼륨에 이전 상태가 남아 있을 수 있다. `docker compose down -v && docker compose up -d` 로 초기화 후 다시 `./gradlew bootRun`.
 
-부트스트랩 전 과정은 [`ONBOARDING.md`](ONBOARDING.md) 참조.
+전체 구조 한눈에: [`ARCHITECTURE.md`](ARCHITECTURE.md) · 부트스트랩 전 과정: [`ONBOARDING.md`](ONBOARDING.md) · 변경 이력: [`CHANGELOG.md`](CHANGELOG.md)
 
 ## 무엇이 들어있나
 

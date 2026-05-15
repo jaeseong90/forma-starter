@@ -1,5 +1,7 @@
--- FORMA Starter — 프레임워크 공통 테이블 DDL
--- (H2 / MySQL 친화 DDL. PostgreSQL 변환본은 init-postgres.sql 참조)
+-- FORMA Starter — 프레임워크 공통 테이블 DDL (PostgreSQL)
+--
+-- docker-compose.yml 의 postgres 컨테이너 첫 기동 시
+-- /docker-entrypoint-initdb.d 로 마운트되어 자동 실행된다.
 --
 -- 본 파일은 신규 프로젝트가 그대로 적용해도 되는 프레임워크 인프라 테이블만 포함한다.
 -- 도메인(업무) 테이블은 본 파일에 추가하지 말고 별도 마이그레이션(schema/migrations/)으로 관리하라.
@@ -40,7 +42,6 @@ CREATE TABLE IF NOT EXISTS tb_user (
     use_yn VARCHAR(1) DEFAULT 'Y'
 );
 
--- 부서 (트리)
 CREATE TABLE IF NOT EXISTS tb_dept (
     dept_code VARCHAR(20) NOT NULL PRIMARY KEY,
     dept_name VARCHAR(100) NOT NULL,
@@ -54,7 +55,6 @@ CREATE TABLE IF NOT EXISTS tb_dept (
     updated_at TIMESTAMP
 );
 
--- 역할
 CREATE TABLE IF NOT EXISTS tb_role (
     role_cd VARCHAR(20) NOT NULL PRIMARY KEY,
     role_nm VARCHAR(100) NOT NULL,
@@ -64,7 +64,6 @@ CREATE TABLE IF NOT EXISTS tb_role (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 사용자-역할 매핑
 CREATE TABLE IF NOT EXISTS tb_user_role (
     user_id VARCHAR(20) NOT NULL,
     role_cd VARCHAR(20) NOT NULL,
@@ -91,7 +90,6 @@ CREATE TABLE IF NOT EXISTS tb_pgm_info (
     use_yn VARCHAR(1) DEFAULT 'Y'
 );
 
--- 메뉴 (트리)
 CREATE TABLE IF NOT EXISTS tb_menu (
     menu_id VARCHAR(20) NOT NULL PRIMARY KEY,
     menu_nm VARCHAR(100) NOT NULL,
@@ -103,7 +101,6 @@ CREATE TABLE IF NOT EXISTS tb_menu (
     use_yn VARCHAR(1) DEFAULT 'Y'
 );
 
--- 역할-프로그램 권한 (프로그램별 버튼 권한)
 CREATE TABLE IF NOT EXISTS tb_role_auth (
     role_cd VARCHAR(20) NOT NULL,
     pgm_id VARCHAR(20) NOT NULL,
@@ -120,9 +117,8 @@ CREATE TABLE IF NOT EXISTS tb_role_auth (
     PRIMARY KEY (role_cd, pgm_id)
 );
 
--- 데이터 권한 (부서/사용자별 데이터 접근 범위)
 CREATE TABLE IF NOT EXISTS tb_data_auth (
-    auth_seq BIGINT AUTO_INCREMENT PRIMARY KEY,
+    auth_seq BIGSERIAL PRIMARY KEY,
     role_cd VARCHAR(20) NOT NULL,
     auth_type VARCHAR(20) NOT NULL,  -- DEPT / DEPT_SUB / USER / ALL / CUSTOM
     auth_target VARCHAR(100),
@@ -155,23 +151,23 @@ CREATE TABLE IF NOT EXISTS tb_user_settings (
 -- ═══════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS tb_log (
-    log_seq BIGINT AUTO_INCREMENT PRIMARY KEY,
+    log_seq BIGSERIAL PRIMARY KEY,
     log_type VARCHAR(20),
     pgm_id VARCHAR(20),
     user_id VARCHAR(20),
     user_ip VARCHAR(50),
-    log_dt TIMESTAMP DEFAULT NOW()
+    log_dt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS tb_audit_log (
-    audit_seq    BIGINT AUTO_INCREMENT PRIMARY KEY,
+    audit_seq    BIGSERIAL PRIMARY KEY,
     trace_id     VARCHAR(50),
     pgm_id       VARCHAR(20),
     table_name   VARCHAR(50),
     action       VARCHAR(10),
     row_key      VARCHAR(200),
-    before_data  CLOB,
-    after_data   CLOB,
+    before_data  TEXT,
+    after_data   TEXT,
     user_id      VARCHAR(50),
     user_ip      VARCHAR(50),
     audit_dt     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -195,36 +191,55 @@ CREATE INDEX IF NOT EXISTS idx_file_ref ON tb_file (ref_type, ref_id);
 
 -- ═══════════════════════════════════════════════
 --  FK 제약조건 (ON DELETE RESTRICT)
+--  IF NOT EXISTS 미지원이므로 DO 블록으로 idempotent 처리
 -- ═══════════════════════════════════════════════
 
-ALTER TABLE tb_code ADD CONSTRAINT fk_code_group
-    FOREIGN KEY (grp_code) REFERENCES tb_code_group(grp_code) ON DELETE RESTRICT;
+DO $$ BEGIN
+    BEGIN ALTER TABLE tb_code ADD CONSTRAINT fk_code_group
+        FOREIGN KEY (grp_code) REFERENCES tb_code_group(grp_code) ON DELETE RESTRICT;
+    EXCEPTION WHEN duplicate_object THEN NULL; END;
 
-ALTER TABLE tb_user ADD CONSTRAINT fk_user_dept
-    FOREIGN KEY (dept_code) REFERENCES tb_dept(dept_code) ON DELETE RESTRICT;
+    BEGIN ALTER TABLE tb_user ADD CONSTRAINT fk_user_dept
+        FOREIGN KEY (dept_code) REFERENCES tb_dept(dept_code) ON DELETE RESTRICT;
+    EXCEPTION WHEN duplicate_object THEN NULL; END;
 
-ALTER TABLE tb_user_role ADD CONSTRAINT fk_user_role_user
-    FOREIGN KEY (user_id) REFERENCES tb_user(user_id) ON DELETE RESTRICT;
-ALTER TABLE tb_user_role ADD CONSTRAINT fk_user_role_role
-    FOREIGN KEY (role_cd) REFERENCES tb_role(role_cd) ON DELETE RESTRICT;
+    BEGIN ALTER TABLE tb_user_role ADD CONSTRAINT fk_user_role_user
+        FOREIGN KEY (user_id) REFERENCES tb_user(user_id) ON DELETE RESTRICT;
+    EXCEPTION WHEN duplicate_object THEN NULL; END;
 
-ALTER TABLE tb_menu ADD CONSTRAINT fk_menu_parent
-    FOREIGN KEY (parent_id) REFERENCES tb_menu(menu_id) ON DELETE RESTRICT;
-ALTER TABLE tb_menu ADD CONSTRAINT fk_menu_pgm
-    FOREIGN KEY (pgm_id) REFERENCES tb_pgm_info(pgm_id) ON DELETE RESTRICT;
+    BEGIN ALTER TABLE tb_user_role ADD CONSTRAINT fk_user_role_role
+        FOREIGN KEY (role_cd) REFERENCES tb_role(role_cd) ON DELETE RESTRICT;
+    EXCEPTION WHEN duplicate_object THEN NULL; END;
 
-ALTER TABLE tb_role_auth ADD CONSTRAINT fk_role_auth_role
-    FOREIGN KEY (role_cd) REFERENCES tb_role(role_cd) ON DELETE RESTRICT;
-ALTER TABLE tb_role_auth ADD CONSTRAINT fk_role_auth_pgm
-    FOREIGN KEY (pgm_id) REFERENCES tb_pgm_info(pgm_id) ON DELETE RESTRICT;
+    BEGIN ALTER TABLE tb_menu ADD CONSTRAINT fk_menu_parent
+        FOREIGN KEY (parent_id) REFERENCES tb_menu(menu_id) ON DELETE RESTRICT;
+    EXCEPTION WHEN duplicate_object THEN NULL; END;
 
-ALTER TABLE tb_data_auth ADD CONSTRAINT fk_data_auth_role
-    FOREIGN KEY (role_cd) REFERENCES tb_role(role_cd) ON DELETE RESTRICT;
+    BEGIN ALTER TABLE tb_menu ADD CONSTRAINT fk_menu_pgm
+        FOREIGN KEY (pgm_id) REFERENCES tb_pgm_info(pgm_id) ON DELETE RESTRICT;
+    EXCEPTION WHEN duplicate_object THEN NULL; END;
 
-ALTER TABLE tb_user_favorite ADD CONSTRAINT fk_user_fav_user
-    FOREIGN KEY (user_id) REFERENCES tb_user(user_id) ON DELETE RESTRICT;
-ALTER TABLE tb_user_favorite ADD CONSTRAINT fk_user_fav_menu
-    FOREIGN KEY (menu_id) REFERENCES tb_menu(menu_id) ON DELETE RESTRICT;
+    BEGIN ALTER TABLE tb_role_auth ADD CONSTRAINT fk_role_auth_role
+        FOREIGN KEY (role_cd) REFERENCES tb_role(role_cd) ON DELETE RESTRICT;
+    EXCEPTION WHEN duplicate_object THEN NULL; END;
 
-ALTER TABLE tb_user_settings ADD CONSTRAINT fk_user_settings_user
-    FOREIGN KEY (user_id) REFERENCES tb_user(user_id) ON DELETE RESTRICT;
+    BEGIN ALTER TABLE tb_role_auth ADD CONSTRAINT fk_role_auth_pgm
+        FOREIGN KEY (pgm_id) REFERENCES tb_pgm_info(pgm_id) ON DELETE RESTRICT;
+    EXCEPTION WHEN duplicate_object THEN NULL; END;
+
+    BEGIN ALTER TABLE tb_data_auth ADD CONSTRAINT fk_data_auth_role
+        FOREIGN KEY (role_cd) REFERENCES tb_role(role_cd) ON DELETE RESTRICT;
+    EXCEPTION WHEN duplicate_object THEN NULL; END;
+
+    BEGIN ALTER TABLE tb_user_favorite ADD CONSTRAINT fk_user_fav_user
+        FOREIGN KEY (user_id) REFERENCES tb_user(user_id) ON DELETE RESTRICT;
+    EXCEPTION WHEN duplicate_object THEN NULL; END;
+
+    BEGIN ALTER TABLE tb_user_favorite ADD CONSTRAINT fk_user_fav_menu
+        FOREIGN KEY (menu_id) REFERENCES tb_menu(menu_id) ON DELETE RESTRICT;
+    EXCEPTION WHEN duplicate_object THEN NULL; END;
+
+    BEGIN ALTER TABLE tb_user_settings ADD CONSTRAINT fk_user_settings_user
+        FOREIGN KEY (user_id) REFERENCES tb_user(user_id) ON DELETE RESTRICT;
+    EXCEPTION WHEN duplicate_object THEN NULL; END;
+END $$;

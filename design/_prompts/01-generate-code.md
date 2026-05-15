@@ -6,7 +6,7 @@
 - CLAUDE.md의 패턴 규칙
 
 ## 생성 대상 파일
-(`{basePkg}` 는 `CLAUDE.md` 인스턴스 섹션의 `basePackage` 를 슬래시 경로로 옮긴 것. 예: `com.saleson` → `com/saleson`)
+(`{basePkg}` 는 `CLAUDE.md` 인스턴스 섹션의 `basePackage` 를 슬래시 경로로 옮긴 것. 예: `com.forma` → `com/forma`)
 
 1. `src/main/java/{basePkg}/domain/{module}/{PgmId}Controller.java`
 2. `src/main/java/{basePkg}/domain/{module}/{PgmId}Service.java`

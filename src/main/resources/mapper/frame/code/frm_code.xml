@@ -3,7 +3,7 @@
 <mapper namespace="frm_code">
 
     <!-- 코드그룹 -->
-    <select id="selectGroups" parameterType="map" resultType="com.saleson.frame.common.dto.CodeGroupResDto">
+    <select id="selectGroups" parameterType="map" resultType="com.forma.frame.common.dto.CodeGroupResDto">
         SELECT grp_code, grp_name
           FROM tb_code_group
         <where>
@@ -33,7 +33,7 @@
     </delete>
 
     <!-- 코드상세 -->
-    <select id="selectCodes" parameterType="map" resultType="com.saleson.frame.common.dto.CodeResDto">
+    <select id="selectCodes" parameterType="map" resultType="com.forma.frame.common.dto.CodeResDto">
         SELECT grp_code, code, code_name, sort_order, use_yn, attr1, attr2, attr3
           FROM tb_code
          WHERE grp_code = #{grpCode}

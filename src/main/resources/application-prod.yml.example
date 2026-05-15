@@ -3,10 +3,10 @@
 ## 사용법: 본 파일을 application-prod.yml 로 복사한 후 값을 자기 환경에 맞춰 수정.
 ## application-prod.yml 은 .gitignore 에 의해 커밋 대상이 아니다.
 ##
-## 운영 시크릿은 가급적 환경변수(SALESON_*) 로 주입하고 본 파일에는 평문으로 두지 말 것.
-## application.yml 의 ${SALESON_*:default} 표기 참조.
+## 운영 시크릿은 가급적 환경변수(FORMA_*) 로 주입하고 본 파일에는 평문으로 두지 말 것.
+## application.yml 의 ${FORMA_*:default} 표기 참조.
 
-saleson:
+forma:
   file:
     # 운영: 다운로드는 nginx X-Accel-Redirect 위임 권장.
     # internal-location 은 nginx conf 의 `location /download/ { internal; alias ...; }` 와 일치해야 함.
@@ -17,14 +17,14 @@ saleson:
     datasource:
       jdbc-url: jdbc:postgresql://your-db-host:5432/your_db_name
       driver-class-name: org.postgresql.Driver
-      username: ${SALESON_DB_USER:your_db_user}
-      password: ${SALESON_DB_PASS:CHANGE_ME}
+      username: ${FORMA_DB_USER:your_db_user}
+      password: ${FORMA_DB_PASS:CHANGE_ME}
   claude:
-    api-key: ${SALESON_CLAUDE_API_KEY:}
+    api-key: ${FORMA_CLAUDE_API_KEY:}
   openai:
-    api-key: ${SALESON_OPENAI_API_KEY:}
+    api-key: ${FORMA_OPENAI_API_KEY:}
 
 logging:
   level:
-    com.saleson: INFO
+    com.forma: INFO
     org.springframework: WARN

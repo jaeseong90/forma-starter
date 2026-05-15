@@ -14,7 +14,7 @@ $ARGUMENTS — YAML 파일 경로 (예: `design/screens/ITM010.yml`)
 
 ## basePackage
 
-`CLAUDE.md` 인스턴스 섹션의 `basePackage` 값을 사용한다(예: `com.saleson`). 이하 경로는 `{basePkg}` 자리에 그 값을 슬래시로 표기한 것(`com.saleson` → `com/saleson`)을 넣는다.
+`CLAUDE.md` 인스턴스 섹션의 `basePackage` 값을 사용한다(예: `com.forma`). 이하 경로는 `{basePkg}` 자리에 그 값을 슬래시로 표기한 것(`com.forma` → `com/forma`)을 넣는다.
 
 ## 생성 대상
 

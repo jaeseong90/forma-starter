@@ -70,7 +70,7 @@ src/main/resources/mapper/domain/{module}/{pgmId}.xml
 src/main/resources/static/pages/{module}/{PGMID}.html
 ```
 
-`basePackage`는 `CLAUDE.md`에서 읽는다 (SalesOn: `com.saleson`).
+`basePackage`는 `CLAUDE.md`에서 읽는다 (FORMA: `com.forma`).
 
 표준 템플릿은 `doc/FORMA-프레임워크.md` §3(백엔드 패턴) + `doc/프론트-패턴.md`(프론트 패턴) 참조.
 

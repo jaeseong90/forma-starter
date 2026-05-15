@@ -2,14 +2,17 @@
 ##
 ## 사용법: 본 파일을 application-local.yml 로 복사한 후 값을 자기 환경에 맞춰 수정.
 ## application-local.yml 은 .gitignore 에 의해 커밋 대상이 아니다 — 시크릿이 새지 않게 한다.
+##
+## 기본값은 저장소 루트의 `docker compose up -d` 로 띄우는 PostgreSQL 컨테이너(forma-postgres)와
+## 맞춰져 있다. 그대로 복사하면 별도 수정 없이 동작한다.
 
-saleson:
+forma:
   primary:
     datasource:
-      jdbc-url: jdbc:postgresql://localhost:5432/your_db_name
+      jdbc-url: jdbc:postgresql://localhost:5432/forma
       driver-class-name: org.postgresql.Driver
-      username: your_db_user
-      password: your_db_password
+      username: forma
+      password: forma
   # AI 기능(회의록 자동작성·보고서 초안 등) 사용 시에만 채움. 미사용이면 빈 값 유지.
   claude:
     api-key: ""

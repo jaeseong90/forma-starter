@@ -50,7 +50,7 @@ public class MyProjectSpiConfig {
 
 ### 3.1 `LoginUser`
 
-**위치**: `com.saleson.frame.auth.LoginUser`
+**위치**: `com.forma.frame.auth.LoginUser`
 
 **시그니처 (현재)**
 ```java
@@ -64,14 +64,14 @@ public interface LoginUser {
     boolean isViewAll();
 }
 ```
-- 기본 구현: `com.saleson.login.LoginUserVo` (Lombok `@Data` POJO, JWT 클레임에서 채워짐)
+- 기본 구현: `com.forma.login.LoginUserVo` (Lombok `@Data` POJO, JWT 클레임에서 채워짐)
 - 호출자: `UserInfoAspect`(`@AddUserInfo`), `AuditLogAspect`, `DataAuthService`, `DynamicSqlExecutor`, `PgmController`, `FileController`, `UserSettingsController`, `TokenInterceptor`(생성 측만)
 - override 사유: 사번·회사·직급 등 프로젝트 고유 필드. JWT payload에 담을 내용 커스터마이즈.
 - 다음 단계: `UserAuthProvider` 추출 시 "LoginUser 생성 책임"을 SPI로 분리 → `TokenInterceptor`가 SPI를 통해서만 생성. 그 시점에 인터페이스에 `getRoles()` / `getAttributes()` 추가 검토.
 
 ### 3.2 `UserAuthProvider`
 
-**위치**: `com.saleson.frame.auth.UserAuthProvider`
+**위치**: `com.forma.frame.auth.UserAuthProvider`
 
 **시그니처 (현재)**
 ```java
@@ -83,8 +83,8 @@ public interface UserAuthProvider {
     LoginUser loadByToken(String token, String clientIp);
 }
 ```
-- 기본 구현: `com.saleson.login.JwtUserAuthProvider` — 로컬 DB(`tb_user`) + BCrypt + 자체 JWT
-- 등록 방식: `com.saleson.login.AuthSpiConfig` 의 `@Bean @ConditionalOnMissingBean`. 프로젝트가 같은 타입 빈을 등록하면 본 기본 빈은 비활성화.
+- 기본 구현: `com.forma.login.JwtUserAuthProvider` — 로컬 DB(`tb_user`) + BCrypt + 자체 JWT
+- 등록 방식: `com.forma.login.AuthSpiConfig` 의 `@Bean @ConditionalOnMissingBean`. 프로젝트가 같은 타입 빈을 등록하면 본 기본 빈은 비활성화.
 - 호출자: `LoginController`(loginProcess / userInfo), `TokenInterceptor`(preHandle)
 - override 사유: SSO(SAML/OAuth2), LDAP, 사내 인증 게이트웨이
 - 본 SPI 범위 밖: JWT 발급(`createToken`)과 토큰 갱신은 `LoginController`/`TokenInterceptor` 가 `JwtTokenProvider` 를 직접 사용. 토큰 발급 정책을 SPI 화할 필요가 생기면 별도 `TokenIssuer` SPI 로 분리.
@@ -105,7 +105,7 @@ public interface AuditLogStore {
 
 ### 3.4 `FileStore`
 
-**위치**: `com.saleson.frame.file.FileStore`
+**위치**: `com.forma.frame.file.FileStore`
 
 **시그니처 (현재)**
 ```java
@@ -120,7 +120,7 @@ public interface FileStore {
     default Map<String, String> tryDelegateDownload(String key) { return null; }
 }
 ```
-- 기본 구현: `com.saleson.frame.file.LocalFileStore` — 로컬 디스크 + 선택적 nginx X-Accel-Redirect 위임
+- 기본 구현: `com.forma.frame.file.LocalFileStore` — 로컬 디스크 + 선택적 nginx X-Accel-Redirect 위임
 - 등록 방식: `FileSpiConfig` 의 `@Bean @ConditionalOnMissingBean`
 - 호출자: `FileService` (메타 DB `tb_file` 처리, 키 생성, 다건 업로드 루프, HTTP 응답 빌드는 그대로 `FileService` 책임)
 - override 사유: S3·GCS·NAS·사내 파일서버
@@ -168,7 +168,7 @@ public interface SeqGenerator {
 
 ### 3.8 `AIClient`
 
-**위치**: `com.saleson.frame.ai.AIClient`
+**위치**: `com.forma.frame.ai.AIClient`
 
 **시그니처 (현재)**
 ```java
@@ -182,7 +182,7 @@ public class AIResponse {
     boolean isTruncated();    // stopReason == "max_tokens"
 }
 ```
-- 기본 구현: `com.saleson.frame.ai.ClaudeHttpClient` (Anthropic Messages API, okhttp3)
+- 기본 구현: `com.forma.frame.ai.ClaudeHttpClient` (Anthropic Messages API, okhttp3)
 - 등록 방식: `AISpiConfig` 의 `@Bean @ConditionalOnMissingBean`
 - 옵션 표준 키: `model`(String), `maxTokens`(Integer), `temperature`(Double). 누락 시 구현체 기본(`claude-opus-4-7` / 4096 / 미설정).
 - 호출자: `MeetingAiService` (도메인 측은 프롬프트 빌드/응답 파싱만 담당)

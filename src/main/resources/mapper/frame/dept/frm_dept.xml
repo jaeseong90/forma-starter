@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="frm_dept">
 
-    <select id="selectDeptTree" parameterType="map" resultType="com.saleson.frame.common.dto.DeptResDto">
+    <select id="selectDeptTree" parameterType="map" resultType="com.forma.frame.common.dto.DeptResDto">
         SELECT d.dept_code, d.dept_name, d.parent_code, d.dept_level, d.sort_order, d.use_yn
           FROM tb_dept d
         <where>
@@ -13,7 +13,7 @@
          ORDER BY d.dept_level, d.sort_order, d.dept_code
     </select>
 
-    <select id="selectDept" parameterType="map" resultType="com.saleson.frame.common.dto.DeptResDto">
+    <select id="selectDept" parameterType="map" resultType="com.forma.frame.common.dto.DeptResDto">
         SELECT d.dept_code, d.dept_name, d.parent_code, p.dept_name AS parent_name,
                d.dept_level, d.sort_order, d.use_yn,
                d.created_by, d.created_at, d.updated_by, d.updated_at

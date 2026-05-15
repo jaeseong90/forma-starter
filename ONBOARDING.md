@@ -14,7 +14,8 @@ FORMA 기반 ERP 스타터킷. 백엔드 코어(`frame/`, `login/`) + 표준 관
 ## 사전 준비
 
 - JDK 21 (Gradle wrapper 가 자동 설치)
-- PostgreSQL 인스턴스 + 접속 정보(URL, 사용자, 비밀번호, DB 이름)
+- Docker (저장소 기본 `docker-compose.yml` 로 PostgreSQL 컨테이너 즉시 기동)
+  - 또는: 기존 PostgreSQL 인스턴스 + 접속 정보(URL, 사용자, 비밀번호, DB 이름)
 - (선택) Claude API 키 — 회의록 자동작성·보고서 초안 등 AI 기능 사용 시
 - (권장) Claude Code — `.claude/commands/` · `.claude/skills/` 자산 활용
 
@@ -22,8 +23,8 @@ FORMA 기반 ERP 스타터킷. 백엔드 코어(`frame/`, `login/`) + 표준 관
 
 ### 1. 패키지 리네임
 
-- [ ] `src/main/java/com/saleson/...` 의 패키지 구조를 자기 프로젝트 값으로 변경
-  - 예: `com.saleson` → `com.acme.orders`
+- [ ] `src/main/java/com/forma/...` 의 패키지 구조를 자기 프로젝트 값으로 변경
+  - 예: `com.forma` → `com.acme.orders`
 - [ ] 모든 `.java` 파일의 `package` / `import` 선언 일괄 치환
 - [ ] 디렉토리 트리 이동
 - 도구: IDE Refactor → Rename Package(권장) 또는 `find` + `sed` 일괄 치환
@@ -32,11 +33,11 @@ FORMA 기반 ERP 스타터킷. 백엔드 코어(`frame/`, `login/`) + 표준 관
 
 - [ ] `settings.gradle` 의 `rootProject.name` 변경
 - [ ] `build.gradle` 의 그룹/이름/버전 확인
-- [ ] `src/main/resources/application.yml` — 기본 프로파일 + 환경변수 키. 그대로 두거나 키 이름(`saleson.*`) 을 자기 프로젝트 prefix 로 일괄 변경(`JwtTokenProvider` 등 `@Value` 동반 교체).
+- [ ] `src/main/resources/application.yml` — 기본 프로파일 + 환경변수 키. 그대로 두거나 키 이름(`forma.*`) 을 자기 프로젝트 prefix 로 일괄 변경(`JwtTokenProvider` 등 `@Value` 동반 교체).
 - [ ] **환경별 yml 생성** — 시크릿 평문 커밋 방지를 위해 `.gitignore` 처리되어 있다. `.example` 파일을 복사해 사용:
   - `cp src/main/resources/application-local.yml.example src/main/resources/application-local.yml`
   - `cp src/main/resources/application-prod.yml.example src/main/resources/application-prod.yml`
-  - 각 파일의 DB 접속(URL/user/password), JWT 시크릿(`saleson.jwt.secret` — 충분히 긴 랜덤), 파일 업로드 경로(`saleson.file.upload-path`), (선택) AI 키를 자기 값으로 교체.
+  - 각 파일의 DB 접속(URL/user/password), JWT 시크릿(`forma.jwt.secret` — 충분히 긴 랜덤), 파일 업로드 경로(`forma.file.upload-path`), (선택) AI 키를 자기 값으로 교체.
 
 ### 3. `CLAUDE.instance.md` 작성
 
@@ -51,28 +52,25 @@ FORMA 기반 ERP 스타터킷. 백엔드 코어(`frame/`, `login/`) + 표준 관
 
 ### 4. DB 스키마 적용
 
-- [ ] PostgreSQL DB 생성 (예: `createdb my_erp`)
-- [ ] `src/main/resources/schema/01-tables.sql` 실행 — 프레임워크 공통 테이블 (`tb_user` / `tb_dept` / `tb_role` / `tb_menu` / `tb_pgm_info` / `tb_code_group` / `tb_code` / `tb_audit_log` / `tb_log` / `tb_file` 등 16개) + FK 제약조건
-- [ ] `src/main/resources/schema/02-codes.sql` 실행 — 예시 코드 그룹(직급) 1건. 자기 도메인 코드는 자유롭게 추가/수정
-- [ ] `src/main/resources/schema/04-pgm.sql` 실행 — 표준 관리자 화면(FRM_*) 7건 + 개발자 가이드 데모 5건 의 `tb_pgm_info` 등록
+저장소 기본값(`docker-compose.yml` + `application-local.yml.example`)을 그대로 쓰면 별도 DB 준비 없이 자동 부트스트랩된다.
 
-> **DB 호환성**: starter 의 DDL 은 H2 / MySQL 친화(`AUTO_INCREMENT`, `CLOB`). PostgreSQL 사용 시
-> `AUTO_INCREMENT` → `BIGSERIAL`, `CLOB` → `TEXT` 로 치환해 실행하라(starter v0.3 에서 PostgreSQL
-> 전용 DDL 분리 예정).
+- [ ] `docker compose up -d` — postgres 컨테이너 첫 기동 시 `src/main/resources/schema/*.sql` 가 `/docker-entrypoint-initdb.d` 로 마운트되어 자동 실행
+  - `01-tables.sql` — 프레임워크 공통 테이블(PostgreSQL DDL, FK 제약조건 포함)
+  - `02-codes.sql` — 공통 코드 그룹(직급)
+  - `03-menu.sql` — 표준 관리자 화면(FRM_*) + 개발자 가이드 데모 메뉴 트리
+  - `04-pgm.sql` — `tb_pgm_info` 12건(FRM_* 7 + DEMO 5)
+  - `05-admin-seed.sql` — 초기 조직(forma), ADMIN 역할 + 전체 FRM_* 권한, admin 사용자(홍길동)
 
-### 5. 초기 사용자 시드
+기존 PostgreSQL 을 쓸 경우: 위 5개 SQL 을 순서대로 실행하고, `application-local.yml` 의 datasource 만 자기 DB 로 가리키면 된다.
 
-- [ ] admin 계정 1건 `tb_user` 에 INSERT (비밀번호는 `LoginService.encodePassword(...)` 로 BCrypt 해시 생성)
-- [ ] `tb_user_role` 에 ADMIN 역할 부여
-- [ ] 첫 로그인 후 비밀번호 변경
-
-### 6. 빌드 + 기동
+### 5. 빌드 + 기동
 
 - [ ] `./gradlew bootRun` → http://localhost:8080
-- [ ] admin 계정 로그인
+- [ ] **admin / forma21** 로 로그인 (최초 기동 시 `InitialAdminBootstrapRunner` 가 BCrypt 해시 채움)
 - [ ] 관리자 화면 동작 확인: `FRM_MENU` / `FRM_USER` / `FRM_ROLE` / `FRM_CODE` / `FRM_DEPT` / `FRM_PGM` / `FRM_AUDIT`
+- [ ] 첫 로그인 후 비밀번호 변경 권장
 
-### 7. (선택) 브랜딩 / SPI 교체
+### 6. (선택) 브랜딩 / SPI 교체
 
 - [ ] `static/login.html` / `main.html` / `index.html` 의 프로젝트명·로고 교체
 - [ ] `static/assets/css/forma.css` 의 CSS 변수(테마 컬러)

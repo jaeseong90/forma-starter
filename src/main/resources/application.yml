@@ -24,34 +24,34 @@ server.servlet.encoding:
   force: true
   force-response: true
 
-saleson:
+forma:
   file:
-    upload-path: ${SALESON_UPLOAD_PATH:./uploads}
+    upload-path: ${FORMA_UPLOAD_PATH:./uploads}
     # 다운로드 위임 (nginx X-Accel-Redirect). 기본 OFF — 로컬은 Spring Resource 로 직접 서빙.
     # 운영 profile(prod)에서 true 로 켜고, nginx 에 internal location 을 추가할 것.
     xaccel:
-      enabled: ${SALESON_FILE_XACCEL:false}
-      internal-location: ${SALESON_FILE_XACCEL_LOCATION:/internal-files/}
+      enabled: ${FORMA_FILE_XACCEL:false}
+      internal-location: ${FORMA_FILE_XACCEL_LOCATION:/internal-files/}
   claude:
-    api-key: ${SALESON_CLAUDE_API_KEY:}
+    api-key: ${FORMA_CLAUDE_API_KEY:}
   openai:
-    api-key: ${SALESON_OPENAI_API_KEY:}
+    api-key: ${FORMA_OPENAI_API_KEY:}
   primary:
     mapper:
       directory: classpath:mapper/**/*.xml
   jwt:
-    secret: ${SALESON_JWT_SECRET:salesonDefaultSecretKeyForDevelopmentOnly1234567890abcdef}
-    valid-seconds: ${SALESON_JWT_VALID_SECONDS:2592000}
+    secret: ${FORMA_JWT_SECRET:formaDefaultSecretKeyForDevelopmentOnly1234567890abcdef}
+    valid-seconds: ${FORMA_JWT_VALID_SECONDS:2592000}
   security:
     # 1회 실행용: 기동 시 전체 사용자 비밀번호를 reset-all-passwords-value 값(BCrypt)로 초기화.
     # 완료 후 반드시 false 로 되돌릴 것.
-    reset-all-passwords: ${SALESON_RESET_ALL_PASSWORDS:false}
-    reset-all-passwords-value: ${SALESON_RESET_ALL_PASSWORDS_VALUE:1}
+    reset-all-passwords: ${FORMA_RESET_ALL_PASSWORDS:false}
+    reset-all-passwords-value: ${FORMA_RESET_ALL_PASSWORDS_VALUE:1}
     # 1회 실행용: tb_user에 emp_no/email 컬럼 추가(IF NOT EXISTS) + 이메일 prefix로 매칭하여
     # emp_no/email/비밀번호(BCrypt(empNo))를 일괄 업데이트. admin 비번은 seed-users-admin-pw 값으로 설정.
     # 완료 후 반드시 false 로 되돌릴 것.
-    seed-users: ${SALESON_SEED_USERS:false}
-    seed-users-admin-pw: ${SALESON_SEED_USERS_ADMIN_PW:sjinc21}
+    seed-users: ${FORMA_SEED_USERS:false}
+    seed-users-admin-pw: ${FORMA_SEED_USERS_ADMIN_PW:forma21}
 
 management:
   endpoints:
@@ -65,4 +65,4 @@ management:
 
 logging:
   level:
-    com.saleson: DEBUG
+    com.forma: DEBUG

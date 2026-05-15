@@ -1,0 +1,35 @@
+# FORMA Starter — 로컬 부트스트랩용 PostgreSQL
+#
+# 사용법:
+#   docker compose up -d     # 5432 포트로 PostgreSQL 기동
+#   docker compose down       # 컨테이너 정리 (볼륨 유지)
+#   docker compose down -v    # 데이터까지 초기화
+#
+# 첫 기동 시 src/main/resources/schema/*.sql 가 /docker-entrypoint-initdb.d 로 마운트되어
+# 자동 실행된다(테이블 + 공통코드 + FRM_* 메뉴/프로그램 + admin 사용자 + forma 조직 시드).
+# Spring 기동 시 InitialAdminBootstrapRunner 가 admin 비밀번호(BCrypt('forma21'))를 설정한다.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: forma-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: forma
+      POSTGRES_USER: forma
+      POSTGRES_PASSWORD: forma
+      TZ: Asia/Seoul
+      PGTZ: Asia/Seoul
+    ports:
+      - "5432:5432"
+    volumes:
+      - forma-pgdata:/var/lib/postgresql/data
+      - ./src/main/resources/schema:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U forma -d forma"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  forma-pgdata:

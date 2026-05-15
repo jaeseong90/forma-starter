@@ -3,7 +3,7 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="login">
 
-    <select id="selectUserById" parameterType="map" resultType="com.saleson.login.dto.LoginUserResDto">
+    <select id="selectUserById" parameterType="map" resultType="com.forma.login.dto.LoginUserResDto">
         SELECT u.user_id, u.user_pw, u.user_nm, u.dept_code, u.use_yn,
                COALESCE(d.dept_name, '') AS dept_name
         FROM tb_user u
@@ -29,7 +29,7 @@
     </select>
 
     <!-- 역할 기반 메뉴별 권한 조회 (가장 넓은 권한 적용) -->
-    <select id="selectPgmAuthByUser" parameterType="map" resultType="com.saleson.frame.common.dto.PgmAuthResDto">
+    <select id="selectPgmAuthByUser" parameterType="map" resultType="com.forma.frame.common.dto.PgmAuthResDto">
         SELECT
             MAX(CASE WHEN ra.srch_yn = 'Y' THEN 'Y' ELSE 'N' END) AS srch_yn,
             MAX(CASE WHEN ra.new_yn  = 'Y' THEN 'Y' ELSE 'N' END) AS new_yn,
@@ -62,7 +62,7 @@
     </select>
 
     <!-- 사용자의 접근 가능 메뉴 목록 (하위 권한 없는 그룹은 제외) -->
-    <select id="selectMenusByUser" parameterType="map" resultType="com.saleson.frame.common.dto.MenuResDto">
+    <select id="selectMenusByUser" parameterType="map" resultType="com.forma.frame.common.dto.MenuResDto">
         WITH RECURSIVE authorized_menus AS (
             /* 사용자가 권한을 가진 리프 메뉴 */
             SELECT m.menu_id, COALESCE(pi.pgm_nm, m.menu_nm) AS menu_nm, m.parent_id, m.menu_type,

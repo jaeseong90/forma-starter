@@ -8,7 +8,7 @@
 
 ## basePackage
 
-`com.saleson` (starter 의 출발 패키지. 신규 프로젝트는 IDE Refactor → Rename Package 로 자기 값으로 교체)
+`com.forma` (starter 의 출발 패키지. 신규 프로젝트는 IDE Refactor → Rename Package 로 자기 값으로 교체)
 
 ## 프로젝트 개요
 

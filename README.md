@@ -7,15 +7,20 @@ YAML 1파일로 CRUD 화면을 즉시 만들고, 복잡한 로직은 커스텀 �
 ## Quick Start
 
 ```bash
-git clone https://git-rnd.sjinc.co.kr/development/forma.git my-erp
+git clone https://github.com/jaeseong90/forma-starter.git my-erp
 cd my-erp
 
-# 환경별 설정 파일 생성 (시크릿은 gitignore)
-cp src/main/resources/application-local.yml.example src/main/resources/application-local.yml
-# → DB 접속 정보·JWT 시크릿을 자기 값으로 채우기
+# 1) PostgreSQL 컨테이너 기동 — 첫 기동 시 schema/*.sql 자동 실행 (테이블·메뉴·권한·admin 사용자 시드)
+docker compose up -d
 
+# 2) 로컬 설정 파일 생성 (그대로 복사하면 docker postgres 와 자동 연결)
+cp src/main/resources/application-local.yml.example src/main/resources/application-local.yml
+
+# 3) 애플리케이션 기동
 ./gradlew bootRun
 ```
+
+기동 후 http://localhost:8080 접속 → **admin / forma21** 로 로그인. 최초 로그인 후 비밀번호 변경 권장.
 
 부트스트랩 전 과정은 [`ONBOARDING.md`](ONBOARDING.md) 참조.
 
@@ -23,8 +28,8 @@ cp src/main/resources/application-local.yml.example src/main/resources/applicati
 
 | 영역 | 자산 |
 |---|---|
-| 백엔드 코어 | `src/main/java/com/saleson/frame/` — YAML 런타임 엔진, JWT, 데이터 권한, 감사로그, 서비스 트레이스, AI/파일 SPI 등 |
-| 인증 | `src/main/java/com/saleson/login/` — BCrypt + JWT (SPI 추출됨, SSO/LDAP 교체 가능) |
+| 백엔드 코어 | `src/main/java/com/forma/frame/` — YAML 런타임 엔진, JWT, 데이터 권한, 감사로그, 서비스 트레이스, AI/파일 SPI 등 |
+| 인증 | `src/main/java/com/forma/login/` — BCrypt + JWT (SPI 추출됨, SSO/LDAP 교체 가능) |
 | 표준 관리자 화면 | `FRM_MENU / FRM_PGM / FRM_ROLE / FRM_USER / FRM_AUDIT / FRM_CODE / FRM_DEPT` (`static/pages/admin/`) |
 | 프론트 컴포넌트 | `static/assets/js/framework/forma.*.js` — Grid·Form·Toolbar·Modal·Menu·Chart 등 |
 | AI 코딩 자산 | `.claude/commands/`, `.claude/skills/forma-screen-workflow/`, `design/_prompts/`, `design/_schema_guide.yml` |

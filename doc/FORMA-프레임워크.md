@@ -1,6 +1,6 @@
 # FORMA 프레임워크
 
-AI(Claude Code / Codex 등)로 ERP·업무시스템을 **바이브코딩**하기 위해 설계된 Spring Boot 기반 프레임워크. SalesOn은 이 프레임워크의 첫 레퍼런스 구현.
+AI(Claude Code / Codex 등)로 ERP·업무시스템을 **바이브코딩**하기 위해 설계된 Spring Boot 기반 프레임워크. FORMA은 이 프레임워크의 첫 레퍼런스 구현.
 
 이 문서는 **도메인 중립**. 어느 ERP 프로젝트에 이식하든 여기 규칙은 그대로 적용된다. 프로젝트 고유 정보(도메인 모듈, 접두어, DB 접속 등)는 `CLAUDE.md` 하단 "인스턴스" 섹션을 본다.
 
@@ -225,7 +225,7 @@ MyBatis XML에서는 `<if test="_dataAuthType == 'DEPT'">AND dept_code = #{_user
 
 | 대상 | 규칙 | 예시 |
 |---|---|---|
-| 패키지 | `{basePackage}.domain.{module}` | `com.saleson.domain.customer` |
+| 패키지 | `{basePackage}.domain.{module}` | `com.forma.domain.customer` |
 | Controller | `{PgmId}Controller.java` | `Cst010Controller.java` |
 | Service | `{PgmId}Service.java` | `Cst010Service.java` |
 | MyBatis XML | `mapper/domain/{module}/{pgmId소문자}.xml` | `mapper/domain/customer/cst010.xml` |

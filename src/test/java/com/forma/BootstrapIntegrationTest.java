@@ -55,7 +55,7 @@ class BootstrapIntegrationTest extends IntegrationTestBase {
         JdbcTemplate jdbc = new JdbcTemplate(dataSource);
         Integer count = jdbc.queryForObject(
                 "SELECT COUNT(*) FROM tb_pgm_info WHERE pgm_id LIKE 'FRM_%'", Integer.class);
-        assertEquals(7, count, "FRM_MENU/PGM/ROLE/USER/AUDIT/CODE/DEPT 7개");
+        assertEquals(8, count, "FRM_MENU/PGM/ROLE/USER/AUDIT/CODE/DEPT/RLS 8개");
     }
 
     @Test
@@ -63,7 +63,7 @@ class BootstrapIntegrationTest extends IntegrationTestBase {
         JdbcTemplate jdbc = new JdbcTemplate(dataSource);
         Integer count = jdbc.queryForObject(
                 "SELECT COUNT(*) FROM tb_menu WHERE menu_id LIKE 'M_FRM_%'", Integer.class);
-        assertEquals(7, count, "FRM_* 7개 메뉴 + 상위그룹 M_SYS 별도");
+        assertEquals(8, count, "FRM_* 8개 메뉴 + 상위그룹 M_SYS 별도");
     }
 
     @Test
@@ -72,7 +72,15 @@ class BootstrapIntegrationTest extends IntegrationTestBase {
         Integer count = jdbc.queryForObject(
                 "SELECT COUNT(*) FROM tb_role_auth WHERE role_cd = 'ADMIN' AND pgm_id LIKE 'FRM_%'",
                 Integer.class);
-        assertEquals(7, count, "ADMIN 역할이 모든 FRM_* PGM 에 권한을 가져야 함");
+        assertEquals(8, count, "ADMIN 역할이 모든 FRM_* PGM 에 권한을 가져야 함");
+    }
+
+    @Test
+    void RLS_엔드포인트_빈배열_반환() {
+        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+        // 시드 직후엔 tb_release_note 가 비어 있어야 한다 — 운영자가 등록할 때까지 빈 배열
+        Integer count = jdbc.queryForObject("SELECT COUNT(*) FROM tb_release_note", Integer.class);
+        assertEquals(0, count);
     }
 
     @Test

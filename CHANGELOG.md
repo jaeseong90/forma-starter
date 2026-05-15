@@ -24,6 +24,12 @@ FORMA 는 **단방향(starter → 프로젝트)** 배포 정책을 따른다(`CL
 - `src/main/resources/schema/` 디렉토리 — V1__init.sql 로 흡수.
 - 직전 라운드에 추가하려던 `frame/migration/FrameworkSchemaUpgradeRunner` band-aid 코드 — Flyway 가 본 역할을 대신함.
 
+### Changed (FORM_DEMO 타이틀 + 레퍼런스 영역 재디자인)
+- 상단 타이틀을 plain `<h1>` 에서 **그라데이션 히어로 카드**(파/보 그라데이션 + 통계 pill) 로 교체. 한눈에 화면 정체성 인식 가능.
+- 기존 4개 `<details>` 접힘 섹션을 **컬러 헤더 4-카드 그리드**(생성자 옵션·공통 필드 속성·위젯 카탈로그 30·Public API 메서드 18)로 재구성. 데스크탑 2x2, 좁은 화면 1열 자동 반응형.
+- 위젯/메서드 표에 **sticky 헤더**, **모노스페이스 시그니처 컬럼**, **그룹 헤더 행**(텍스트·숫자 / 선택 / 날짜·기간 / 범위·평점·색·태그 / 팝업·파일·표시; 데이터 입출력 / 검증·상태 / 동적 제어 / 포커스·라이프사이클) 적용.
+- API 메서드는 18개(read/write/check/mutate/ui/lifecycle 분류 컬럼 포함) 로 묶어 표시.
+
 ### Changed (FORM_DEMO 30 위젯 카탈로그 재구성)
 - `static/pages/dev/FORM_DEMO.html` 의 "전체 위젯" 섹션을 5개 그룹(텍스트·숫자 / 선택 / 날짜·기간 / 범위·평점·색·태그 / 팝업·파일·표시) 로 정리, **30개 위젯 모두** 표기. 기존 21개 → 30개 (`yearMonthRange`, `inputMask`, `slider`, `rating`, `colorPicker`, `tagInput`, `buttonGroup`, `week`, `select` 9종 신규 노출).
 - 상단 위젯 타입 레퍼런스 표도 그룹별 행 헤더와 함께 30종으로 갱신.

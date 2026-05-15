@@ -1,116 +1,221 @@
 <style>
-        .ref-tbl { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 4px; }
-        .ref-tbl th { background: var(--bg-group); padding: 4px 8px; text-align: left; border: 1px solid var(--border-group); font-weight: 600; white-space: nowrap; color: var(--text); }
-        .ref-tbl td { padding: 3px 8px; border: 1px solid var(--border-light); color: var(--text); }
+        /* ── FORM_DEMO 전용 ───────────────────────────────────── */
+        .fd-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px; padding: 18px 22px; color: #fff;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 16px; margin-bottom: 14px;
+        }
+        .fd-hero h1 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+        .fd-hero p  { margin: 4px 0 0; font-size: 12px; opacity: 0.85; }
+        .fd-hero .fd-stats { display: flex; gap: 8px; }
+        .fd-hero .fd-pill {
+            background: rgba(255,255,255,0.18); border-radius: 999px;
+            padding: 4px 12px; font-size: 12px; font-weight: 600;
+        }
+        .fd-hero a { color: #fff; text-decoration: underline; opacity: 0.85; font-size: 12px; }
+
+        /* 4-card 레퍼런스 그리드 */
+        .fd-ref-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+            margin-bottom: 16px;
+        }
+        @media (max-width: 900px) { .fd-ref-grid { grid-template-columns: 1fr; } }
+
+        .fd-card {
+            background: var(--bg-card); border: 1px solid var(--border-group);
+            border-radius: 6px; overflow: hidden;
+        }
+        .fd-card-hd {
+            padding: 9px 14px; font-weight: 700; font-size: 13px;
+            color: #fff; display: flex; align-items: center; gap: 8px;
+        }
+        .fd-card-hd .fd-icon { font-size: 16px; }
+        .fd-card-hd .fd-count {
+            background: rgba(255,255,255,0.22); border-radius: 999px;
+            font-size: 11px; padding: 1px 8px; margin-left: auto;
+        }
+        .fd-c-blue   { background: #4f6cd9; }
+        .fd-c-green  { background: #10a37f; }
+        .fd-c-purple { background: #7c5cd5; }
+        .fd-c-orange { background: #e07b3f; }
+        .fd-card-bd { max-height: 320px; overflow: auto; }
+
+        .ref-tbl { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .ref-tbl th {
+            background: var(--bg-alt); padding: 6px 10px; text-align: left;
+            border-bottom: 1px solid var(--border-group); font-weight: 600;
+            white-space: nowrap; color: var(--text); position: sticky; top: 0; z-index: 1;
+        }
+        .ref-tbl td { padding: 5px 10px; border-bottom: 1px solid var(--border-light); color: var(--text); vertical-align: top; }
         .ref-tbl tr:hover td { background: var(--bg-alt); }
-        details summary { outline: none; }
-        details summary::-webkit-details-marker { color: var(--primary); }
+        .ref-tbl td.fd-mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; color: #4f6cd9; font-size: 11px; }
+        .ref-tbl td.fd-type { font-size: 10.5px; color: var(--text-muted); }
+        .ref-tbl tr.fd-group td {
+            background: var(--bg-header); font-weight: 700; font-size: 11px;
+            color: var(--text-muted); letter-spacing: 0.5px; text-transform: uppercase;
+            padding: 5px 10px;
+        }
     </style>
 <div class="forma-page" style="max-width:1200px">
-    <div class="forma-page-header">
-        <h1 class="forma-page-title">FormaForm API 레퍼런스 &amp; 데모</h1>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:4px">30개 위젯 카탈로그 | <a href="/pages/dev/GRID_DEMO.html">FormaGrid 데모 &rarr;</a> | <a href="/">홈 &rarr;</a></div>
-    </div>
     <div class="forma-content">
 
-        <!-- API 레퍼런스 -->
-        <div class="demo-section" style="background:var(--bg-card);border:1px solid var(--border-group);border-radius:6px;padding:16px;">
-            <details open>
-                <summary style="font-weight:700;font-size:14px;cursor:pointer;margin-bottom:10px">생성자 옵션</summary>
-                <table class="ref-tbl">
-                    <tr><th>옵션</th><th>타입</th><th>기본값</th><th>설명</th></tr>
-                    <tr><td>search</td><td>Boolean</td><td>false</td><td>true면 검색폼 (가로 배치)</td></tr>
-                    <tr><td>columns</td><td>Number</td><td>2</td><td>form 모드 컬럼 수</td></tr>
-                    <tr><td>labelWidth</td><td>Number</td><td>80</td><td>라벨 너비 (px)</td></tr>
-                    <tr><td>elements</td><td>Array</td><td>[]</td><td>위젯 정의 배열</td></tr>
-                    <tr><td>onChange</td><td>Function</td><td>null</td><td>(field, value, oldValue)</td></tr>
-                    <tr><td>onBlur</td><td>Function</td><td>null</td><td>(field, value)</td></tr>
-                    <tr><td>onEnter</td><td>Function</td><td>null</td><td>(field, value)</td></tr>
-                </table>
-            </details>
-
-            <details>
-                <summary style="font-weight:700;font-size:14px;cursor:pointer;margin:12px 0 10px">위젯 타입 (30종)</summary>
-                <table class="ref-tbl">
-                    <tr><th>widget</th><th>설명</th><th>getValue() 반환</th><th>주요 속성</th></tr>
-                    <tr><td colspan="4" style="background:var(--bg-alt);font-weight:600">텍스트·숫자</td></tr>
-                    <tr><td>text</td><td>텍스트 입력 (기본)</td><td>String / Number</td><td>placeholder, maxLength, type, min, max, step, prefix, suffix</td></tr>
-                    <tr><td>textarea</td><td>여러 줄 텍스트</td><td>String</td><td>rows, placeholder</td></tr>
-                    <tr><td>password</td><td>비밀번호 (눈 토글)</td><td>String</td><td>placeholder</td></tr>
-                    <tr><td>hidden</td><td>숨김 필드</td><td>String</td><td>—</td></tr>
-                    <tr><td>currency</td><td>금액 (콤마)</td><td>Number</td><td>prefix, suffix</td></tr>
-                    <tr><td>inputMask</td><td>입력 마스크</td><td>String</td><td>mask (예: '999-9999-9999')</td></tr>
-                    <tr><td>address</td><td>카카오 주소검색</td><td>field_zip / field_addr / field_detail 분리</td><td>—</td></tr>
-                    <tr><td colspan="4" style="background:var(--bg-alt);font-weight:600">선택</td></tr>
-                    <tr><td>combo</td><td>검색 드롭다운 (+popup)</td><td>String</td><td>options, code, popup, dependsOn</td></tr>
-                    <tr><td>select</td><td>단순 드롭다운</td><td>String</td><td>options, code</td></tr>
-                    <tr><td>radio</td><td>라디오</td><td>String</td><td>options</td></tr>
-                    <tr><td>checkbox</td><td>체크박스</td><td>'Y'/'N'</td><td>checkLabel</td></tr>
-                    <tr><td>switch</td><td>ON/OFF 토글</td><td>'Y'/'N'</td><td>onLabel, offLabel</td></tr>
-                    <tr><td>multiCombo</td><td>복수 선택</td><td>'A,B,C'</td><td>options</td></tr>
-                    <tr><td>buttonGroup</td><td>버튼 그룹 선택</td><td>String</td><td>options</td></tr>
-                    <tr><td>autocomplete</td><td>자동완성</td><td>String</td><td>options, fetchUrl</td></tr>
-                    <tr><td colspan="4" style="background:var(--bg-alt);font-weight:600">날짜·기간</td></tr>
-                    <tr><td>date</td><td>날짜 (캘린더)</td><td>'YYYY-MM-DD'</td><td>default: 'TODAY'</td></tr>
-                    <tr><td>dateRange</td><td>기간 (프리셋)</td><td>field_from / field_to</td><td>default, presets</td></tr>
-                    <tr><td>yearMonth</td><td>년월</td><td>'YYYY-MM'</td><td>default</td></tr>
-                    <tr><td>yearMonthRange</td><td>년월 기간</td><td>field_from / field_to</td><td>default: 'THIS_YEAR'</td></tr>
-                    <tr><td>year</td><td>년도</td><td>String</td><td>default: 'THIS_YEAR'</td></tr>
-                    <tr><td>week</td><td>주차</td><td>'YYYY-Www'</td><td>—</td></tr>
-                    <tr><td>time</td><td>시간</td><td>'HH:MM'</td><td>default: 'NOW', step</td></tr>
-                    <tr><td colspan="4" style="background:var(--bg-alt);font-weight:600">범위·평점·색·태그</td></tr>
-                    <tr><td>slider</td><td>슬라이더 (범위)</td><td>Number</td><td>min, max, step</td></tr>
-                    <tr><td>rating</td><td>별점</td><td>Number</td><td>max (기본 5)</td></tr>
-                    <tr><td>colorPicker</td><td>색상 선택</td><td>'#RRGGBB'</td><td>default</td></tr>
-                    <tr><td>tagInput</td><td>태그 입력</td><td>'tag1,tag2'</td><td>placeholder</td></tr>
-                    <tr><td colspan="4" style="background:var(--bg-alt);font-weight:600">팝업·파일·표시</td></tr>
-                    <tr><td>codePopup</td><td>코드 검색 팝업</td><td>String</td><td>popup: {url, codeField, nameField}</td></tr>
-                    <tr><td>file</td><td>파일 업로드</td><td>File[]</td><td>accept, multiple, buttonLabel</td></tr>
-                    <tr><td>display</td><td>읽기전용 / 뱃지</td><td>String</td><td>badge, badgeColors, options</td></tr>
-                    <tr><td>divider</td><td>구분선/섹션</td><td>—</td><td>label, collapsible, collapsed</td></tr>
-                </table>
-            </details>
-
-            <details>
-                <summary style="font-weight:700;font-size:14px;cursor:pointer;margin:12px 0 10px">공통 필드 속성</summary>
-                <table class="ref-tbl">
-                    <tr><th>속성</th><th>타입</th><th>설명</th></tr>
-                    <tr><td>field</td><td>String</td><td>데이터 필드명 (필수)</td></tr>
-                    <tr><td>label</td><td>String</td><td>라벨 텍스트</td></tr>
-                    <tr><td>widget</td><td>String</td><td>위젯 타입 (기본 'text')</td></tr>
-                    <tr><td>required</td><td>Boolean</td><td>필수 여부 (* 표시, validate 대상)</td></tr>
-                    <tr><td>readOnly</td><td>Boolean</td><td>읽기 전용</td></tr>
-                    <tr><td>colspan</td><td>Number</td><td>차지할 컬럼 수</td></tr>
-                    <tr><td>prefix / suffix</td><td>String</td><td>입력 앞/뒤 텍스트 ('₩', '원', 'kg')</td></tr>
-                    <tr><td>helpText</td><td>String</td><td>필드 아래 도움말</td></tr>
-                    <tr><td>onChange</td><td>Function</td><td>(value, oldValue) 개별 필드</td></tr>
-                </table>
-            </details>
-
-            <details>
-                <summary style="font-weight:700;font-size:14px;cursor:pointer;margin:12px 0 10px">Public API 메서드</summary>
-                <table class="ref-tbl">
-                    <tr><th>메서드</th><th>설명</th></tr>
-                    <tr><td>getData()</td><td>폼 전체 데이터 반환</td></tr>
-                    <tr><td>setData(obj)</td><td>폼 데이터 세팅 + 원본 저장</td></tr>
-                    <tr><td>getField(field) / setField(field, value)</td><td>개별 필드 읽기/쓰기</td></tr>
-                    <tr><td>clear()</td><td>전체 초기화</td></tr>
-                    <tr><td>validate()</td><td>required 필드 검증</td></tr>
-                    <tr><td>formReadonly(boolean)</td><td>전체 읽기전용 토글</td></tr>
-                    <tr><td>showField(field) / hideField(field)</td><td>필드 표시/숨김</td></tr>
-                    <tr><td>setOptions(field, options)</td><td>combo/multiCombo 옵션 교체</td></tr>
-                    <tr><td>setRequired(field, boolean)</td><td>필수 여부 동적 변경</td></tr>
-                    <tr><td>setReadonly(field, boolean)</td><td>개별 readOnly</td></tr>
-                    <tr><td>setDisabled(field, boolean)</td><td>개별 disabled</td></tr>
-                    <tr><td>setLabel(field, text)</td><td>라벨 변경</td></tr>
-                    <tr><td>focus(field)</td><td>특정 필드 포커스</td></tr>
-                    <tr><td>isDirty()</td><td>원본 대비 변경 여부</td></tr>
-                    <tr><td>getChangedFields()</td><td>변경된 필드명 배열</td></tr>
-                    <tr><td>resetToOriginal()</td><td>원본 데이터로 복원</td></tr>
-                    <tr><td>destroy()</td><td>위젯 정리 (document 리스너 해제)</td></tr>
-                </table>
-            </details>
+        <!-- 히어로 타이틀 -->
+        <div class="fd-hero">
+            <div>
+                <h1>FormaForm 위젯 카탈로그 &amp; API 레퍼런스</h1>
+                <p>30종 위젯 · 7개 생성자 옵션 · 9개 공통 속성 · 18개 메서드. 아래 카드에서 시그니처 확인 후, 페이지 하단의 라이브 데모에서 직접 동작 확인.</p>
+            </div>
+            <div class="fd-stats">
+                <span class="fd-pill">📦 30 widgets</span>
+                <span class="fd-pill"><a href="/pages/dev/GRID_DEMO.html">Grid &rarr;</a></span>
+            </div>
         </div>
+
+        <!-- 4-card 레퍼런스 그리드 -->
+        <div class="fd-ref-grid">
+
+            <!-- 1. 생성자 옵션 -->
+            <div class="fd-card">
+                <div class="fd-card-hd fd-c-blue">
+                    <span class="fd-icon">⚙️</span> 생성자 옵션
+                    <span class="fd-count">7</span>
+                </div>
+                <div class="fd-card-bd">
+                    <table class="ref-tbl">
+                        <thead><tr><th>옵션</th><th>타입</th><th>기본값</th><th>설명</th></tr></thead>
+                        <tbody>
+                            <tr><td class="fd-mono">search</td>     <td class="fd-type">Boolean</td>  <td><code>false</code></td> <td>true 면 검색폼 (가로 배치)</td></tr>
+                            <tr><td class="fd-mono">columns</td>    <td class="fd-type">Number</td>   <td><code>2</code></td>     <td>form 모드 컬럼 수</td></tr>
+                            <tr><td class="fd-mono">labelWidth</td> <td class="fd-type">Number</td>   <td><code>80</code></td>    <td>라벨 너비 (px)</td></tr>
+                            <tr><td class="fd-mono">elements</td>   <td class="fd-type">Array</td>    <td><code>[]</code></td>    <td>위젯 정의 배열</td></tr>
+                            <tr><td class="fd-mono">onChange</td>   <td class="fd-type">Function</td> <td>null</td>               <td>(field, value, oldValue)</td></tr>
+                            <tr><td class="fd-mono">onBlur</td>     <td class="fd-type">Function</td> <td>null</td>               <td>(field, value)</td></tr>
+                            <tr><td class="fd-mono">onEnter</td>    <td class="fd-type">Function</td> <td>null</td>               <td>(field, value)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2. 공통 필드 속성 -->
+            <div class="fd-card">
+                <div class="fd-card-hd fd-c-green">
+                    <span class="fd-icon">🧩</span> 공통 필드 속성 (elements 항목)
+                    <span class="fd-count">9</span>
+                </div>
+                <div class="fd-card-bd">
+                    <table class="ref-tbl">
+                        <thead><tr><th>속성</th><th>타입</th><th>설명</th></tr></thead>
+                        <tbody>
+                            <tr><td class="fd-mono">field</td>           <td class="fd-type">String</td>   <td>데이터 필드명 (필수)</td></tr>
+                            <tr><td class="fd-mono">label</td>           <td class="fd-type">String</td>   <td>라벨 텍스트</td></tr>
+                            <tr><td class="fd-mono">widget</td>          <td class="fd-type">String</td>   <td>위젯 타입 (기본 <code>'text'</code>)</td></tr>
+                            <tr><td class="fd-mono">required</td>        <td class="fd-type">Boolean</td>  <td>필수 여부 (* 표시, validate 대상)</td></tr>
+                            <tr><td class="fd-mono">readOnly</td>        <td class="fd-type">Boolean</td>  <td>읽기 전용</td></tr>
+                            <tr><td class="fd-mono">colspan</td>         <td class="fd-type">Number</td>   <td>차지할 컬럼 수</td></tr>
+                            <tr><td class="fd-mono">prefix / suffix</td> <td class="fd-type">String</td>   <td>입력 앞/뒤 텍스트 (<code>'₩'</code>, <code>'원'</code>, <code>'kg'</code>)</td></tr>
+                            <tr><td class="fd-mono">helpText</td>        <td class="fd-type">String</td>   <td>필드 아래 도움말</td></tr>
+                            <tr><td class="fd-mono">onChange</td>        <td class="fd-type">Function</td> <td>(value, oldValue) 개별 필드</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. 위젯 카탈로그 -->
+            <div class="fd-card" style="grid-column: span 2;">
+                <div class="fd-card-hd fd-c-purple">
+                    <span class="fd-icon">🎨</span> 위젯 카탈로그
+                    <span class="fd-count">30</span>
+                </div>
+                <div class="fd-card-bd" style="max-height: 480px;">
+                    <table class="ref-tbl">
+                        <thead><tr><th style="width:140px">widget</th><th style="width:240px">설명</th><th style="width:200px">getValue() 반환</th><th>주요 속성</th></tr></thead>
+                        <tbody>
+                            <tr class="fd-group"><td colspan="4">텍스트 · 숫자 (7)</td></tr>
+                            <tr><td class="fd-mono">text</td>           <td>텍스트 입력 (기본)</td>         <td class="fd-type">String / Number</td> <td class="fd-type">placeholder, maxLength, type, min, max, step, prefix, suffix</td></tr>
+                            <tr><td class="fd-mono">textarea</td>       <td>여러 줄 텍스트</td>             <td class="fd-type">String</td>          <td class="fd-type">rows, placeholder</td></tr>
+                            <tr><td class="fd-mono">password</td>       <td>비밀번호 (눈 토글)</td>          <td class="fd-type">String</td>          <td class="fd-type">placeholder</td></tr>
+                            <tr><td class="fd-mono">hidden</td>         <td>숨김 필드</td>                  <td class="fd-type">String</td>          <td class="fd-type">—</td></tr>
+                            <tr><td class="fd-mono">currency</td>       <td>금액 (콤마 포맷)</td>            <td class="fd-type">Number</td>          <td class="fd-type">prefix, suffix</td></tr>
+                            <tr><td class="fd-mono">inputMask</td>      <td>입력 마스크</td>                <td class="fd-type">String</td>          <td class="fd-type">mask (<code>'999-9999-9999'</code>)</td></tr>
+                            <tr><td class="fd-mono">address</td>        <td>카카오 주소검색</td>             <td class="fd-type">field_zip / _addr / _detail</td> <td class="fd-type">—</td></tr>
+
+                            <tr class="fd-group"><td colspan="4">선택 (8)</td></tr>
+                            <tr><td class="fd-mono">combo</td>          <td>검색 드롭다운 (+popup)</td>     <td class="fd-type">String</td>          <td class="fd-type">options, code, popup, dependsOn</td></tr>
+                            <tr><td class="fd-mono">select</td>         <td>단순 드롭다운</td>              <td class="fd-type">String</td>          <td class="fd-type">options, code</td></tr>
+                            <tr><td class="fd-mono">radio</td>          <td>라디오</td>                    <td class="fd-type">String</td>          <td class="fd-type">options</td></tr>
+                            <tr><td class="fd-mono">checkbox</td>       <td>체크박스</td>                  <td class="fd-type">'Y' / 'N'</td>        <td class="fd-type">checkLabel</td></tr>
+                            <tr><td class="fd-mono">switch</td>         <td>ON/OFF 토글</td>               <td class="fd-type">'Y' / 'N'</td>        <td class="fd-type">onLabel, offLabel</td></tr>
+                            <tr><td class="fd-mono">multiCombo</td>     <td>복수 선택</td>                  <td class="fd-type">'A,B,C'</td>         <td class="fd-type">options</td></tr>
+                            <tr><td class="fd-mono">buttonGroup</td>    <td>버튼 그룹 선택</td>             <td class="fd-type">String</td>          <td class="fd-type">options</td></tr>
+                            <tr><td class="fd-mono">autocomplete</td>   <td>자동완성</td>                   <td class="fd-type">String</td>          <td class="fd-type">options, fetchUrl</td></tr>
+
+                            <tr class="fd-group"><td colspan="4">날짜 · 기간 (7)</td></tr>
+                            <tr><td class="fd-mono">date</td>           <td>날짜 (캘린더)</td>              <td class="fd-type">'YYYY-MM-DD'</td>    <td class="fd-type">default: 'TODAY'</td></tr>
+                            <tr><td class="fd-mono">dateRange</td>      <td>기간 (프리셋)</td>              <td class="fd-type">field_from / _to</td><td class="fd-type">default, presets</td></tr>
+                            <tr><td class="fd-mono">yearMonth</td>      <td>년월</td>                      <td class="fd-type">'YYYY-MM'</td>        <td class="fd-type">default</td></tr>
+                            <tr><td class="fd-mono">yearMonthRange</td> <td>년월 기간</td>                  <td class="fd-type">field_from / _to</td><td class="fd-type">default: 'THIS_YEAR'</td></tr>
+                            <tr><td class="fd-mono">year</td>           <td>년도</td>                      <td class="fd-type">String</td>          <td class="fd-type">default: 'THIS_YEAR'</td></tr>
+                            <tr><td class="fd-mono">week</td>           <td>주차</td>                      <td class="fd-type">'YYYY-Www'</td>      <td class="fd-type">—</td></tr>
+                            <tr><td class="fd-mono">time</td>           <td>시간</td>                      <td class="fd-type">'HH:MM'</td>          <td class="fd-type">default: 'NOW', step</td></tr>
+
+                            <tr class="fd-group"><td colspan="4">범위 · 평점 · 색 · 태그 (4)</td></tr>
+                            <tr><td class="fd-mono">slider</td>         <td>슬라이더 (범위)</td>            <td class="fd-type">Number</td>          <td class="fd-type">min, max, step</td></tr>
+                            <tr><td class="fd-mono">rating</td>         <td>별점</td>                      <td class="fd-type">Number</td>          <td class="fd-type">max (기본 5)</td></tr>
+                            <tr><td class="fd-mono">colorPicker</td>    <td>색상 선택</td>                  <td class="fd-type">'#RRGGBB'</td>       <td class="fd-type">default</td></tr>
+                            <tr><td class="fd-mono">tagInput</td>       <td>태그 입력</td>                  <td class="fd-type">'tag1,tag2'</td>     <td class="fd-type">placeholder</td></tr>
+
+                            <tr class="fd-group"><td colspan="4">팝업 · 파일 · 표시 (4)</td></tr>
+                            <tr><td class="fd-mono">codePopup</td>      <td>코드 검색 팝업</td>             <td class="fd-type">String</td>          <td class="fd-type">popup: {url, codeField, nameField}</td></tr>
+                            <tr><td class="fd-mono">file</td>           <td>파일 업로드</td>                <td class="fd-type">File[]</td>          <td class="fd-type">accept, multiple, buttonLabel</td></tr>
+                            <tr><td class="fd-mono">display</td>        <td>읽기전용 / 뱃지</td>            <td class="fd-type">String</td>          <td class="fd-type">badge, badgeColors, options</td></tr>
+                            <tr><td class="fd-mono">divider</td>        <td>구분선 / 섹션</td>              <td class="fd-type">—</td>                <td class="fd-type">label, collapsible, collapsed</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 4. Public API 메서드 -->
+            <div class="fd-card" style="grid-column: span 2;">
+                <div class="fd-card-hd fd-c-orange">
+                    <span class="fd-icon">🛠️</span> Public API 메서드
+                    <span class="fd-count">18</span>
+                </div>
+                <div class="fd-card-bd">
+                    <table class="ref-tbl">
+                        <thead><tr><th style="width:220px">메서드</th><th style="width:140px">분류</th><th>설명</th></tr></thead>
+                        <tbody>
+                            <tr class="fd-group"><td colspan="3">데이터 입출력</td></tr>
+                            <tr><td class="fd-mono">getData()</td>                              <td class="fd-type">read</td>  <td>폼 전체 데이터 반환</td></tr>
+                            <tr><td class="fd-mono">setData(obj)</td>                           <td class="fd-type">write</td> <td>폼 데이터 세팅 + 원본 스냅샷 저장</td></tr>
+                            <tr><td class="fd-mono">getField(field) / setField(field, value)</td><td class="fd-type">read/write</td><td>개별 필드 읽기/쓰기</td></tr>
+                            <tr><td class="fd-mono">clear()</td>                                <td class="fd-type">write</td> <td>전체 초기화</td></tr>
+                            <tr><td class="fd-mono">resetToOriginal()</td>                     <td class="fd-type">write</td> <td>마지막 setData 의 원본으로 복원</td></tr>
+
+                            <tr class="fd-group"><td colspan="3">검증 · 상태</td></tr>
+                            <tr><td class="fd-mono">validate()</td>                             <td class="fd-type">check</td> <td>required 필드 검증 (false 면 에러 표시)</td></tr>
+                            <tr><td class="fd-mono">isDirty()</td>                              <td class="fd-type">check</td> <td>원본 대비 변경 여부</td></tr>
+                            <tr><td class="fd-mono">getChangedFields()</td>                    <td class="fd-type">check</td> <td>변경된 필드명 배열</td></tr>
+
+                            <tr class="fd-group"><td colspan="3">동적 제어</td></tr>
+                            <tr><td class="fd-mono">setOptions(field, options)</td>             <td class="fd-type">mutate</td><td>combo / multiCombo / select 옵션 교체</td></tr>
+                            <tr><td class="fd-mono">setRequired(field, boolean)</td>            <td class="fd-type">mutate</td><td>필수 여부 동적 변경</td></tr>
+                            <tr><td class="fd-mono">setReadonly(field, boolean)</td>            <td class="fd-type">mutate</td><td>개별 readOnly 토글</td></tr>
+                            <tr><td class="fd-mono">setDisabled(field, boolean)</td>            <td class="fd-type">mutate</td><td>개별 disabled 토글</td></tr>
+                            <tr><td class="fd-mono">setLabel(field, text)</td>                  <td class="fd-type">mutate</td><td>라벨 텍스트 변경</td></tr>
+                            <tr><td class="fd-mono">formReadonly(boolean)</td>                  <td class="fd-type">mutate</td><td>전체 읽기전용 토글</td></tr>
+                            <tr><td class="fd-mono">showField(field) / hideField(field)</td>   <td class="fd-type">mutate</td><td>필드 표시/숨김</td></tr>
+
+                            <tr class="fd-group"><td colspan="3">포커스 · 라이프사이클</td></tr>
+                            <tr><td class="fd-mono">focus(field)</td>                           <td class="fd-type">ui</td>    <td>특정 필드 포커스</td></tr>
+                            <tr><td class="fd-mono">destroy()</td>                              <td class="fd-type">lifecycle</td><td>위젯 정리 (document 리스너 해제)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+        <!-- /fd-ref-grid -->
 
         <!-- 1. 검색폼 (가로 배치) -->
         <div class="demo-section">

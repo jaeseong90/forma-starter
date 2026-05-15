@@ -18,6 +18,7 @@ FORMA 는 **단방향(starter → 프로젝트)** 배포 정책을 따른다(`CL
 - `CHANGELOG.md` (Keep a Changelog 포맷) — starter→프로젝트 cherry-pick 판단 기준 문서.
 - `CLAUDE.md` 에 CHANGELOG 유지 규칙 섹션 — AI 가 프레임워크 자산 변경 시 자동으로 누적하도록 트리거 조건·분류·Breaking 라벨 판단 기준 명시.
 - `src/test/java` 신설 — `PasswordPolicyTest`, `BaseResponseTest` 로 핵심 유틸 검증.
+- **Testcontainers 기반 통합 테스트** (`BootstrapIntegrationTest`) — PostgreSQL 16 컨테이너에 `schema/*.sql` 를 마운트하여 부트스트랩 전 과정 검증(스키마 순서, admin BCrypt 시드, FRM_* PGM/메뉴/권한 7건씩, 로그인 매퍼). Docker 부재 시 JUnit Assumption 으로 스킵.
 - `.github/workflows/ci.yml` — push/PR 시 build + test 자동 실행 (JDK 21 + gradle cache).
 - `SECURITY.md` — 취약점 비공개 보고 채널(GitHub Security Advisory) 안내, 알려진 보안 가정 명시(기본 JWT 시크릿/admin 비밀번호/postgres 비밀번호).
 - `.github/pull_request_template.md` — Breaking 영향·CHANGELOG 누적·검증 체크리스트.

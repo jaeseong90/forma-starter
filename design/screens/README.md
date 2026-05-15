@@ -14,7 +14,9 @@ FORMA **YAML 스크린 엔진(방식 A)** 설계서 디렉토리. `ScreenRegistr
 | `DEMO_CUSTOMER.yml` | split-detail | tb_customer + tb_customer_contact | 좌우분할 마스터-디테일 학습 |
 | `DEMO_BIZ.yml` | master-detail | tb_business + tb_business_milestone | 상하 마스터-디테일 + 입력폼 학습 |
 
-`DEMO_*` 접두는 **학습용 샘플** 표시. 실 서비스 화면과 화면 ID 충돌이 없고, AI가 방식 A를 설명할 때의 레퍼런스로 쓴다. 같은 테이블을 쓰는 실 서비스 화면(CST010, BIZ010 등)은 방식 B(커스텀 Controller/Service)로 구현되어 있다.
+`DEMO_*` 접두는 **학습용 샘플** 표시. AI 가 방식 A 를 설명할 때 few-shot 참조로 쓴다.
+
+테이블/시드는 `db/migration/V2__demo_tables.sql` 가 자동 생성한다 (`tb_customer`/`tb_customer_contact`/`tb_business`/`tb_business_milestone` + `CUST_TYPE`/`BIZ_STAGE`/`MILESTONE_TYPE` 코드그룹 + 더미 데이터 약 10건). 프로젝트가 실 서비스에 들어갈 때 본 데모가 거슬리면 후속 마이그레이션으로 DELETE 또는 use_yn='N' 처리.
 
 ## 신규 화면 추가
 

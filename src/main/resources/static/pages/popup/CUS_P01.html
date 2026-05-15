@@ -1,0 +1,45 @@
+<div class="forma-popup-page">
+    <div id="search-area" style="margin-bottom: 8px;"></div>
+    <div id="grid-area"></div>
+</div>
+<script>
+(function() {
+    const modal = FormaModal.current();
+    const param = FormaModal.getParam() || {};
+
+    const searchForm = new FormaForm('#search-area', {
+        search: true,
+        elements: [
+            { field: 'cust_nm', label: '거래처명', widget: 'text', placeholder: '거래처명 일부', maxLength: 100 }
+        ],
+        onEnter: function() { doSearch(); }
+    });
+
+    const grid = new FormaGrid('#grid-area', {
+        sortable: true,
+        columns: [
+            { field: 'cust_cd',   label: '거래처코드', width: 100 },
+            { field: 'cust_nm',   label: '거래처명',   width: 220 },
+            { field: 'cust_type', label: '유형',       width: 90,  align: 'center' },
+            { field: 'biz_no',    label: '사업자번호', width: 120 },
+            { field: 'ceo_nm',    label: '대표자',     width: 90 },
+            { field: 'tel',       label: '전화',       width: 120 }
+        ],
+        onRowDblClick: function(row) {
+            if (modal) modal.ok({ cust_cd: row.cust_cd, cust_nm: row.cust_nm });
+        }
+    });
+
+    if (param.keyword) searchForm.setField('cust_nm', param.keyword);
+
+    function doSearch() {
+        // DEMO_CUSTOMER YAML 엔진 엔드포인트를 그대로 재사용한다.
+        // 실서비스 거래처는 별도 컨트롤러로 만들고 본 popup 의 URL 만 갈아끼우면 된다.
+        platform.post('/api/screen/DEMO_CUSTOMER/selectGrid1', searchForm.getData(), new Callback(function(r) {
+            if (r.resultCode === RESULT_CODE.OK) grid.setData(r.resultData);
+        }));
+    }
+
+    doSearch();
+})();
+</script>

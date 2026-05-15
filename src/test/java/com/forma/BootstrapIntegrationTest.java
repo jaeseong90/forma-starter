@@ -84,6 +84,21 @@ class BootstrapIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
+    void DEMO_학습샘플_테이블이_시드되었다() {
+        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+        // V2__demo_tables.sql 가 거래처 4건 + 담당자 5건 + 영업기회 3건 + 마일스톤 6건 시드
+        assertEquals(4, jdbc.queryForObject("SELECT COUNT(*) FROM tb_customer", Integer.class));
+        assertEquals(5, jdbc.queryForObject("SELECT COUNT(*) FROM tb_customer_contact", Integer.class));
+        assertEquals(3, jdbc.queryForObject("SELECT COUNT(*) FROM tb_business", Integer.class));
+        assertEquals(6, jdbc.queryForObject("SELECT COUNT(*) FROM tb_business_milestone", Integer.class));
+        // 코드 그룹 3개(CUST_TYPE / BIZ_STAGE / MILESTONE_TYPE) + 기본 GRADE = 4개
+        Integer codeGroups = jdbc.queryForObject(
+                "SELECT COUNT(*) FROM tb_code_group WHERE grp_code IN ('CUST_TYPE','BIZ_STAGE','MILESTONE_TYPE')",
+                Integer.class);
+        assertEquals(3, codeGroups);
+    }
+
+    @Test
     void forma_조직과_admin_사용자가_연결되어있다() {
         LoginUserResDto user = loginService.selectUserById("admin");
         assertNotNull(user, "admin 사용자 조회 가능해야 함");

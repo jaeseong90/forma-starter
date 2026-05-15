@@ -24,6 +24,12 @@ FORMA 는 **단방향(starter → 프로젝트)** 배포 정책을 따른다(`CL
 - `src/main/resources/schema/` 디렉토리 — V1__init.sql 로 흡수.
 - 직전 라운드에 추가하려던 `frame/migration/FrameworkSchemaUpgradeRunner` band-aid 코드 — Flyway 가 본 역할을 대신함.
 
+### Added (DEMO 학습샘플 살리기)
+- `db/migration/V2__demo_tables.sql` — `tb_customer` / `tb_customer_contact` / `tb_business` / `tb_business_milestone` 테이블 + `CUST_TYPE` / `BIZ_STAGE` / `MILESTONE_TYPE` 코드그룹 + 더미 데이터(거래처 4·담당자 5·영업기회 3·마일스톤 6). `design/screens/DEMO_*.yml` 의 3개 학습 샘플이 이제 모두 실제 동작.
+- `static/pages/popup/CUS_P01.html` — 거래처 검색 팝업. DEMO_BIZ 의 codePopup 위젯이 참조. YAML 엔진 엔드포인트(`/api/screen/DEMO_CUSTOMER/selectGrid1`) 재사용하는 단순 구조.
+- `BootstrapIntegrationTest`: DEMO 학습샘플 테이블/시드 검증 케이스 추가.
+- `design/screens/README.md` 갱신 — SalesOn 잔재 표현(존재하지 않는 CST010/BIZ010 참조) 제거하고 V2 마이그레이션 안내.
+
 ### Added
 - `CHANGELOG.md` (Keep a Changelog 포맷) — starter→프로젝트 cherry-pick 판단 기준 문서.
 - `CLAUDE.md` 에 CHANGELOG 유지 규칙 섹션 — AI 가 프레임워크 자산 변경 시 자동으로 누적하도록 트리거 조건·분류·Breaking 라벨 판단 기준 명시.

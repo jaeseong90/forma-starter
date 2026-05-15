@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+    PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <!-- resultType="map" 의 NULL 컬럼도 키로 채움 (FormaSqlSession.normalizeMapKeys 가 키 정규화) -->
+        <setting name="callSettersOnNulls" value="true"/>
+        <!-- NULL 파라미터 바인딩 시 PostgreSQL 호환을 위한 JDBC 타입 명시 -->
+        <setting name="jdbcTypeForNull" value="NULL"/>
+        <!-- snake_case → camelCase 매핑 (DTO 결과 한정. resultType=map 은 FormaSqlSession 가 별도 처리) -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!-- 캐시 비활성화 (FORMA 는 데이터 권한 컨텍스트가 동적이므로 mybatis 캐시는 사용하지 않음) -->
+        <setting name="cacheEnabled" value="false"/>
+        <!-- lazy load 비활성화 -->
+        <setting name="lazyLoadingEnabled" value="false"/>
+        <!-- 빈 결과를 빈 객체로 반환하지 않음 -->
+        <setting name="returnInstanceForEmptyRow" value="false"/>
+    </settings>
+</configuration>

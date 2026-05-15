@@ -44,6 +44,9 @@ dependencies {
     // DB
     runtimeOnly 'org.postgresql:postgresql'
 
+    // OpenAPI / Swagger UI — application.yml 의 springdoc.api-docs.enabled 로 토글 (운영에선 false)
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+
     // DevTools (자동 재시작 + 정적 리소스 즉시 반영)
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 

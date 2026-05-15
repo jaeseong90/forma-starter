@@ -28,3 +28,10 @@ logging:
   level:
     com.forma: INFO
     org.springframework: WARN
+
+# 운영: OpenAPI/Swagger 비활성화 (API 노출 최소화)
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

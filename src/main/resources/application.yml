@@ -64,3 +64,16 @@ management:
 logging:
   level:
     com.forma: DEBUG
+
+# OpenAPI / Swagger UI
+# 기본 ON (개발 편의). 운영(prod)에선 application-prod.yml.example 의 설정으로 OFF.
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+    display-request-duration: true

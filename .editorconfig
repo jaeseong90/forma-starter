@@ -1,0 +1,24 @@
+# EditorConfig — https://editorconfig.org
+# IDE 가 자동으로 인식하여 인코딩/들여쓰기/줄바꿈 통일
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{yml,yaml,json,md,html,js,ts,css,scss}]
+indent_size = 2
+
+[*.{bat,cmd,ps1}]
+end_of_line = crlf
+
+[Makefile]
+indent_style = tab
+
+[*.md]
+trim_trailing_whitespace = false

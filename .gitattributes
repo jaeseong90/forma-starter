@@ -1,0 +1,29 @@
+# 텍스트 파일은 기본적으로 자동 정규화 + LF 로 커밋
+* text=auto eol=lf
+
+# Windows 전용 스크립트는 CRLF 유지
+*.bat       text eol=crlf
+*.cmd       text eol=crlf
+*.ps1       text eol=crlf
+
+# 유닉스 스크립트는 LF
+*.sh        text eol=lf
+gradlew     text eol=lf
+
+# 바이너리
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.pdf       binary
+*.zip       binary
+*.jar       binary
+*.xlsx      binary
+*.xls       binary
+*.docx      binary
+*.doc       binary
+*.woff      binary
+*.woff2     binary
+*.ttf       binary
+*.eot       binary

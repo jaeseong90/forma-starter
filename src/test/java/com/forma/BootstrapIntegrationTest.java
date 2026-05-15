@@ -84,6 +84,21 @@ class BootstrapIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
+    void DEMO_학습샘플_PGM_메뉴_권한이_등록되었다() {
+        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+        // V3__demo_screens.sql 가 DEMO_* 3건 + 메뉴 그룹 1 + 자식 3 + role_auth 3
+        assertEquals(3, jdbc.queryForObject(
+                "SELECT COUNT(*) FROM tb_pgm_info WHERE pgm_id LIKE 'DEMO\\_%' ESCAPE '\\'",
+                Integer.class));
+        assertEquals(4, jdbc.queryForObject(
+                "SELECT COUNT(*) FROM tb_menu WHERE menu_id LIKE 'M\\_DEMO%' ESCAPE '\\'",
+                Integer.class), "그룹 M_DEMO + 자식 3건");
+        assertEquals(3, jdbc.queryForObject(
+                "SELECT COUNT(*) FROM tb_role_auth WHERE role_cd = 'ADMIN' AND pgm_id LIKE 'DEMO\\_%' ESCAPE '\\'",
+                Integer.class));
+    }
+
+    @Test
     void DEMO_학습샘플_테이블이_시드되었다() {
         JdbcTemplate jdbc = new JdbcTemplate(dataSource);
         // V2__demo_tables.sql 가 거래처 4건 + 담당자 5건 + 영업기회 3건 + 마일스톤 6건 시드

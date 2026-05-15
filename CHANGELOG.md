@@ -26,8 +26,9 @@ FORMA 는 **단방향(starter → 프로젝트)** 배포 정책을 따른다(`CL
 
 ### Added (DEMO 학습샘플 살리기)
 - `db/migration/V2__demo_tables.sql` — `tb_customer` / `tb_customer_contact` / `tb_business` / `tb_business_milestone` 테이블 + `CUST_TYPE` / `BIZ_STAGE` / `MILESTONE_TYPE` 코드그룹 + 더미 데이터(거래처 4·담당자 5·영업기회 3·마일스톤 6). `design/screens/DEMO_*.yml` 의 3개 학습 샘플이 이제 모두 실제 동작.
+- `db/migration/V3__demo_screens.sql` — DEMO_* 3종을 `tb_pgm_info` + 사이드바 메뉴 그룹("학습샘플 (YAML 화면)") + ADMIN role_auth 에 등록. 이전엔 URL 직접 입력으로만 접근 가능했지만 이제 로그인 후 좌측 메뉴 클릭만으로 진입. URL 은 `/pages/screen.html?pgm=DEMO_*` 로 YAML 엔진 라우팅.
 - `static/pages/popup/CUS_P01.html` — 거래처 검색 팝업. DEMO_BIZ 의 codePopup 위젯이 참조. YAML 엔진 엔드포인트(`/api/screen/DEMO_CUSTOMER/selectGrid1`) 재사용하는 단순 구조.
-- `BootstrapIntegrationTest`: DEMO 학습샘플 테이블/시드 검증 케이스 추가.
+- `BootstrapIntegrationTest`: DEMO 학습샘플 테이블/시드 + PGM/메뉴/권한 검증 케이스 추가.
 - `design/screens/README.md` 갱신 — SalesOn 잔재 표현(존재하지 않는 CST010/BIZ010 참조) 제거하고 V2 마이그레이션 안내.
 
 ### Added

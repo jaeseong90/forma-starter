@@ -196,6 +196,7 @@ public class {PgmId}Controller extends BaseController {
 | 주제 | 문서 |
 |---|---|
 | 신규 프로젝트 부트스트랩(starter 클론 직후) | `ONBOARDING.md` |
+| 프레임워크 변경 이력 (cherry-pick 기준) | `CHANGELOG.md` |
 | 프레임워크 전체 | `doc/FORMA-프레임워크.md` |
 | AI 바이브코딩 절차 | `doc/AI-워크플로.md` |
 | 프론트 조립 관례 | `doc/프론트-패턴.md` |
@@ -206,6 +207,36 @@ public class {PgmId}Controller extends BaseController {
 | 기술스택 | `doc/기술스택/*.md` |
 | YAML 설계서 스키마 | `design/_schema_guide.yml` |
 | YAML 샘플 (학습용) | `design/screens/DEMO_*.yml` |
+
+## CHANGELOG 유지 규칙 (starter 한정)
+
+> 본 규칙은 **`forma-starter` 저장소**에서만 적용된다. starter 를 클론한 도메인 프로젝트는 본 섹션을 무시해도 된다.
+
+starter 는 단방향(starter → 프로젝트) 배포라 다운스트림이 cherry-pick 으로 따라잡는다. 따라서 **프레임워크 자산을 건드릴 때마다** `CHANGELOG.md` 의 `[Unreleased]` 섹션에 한 줄 추가한다. AI 가 자동으로 챙긴다.
+
+기록 대상 (해당하면 반드시 추가):
+- `frame/*`, `login/*` 의 Java 코드 변경 (특히 SPI 시그니처)
+- `src/main/resources/schema/*.sql` 의 DDL/시드 변경
+- `src/main/resources/application*.yml*` 의 설정 키·기본값·환경변수 prefix 변경
+- `static/assets/js/framework/forma.*.js` / `static/assets/css/forma.css` 변경
+- 표준 관리자 화면(`static/pages/admin/FRM_*.html`) 변경
+- `docker-compose.yml`, `Dockerfile`, 포트, 빌드 설정 변경
+- `.claude/commands/*`, `.claude/skills/forma-*` 변경
+- `CLAUDE.md`, `doc/*`, `ONBOARDING.md`, `design/_schema_guide.yml`, `design/_prompts/*` 변경
+
+기록 제외 대상:
+- 예제 화면(`DEMO_*`), 도메인 코드, README 의 오탈자
+- 빌드 산출물, 임시 스크립트(`tmp/`), `.gitignore` 자체
+
+분류: `Added` / `Changed` / `Deprecated` / `Removed` / `Fixed` / `Security` 중 1택.
+
+다운스트림 영향이 큰 항목은 앞에 **`Breaking:`** 라벨. 판단 기준:
+- 패키지/클래스명 변경, 메서드 시그니처 변경
+- DB 스키마 변경 (컬럼 추가/삭제/타입 변경)
+- 환경변수 prefix·포트·기본 설정값 변경
+- SPI 인터페이스 변경
+
+릴리즈 시점에 `[Unreleased]` 를 `[x.y.z] - YYYY-MM-DD` 로 잘라내고 하단 비교 링크를 갱신한다.
 
 ---
 ---

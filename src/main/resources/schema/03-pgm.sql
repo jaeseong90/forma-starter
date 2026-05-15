@@ -14,7 +14,8 @@ INSERT INTO tb_pgm_info (pgm_id, pgm_nm, srch_yn, new_yn, save_yn, del_yn, prnt_
     ('FRM_USER',  '사용자관리',     'Y', 'Y', 'Y', 'N', 'N', 'N', 'Y', '🔐', '비밀번호초기화'),
     ('FRM_AUDIT', '감사로그',       'Y', 'N', 'N', 'N', 'N', 'N', 'Y', '📊', NULL),
     ('FRM_CODE',  '코드관리',       'Y', 'Y', 'Y', 'Y', 'N', 'N', 'Y', '🏷️', '코드추가'),
-    ('FRM_DEPT',  '조직관리',       'Y', 'Y', 'Y', 'Y', 'N', 'N', 'Y', '🏗️', NULL)
+    ('FRM_DEPT',  '조직관리',       'Y', 'Y', 'Y', 'Y', 'N', 'N', 'Y', '🏗️', NULL),
+    ('FRM_RLS',   '릴리즈노트관리', 'Y', 'Y', 'Y', 'Y', 'N', 'N', 'Y', '📣', NULL)
 ON CONFLICT (pgm_id) DO NOTHING;
 
 -- ═══════════════════════════════════════════════

@@ -173,6 +173,35 @@ CREATE TABLE IF NOT EXISTS tb_audit_log (
     audit_dt     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- ═══════════════════════════════════════════════
+--  릴리즈노트 (FRM_RLS / 프론트 forma.releasenote.js 가 사용)
+-- ═══════════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS tb_release_note (
+    note_seq      BIGSERIAL PRIMARY KEY,
+    version       VARCHAR(20) NOT NULL,
+    title         VARCHAR(200) NOT NULL,
+    summary       TEXT,
+    release_date  VARCHAR(8),                    -- YYYYMMDD
+    target        VARCHAR(20) DEFAULT 'DESKTOP', -- DESKTOP / MOBILE / ALL
+    use_yn        VARCHAR(1) DEFAULT 'Y',
+    sort_order    INT DEFAULT 0,
+    created_by    VARCHAR(50),
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_by    VARCHAR(50),
+    updated_at    TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_release_note_target ON tb_release_note(target, use_yn);
+
+CREATE TABLE IF NOT EXISTS tb_release_note_item (
+    item_seq      BIGSERIAL PRIMARY KEY,
+    note_seq      BIGINT NOT NULL,
+    category      VARCHAR(20),                   -- NEW / IMPROVE / BUGFIX / NOTICE
+    content       TEXT NOT NULL,
+    sort_order    INT DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_release_note_item_note ON tb_release_note_item(note_seq);
+
 CREATE TABLE IF NOT EXISTS tb_file (
     file_id VARCHAR(50) NOT NULL PRIMARY KEY,
     ref_type VARCHAR(20) NOT NULL,
@@ -241,5 +270,9 @@ DO $$ BEGIN
 
     BEGIN ALTER TABLE tb_user_settings ADD CONSTRAINT fk_user_settings_user
         FOREIGN KEY (user_id) REFERENCES tb_user(user_id) ON DELETE RESTRICT;
+    EXCEPTION WHEN duplicate_object THEN NULL; END;
+
+    BEGIN ALTER TABLE tb_release_note_item ADD CONSTRAINT fk_release_note_item_note
+        FOREIGN KEY (note_seq) REFERENCES tb_release_note(note_seq) ON DELETE CASCADE;
     EXCEPTION WHEN duplicate_object THEN NULL; END;
 END $$;

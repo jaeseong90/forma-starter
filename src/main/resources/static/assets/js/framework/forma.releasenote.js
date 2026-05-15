@@ -117,7 +117,7 @@
         try { lastSeen = localStorage.getItem(STORAGE_PREFIX + target) || ''; } catch(e) {}
 
         try {
-            var res = await platform.post('/rls010/selectActiveByTarget', { target: target }, { loading: false });
+            var res = await platform.post('/frm_rls/selectActiveByTarget', { target: target }, { loading: false });
             if (!res || res.resultCode !== 'OK' || !res.resultData) return;
             var notes = res.resultData;
             var newNotes = notes.filter(function(n) {

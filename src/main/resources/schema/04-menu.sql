@@ -22,7 +22,8 @@ INSERT INTO tb_menu (menu_id, menu_nm, parent_id, menu_type, pgm_id, url, sort_o
     ('M_FRM_USER',  '사용자관리',     'M_SYS', 'P', 'FRM_USER',  '/pages/admin/FRM_USER.html',  40, 'Y'),
     ('M_FRM_DEPT',  '조직관리',       'M_SYS', 'P', 'FRM_DEPT',  '/pages/admin/FRM_DEPT.html',  50, 'Y'),
     ('M_FRM_CODE',  '코드관리',       'M_SYS', 'P', 'FRM_CODE',  '/pages/admin/FRM_CODE.html',  60, 'Y'),
-    ('M_FRM_AUDIT', '감사로그',       'M_SYS', 'P', 'FRM_AUDIT', '/pages/admin/FRM_AUDIT.html', 70, 'Y')
+    ('M_FRM_AUDIT', '감사로그',       'M_SYS', 'P', 'FRM_AUDIT', '/pages/admin/FRM_AUDIT.html', 70, 'Y'),
+    ('M_FRM_RLS',   '릴리즈노트관리', 'M_SYS', 'P', 'FRM_RLS',   '/pages/admin/FRM_RLS.html',   80, 'Y')
 ON CONFLICT (menu_id) DO NOTHING;
 
 -- ═══════════════════════════════════════════════

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="frm_rls">
+
+    <!-- ═══ 관리자 ═══ -->
+
+    <select id="selectList" parameterType="map" resultType="map">
+        SELECT note_seq, version, title, summary, release_date, target, use_yn, sort_order,
+               created_by, created_at, updated_by, updated_at
+          FROM tb_release_note
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (version LIKE '%' || #{keyword} || '%' OR title LIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="target != null and target != ''">
+                AND target = #{target}
+            </if>
+            <if test="useYn != null and useYn != ''">
+                AND use_yn = #{useYn}
+            </if>
+        </where>
+        ORDER BY release_date DESC NULLS LAST, version DESC, note_seq DESC
+    </select>
+
+    <select id="selectOne" parameterType="map" resultType="map">
+        SELECT note_seq, version, title, summary, release_date, target, use_yn, sort_order,
+               created_by, created_at, updated_by, updated_at
+          FROM tb_release_note
+         WHERE note_seq = #{noteSeq}
+    </select>
+
+    <select id="selectItems" parameterType="map" resultType="map">
+        SELECT item_seq, note_seq, category, content, sort_order
+          FROM tb_release_note_item
+         WHERE note_seq = #{noteSeq}
+         ORDER BY sort_order, item_seq
+    </select>
+
+    <insert id="insertNote" parameterType="map" useGeneratedKeys="true" keyProperty="noteSeq" keyColumn="note_seq">
+        INSERT INTO tb_release_note
+            (version, title, summary, release_date, target, use_yn, sort_order,
+             created_by, created_at, updated_by, updated_at)
+        VALUES
+            (#{version}, #{title}, #{summary}, #{releaseDate},
+             COALESCE(#{target}, 'DESKTOP'), COALESCE(#{useYn}, 'Y'),
+             COALESCE(#{sortOrder}, 0),
+             #{createdBy}, CURRENT_TIMESTAMP, #{updatedBy}, CURRENT_TIMESTAMP)
+    </insert>
+
+    <update id="updateNote" parameterType="map">
+        UPDATE tb_release_note
+           SET version = #{version},
+               title = #{title},
+               summary = #{summary},
+               release_date = #{releaseDate},
+               target = COALESCE(#{target}, target),
+               use_yn = COALESCE(#{useYn}, use_yn),
+               sort_order = COALESCE(#{sortOrder}, sort_order),
+               updated_by = #{updatedBy},
+               updated_at = CURRENT_TIMESTAMP
+         WHERE note_seq = #{noteSeq}
+    </update>
+
+    <delete id="deleteNote" parameterType="map">
+        DELETE FROM tb_release_note WHERE note_seq = #{noteSeq}
+    </delete>
+
+    <delete id="deleteItemsByNote" parameterType="map">
+        DELETE FROM tb_release_note_item WHERE note_seq = #{noteSeq}
+    </delete>
+
+    <insert id="insertItem" parameterType="map">
+        INSERT INTO tb_release_note_item (note_seq, category, content, sort_order)
+        VALUES (#{noteSeq}, #{category}, #{content}, COALESCE(#{sortOrder}, 0))
+    </insert>
+
+    <!-- ═══ 프론트 forma.releasenote.js 용 ═══ -->
+
+    <select id="selectActiveByTarget" parameterType="map" resultType="map">
+        SELECT note_seq, version, title, summary, release_date, target
+          FROM tb_release_note
+         WHERE use_yn = 'Y'
+           AND (target = #{target} OR target = 'ALL')
+         ORDER BY release_date DESC NULLS LAST, version DESC, note_seq DESC
+    </select>
+
+</mapper>

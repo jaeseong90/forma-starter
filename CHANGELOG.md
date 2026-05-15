@@ -27,8 +27,12 @@ FORMA 는 **단방향(starter → 프로젝트)** 배포 정책을 따른다(`CL
 - **Breaking: `login/UserSeedRunner`** 제거 — `seed/users.tsv`(존재하지 않고 `.gitignore` 처리됨) 를 읽는 SalesOn 전용 bulk import 코드였다. admin 시드는 `InitialAdminBootstrapRunner` 가 담당하므로 중복.
 - `mapper/common/admin.xml` 의 `updateUserEmpEmailPw`, `updateAdminPw` 매퍼 — `UserSeedRunner` 전용이라 동반 제거.
 
+### Security
+- `JwtTokenProvider` 기동 시 `forma.jwt.secret` 가 starter 기본값으로 남아 있으면 로그 WARN(local/test) 또는 ERROR(그 외 프로파일) 출력. 운영 전환 시 시크릿 교체 강제하기 위한 안전장치.
+
 ### Changed
 - `application.yml` 의 `forma.security.*` 키 재정렬: `seed-users`/`seed-users-admin-pw` 제거, `initial-admin-pw` 추가(`InitialAdminBootstrapRunner` 의 BCrypt 대상값). `reset-all-passwords` 계열은 운영 도구로 유지.
+- Apache POI 4.1.0 → 5.3.0 업그레이드 — 5년된 의존성 갱신. `ExcelService`(SXSSFWorkbook) / `DocOutputService`(XWPF) 모두 API 호환.
 
 ## [0.5.0] - 2026-05-15
 

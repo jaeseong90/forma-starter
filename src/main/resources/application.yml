@@ -51,7 +51,7 @@ forma:
     # emp_no/email/비밀번호(BCrypt(empNo))를 일괄 업데이트. admin 비번은 seed-users-admin-pw 값으로 설정.
     # 완료 후 반드시 false 로 되돌릴 것.
     seed-users: ${FORMA_SEED_USERS:false}
-    seed-users-admin-pw: ${FORMA_SEED_USERS_ADMIN_PW:forma21}
+    seed-users-admin-pw: ${FORMA_SEED_USERS_ADMIN_PW:admin1!}
 
 management:
   endpoints:

@@ -16,7 +16,7 @@ import javax.sql.DataSource;
  *
  * <p>schema/05-admin-seed.sql 는 user_pw 를 NULL 로 두고 사용자(admin/홍길동)만 만든다.
  * 정적 BCrypt 해시를 SQL 시드에 박아두지 않으려는 의도이며, 본 러너가 기동 시 user_pw 가
- * 비어 있는 admin 행에 BCrypt('forma21') 를 채워준다.
+ * 비어 있는 admin 행에 BCrypt('admin1!') 를 채워준다.
  *
  * <p>이미 비밀번호가 설정돼 있으면 아무 일도 하지 않는다 — 안전하게 매 기동마다 호출 가능.
  * 최초 로그인 후 비밀번호 변경 권장.
@@ -29,7 +29,7 @@ public class InitialAdminBootstrapRunner implements ApplicationRunner {
     private final DataSource dataSource;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${forma.security.initial-admin-pw:forma21}")
+    @Value("${forma.security.initial-admin-pw:admin1!}")
     private String initialAdminPw;
 
     @Override

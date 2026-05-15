@@ -37,7 +37,7 @@ public class UserSeedRunner implements CommandLineRunner {
     @Value("${forma.security.seed-users:false}")
     private boolean enabled;
 
-    @Value("${forma.security.seed-users-admin-pw:forma21}")
+    @Value("${forma.security.seed-users-admin-pw:admin1!}")
     private String adminPw;
 
     @Override

@@ -2,7 +2,7 @@
 --
 -- 본 파일은 컨테이너 첫 기동 시 자동 실행되어 최소 운영 가능한 상태(조직 1건 + ADMIN 역할 +
 -- 전체 FRM_* 권한 + 관리자 1명) 를 만든다.
--- 비밀번호는 NULL 로 두며, 애플리케이션 기동 시 InitialAdminBootstrapRunner 가 BCrypt('forma21')
+-- 비밀번호는 NULL 로 두며, 애플리케이션 기동 시 InitialAdminBootstrapRunner 가 BCrypt('admin1!')
 -- 로 채운다. (정적 BCrypt 해시를 시드에 박지 않기 위함.)
 
 -- ═══════════════════════════════════════════════
@@ -47,7 +47,7 @@ SELECT 'ADMIN', 'ALL', NULL, NULL, '관리자 전체 데이터 권한'
 
 -- ═══════════════════════════════════════════════
 --  최초 관리자 사용자 (admin / 홍길동)
---  user_pw 는 NULL — InitialAdminBootstrapRunner 가 BCrypt('forma21') 로 채운다.
+--  user_pw 는 NULL — InitialAdminBootstrapRunner 가 BCrypt('admin1!') 로 채운다.
 -- ═══════════════════════════════════════════════
 
 INSERT INTO tb_user (user_id, user_pw, user_nm, dept_code, grade_cd, use_yn)

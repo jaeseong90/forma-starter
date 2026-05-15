@@ -7,7 +7,7 @@
 #
 # 첫 기동 시 src/main/resources/schema/*.sql 가 /docker-entrypoint-initdb.d 로 마운트되어
 # 자동 실행된다(테이블 + 공통코드 + FRM_* 메뉴/프로그램 + admin 사용자 + forma 조직 시드).
-# Spring 기동 시 InitialAdminBootstrapRunner 가 admin 비밀번호(BCrypt('forma21'))를 설정한다.
+# Spring 기동 시 InitialAdminBootstrapRunner 가 admin 비밀번호(BCrypt('admin1!'))를 설정한다.
 
 services:
   postgres:

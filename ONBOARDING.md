@@ -66,7 +66,7 @@ FORMA 기반 ERP 스타터킷. 백엔드 코어(`frame/`, `login/`) + 표준 관
 ### 5. 빌드 + 기동
 
 - [ ] `./gradlew bootRun` → http://localhost:8080
-- [ ] **admin / forma21** 로 로그인 (최초 기동 시 `InitialAdminBootstrapRunner` 가 BCrypt 해시 채움)
+- [ ] **admin / admin1!** 로 로그인 (최초 기동 시 `InitialAdminBootstrapRunner` 가 BCrypt 해시 채움)
 - [ ] 관리자 화면 동작 확인: `FRM_MENU` / `FRM_USER` / `FRM_ROLE` / `FRM_CODE` / `FRM_DEPT` / `FRM_PGM` / `FRM_AUDIT`
 - [ ] 첫 로그인 후 비밀번호 변경 권장
 

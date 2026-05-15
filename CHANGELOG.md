@@ -24,6 +24,11 @@ FORMA 는 **단방향(starter → 프로젝트)** 배포 정책을 따른다(`CL
 - `src/main/resources/schema/` 디렉토리 — V1__init.sql 로 흡수.
 - 직전 라운드에 추가하려던 `frame/migration/FrameworkSchemaUpgradeRunner` band-aid 코드 — Flyway 가 본 역할을 대신함.
 
+### Changed (FORM_DEMO 30 위젯 카탈로그 재구성)
+- `static/pages/dev/FORM_DEMO.html` 의 "전체 위젯" 섹션을 5개 그룹(텍스트·숫자 / 선택 / 날짜·기간 / 범위·평점·색·태그 / 팝업·파일·표시) 로 정리, **30개 위젯 모두** 표기. 기존 21개 → 30개 (`yearMonthRange`, `inputMask`, `slider`, `rating`, `colorPicker`, `tagInput`, `buttonGroup`, `week`, `select` 9종 신규 노출).
+- 상단 위젯 타입 레퍼런스 표도 그룹별 행 헤더와 함께 30종으로 갱신.
+- `codePopup` 데모의 popup URL 을 SalesOn 시절 잔재(`/pages/base/SDA010.html`) 에서 starter 자체 팝업(`/pages/popup/CUS_P01.html`) 으로 수정.
+
 ### Added (DEMO 학습샘플 살리기)
 - `db/migration/V2__demo_tables.sql` — `tb_customer` / `tb_customer_contact` / `tb_business` / `tb_business_milestone` 테이블 + `CUST_TYPE` / `BIZ_STAGE` / `MILESTONE_TYPE` 코드그룹 + 더미 데이터(거래처 4·담당자 5·영업기회 3·마일스톤 6). `design/screens/DEMO_*.yml` 의 3개 학습 샘플이 이제 모두 실제 동작.
 - `db/migration/V3__demo_screens.sql` — DEMO_* 3종을 `tb_pgm_info` + 사이드바 메뉴 그룹("학습샘플 (YAML 화면)") + ADMIN role_auth 에 등록. 이전엔 URL 직접 입력으로만 접근 가능했지만 이제 로그인 후 좌측 메뉴 클릭만으로 진입. URL 은 `/pages/screen.html?pgm=DEMO_*` 로 YAML 엔진 라우팅.

@@ -35,7 +35,8 @@ FORMA 는 **단방향(starter → 프로젝트)** 배포 정책을 따른다(`CL
 
 ### Fixed (docs)
 - `doc/기술스택/백엔드.md` 전면 재작성 — Java 17/H2/JdbcTemplate-only/Lombok 금지 등 실제 구현과 완전 모순되는 stale 정보 제거. 현 구현(Java 21, PostgreSQL, MyBatis + FormaSqlSession, Lombok 사용) 반영.
-- `doc/아키텍처/시스템-개요.md` 다이어그램의 "H2(개발) / PostgreSQL(운영)" 표기를 "PostgreSQL (로컬: docker-compose 자동)" 로 정정. JdbcTemplate → MyBatis + FormaSqlSession.
+- `doc/아키텍처/시스템-개요.md` 다이어그램의 "H2(개발) / PostgreSQL(운영)" 표기를 "PostgreSQL (로컬: docker-compose 자동)" 로 정정. JdbcTemplate → MyBatis + FormaSqlSession. design/ 디렉토리 구조도 현행화(`_entities.yml` 없음, `00/01-generate-*.md` 정정).
+- `doc/아키텍처/설계서-기반-개발.md` 재작성 — 존재하지 않는 `_entities.yml` 참조, 잘못된 prompt 파일명(`01-/02-` → `00-/01-`), 분리된 JS 파일(현재는 인라인 `<script>` IIFE) 등 stale 정보 제거. 방식 A/B 흐름·산출물 경로·AI 자산 위치 정확히 정리.
 
 ### Changed
 - `application.yml` 의 `forma.security.*` 키 재정렬: `seed-users`/`seed-users-admin-pw` 제거, `initial-admin-pw` 추가(`InitialAdminBootstrapRunner` 의 BCrypt 대상값). `reset-all-passwords` 계열은 운영 도구로 유지.

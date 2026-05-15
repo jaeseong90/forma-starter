@@ -1,13 +1,13 @@
 # FORMA Starter — 로컬 부트스트랩용 PostgreSQL
 #
 # 사용법:
-#   docker compose up -d     # 15432 포트로 PostgreSQL 기동
+#   docker compose up -d     # 15432 포트로 PostgreSQL 기동 (빈 DB)
 #   docker compose down       # 컨테이너 정리 (볼륨 유지)
 #   docker compose down -v    # 데이터까지 초기화
 #
-# 첫 기동 시 src/main/resources/schema/*.sql 가 /docker-entrypoint-initdb.d 로 마운트되어
-# 자동 실행된다(테이블 + 공통코드 + FRM_* 메뉴/프로그램 + admin 사용자 + forma 조직 시드).
-# Spring 기동 시 InitialAdminBootstrapRunner 가 admin 비밀번호(BCrypt('admin1!'))를 설정한다.
+# 스키마/시드는 **Flyway** 가 앱 기동 시 자동 적용한다 (src/main/resources/db/migration/V*__*.sql).
+# 따라서 본 docker-compose 는 빈 PostgreSQL 만 제공하면 되고, /docker-entrypoint-initdb.d 마운트는
+# 더 이상 필요하지 않다. 운영 DB 의 경우 Flyway 가 동일하게 동작한다.
 
 services:
   postgres:
@@ -24,7 +24,6 @@ services:
       - "15432:5432"
     volumes:
       - forma-pgdata:/var/lib/postgresql/data
-      - ./src/main/resources/schema:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U forma -d forma"]
       interval: 10s

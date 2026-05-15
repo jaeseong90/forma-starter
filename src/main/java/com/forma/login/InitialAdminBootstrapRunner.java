@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 /**
  * 초기 관리자 계정 비밀번호 부트스트랩.
  *
- * <p>schema/05-admin-seed.sql 는 user_pw 를 NULL 로 두고 사용자(admin/홍길동)만 만든다.
+ * <p>db/migration/V1__init.sql 는 user_pw 를 NULL 로 두고 사용자(admin/홍길동)만 만든다.
  * 정적 BCrypt 해시를 SQL 시드에 박아두지 않으려는 의도이며, 본 러너가 기동 시 user_pw 가
  * 비어 있는 admin 행에 BCrypt('admin1!') 를 채워준다.
  *

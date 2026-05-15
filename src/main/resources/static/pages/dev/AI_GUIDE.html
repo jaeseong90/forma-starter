@@ -311,7 +311,7 @@ CLAUDE.md                        ← 프레임워크 전체 규칙 (AI 참조)</
        예: SOA010에 승인 버튼 추가. 승인 시 상태를 APPROVED로 변경.</div>
 
         <h3>테이블 추가</h3>
-        <div class="guide-cmd"><span class="prompt">User &gt;</span> {테이블 설명} 테이블 DDL 만들고 schema/01-tables.sql에 추가해줘.</div>
+        <div class="guide-cmd"><span class="prompt">User &gt;</span> {테이블 설명} 테이블 DDL 만들고 db/migration/V{N}__*.sql 신규 마이그레이션으로 추가해줘.</div>
 
         <h3>복잡한 레이아웃</h3>
         <div class="guide-cmd"><span class="prompt">User &gt;</span> 좌측에 트리 조직도, 우측에 탭(기본정보 폼 + 소속 직원 그리드 + 이력 그리드).

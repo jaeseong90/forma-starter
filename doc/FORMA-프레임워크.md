@@ -265,8 +265,8 @@ FORMA는 런타임 + 컴포넌트만이 아니라 **ERP 구동에 필수인 관�
 ## 8. FORMA를 다른 ERP에 이식할 때
 
 1. **패키지 복사**: `{basePackage}.frame/`, `{basePackage}.login/` 두 덩어리를 새 프로젝트에 복사. `{basePackage}`만 바꾸면 됨.
-2. **공통 테이블 DDL 유지**: `schema/01-tables.sql`의 프레임워크 테이블만 남기고(tb_user, tb_user_role, tb_user_settings, tb_user_favorite, tb_dept, tb_role, tb_menu, tb_role_menu, tb_role_auth, tb_data_auth, tb_pgm_info, tb_code_group, tb_code, tb_audit_log, tb_log, tb_file), 업무 테이블은 제거.
-3. **프레임워크 시드 유지**: `schema/02-codes.sql`의 공통 코드 그룹만 유지, 업무 코드는 프로젝트별.
+2. **공통 테이블 DDL 유지**: `db/migration/V1__init.sql` (Flyway)의 프레임워크 테이블만 남기고(tb_user, tb_user_role, tb_user_settings, tb_user_favorite, tb_dept, tb_role, tb_menu, tb_role_menu, tb_role_auth, tb_data_auth, tb_pgm_info, tb_code_group, tb_code, tb_audit_log, tb_log, tb_file), 업무 테이블은 제거.
+3. **프레임워크 시드 유지**: `db/migration/V1__init.sql` (Flyway)의 공통 코드 그룹만 유지, 업무 코드는 프로젝트별.
 4. **정적 자원 복사**: `static/assets/js/framework/*.js`, `forma.css`, `login.html`, `main.html`, `index.html`, `pages/screen.html`, `pages/admin/*`, `pages/popup/PGM_P01`·`USR_P01`.
 5. **application.yml**의 DB·JWT secret·파일 업로드 경로 교체.
 6. **CLAUDE.md**: 상단(FORMA 공통 섹션)은 그대로, 하단(인스턴스)만 새 도메인에 맞춰 교체.

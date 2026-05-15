@@ -42,7 +42,7 @@ description: |
 
 ## 3단계: 화면 ID 채번
 
-`CLAUDE.md` 하단 **"PGM ID 접두어"** 테이블에서 모듈 접두어 확인 → `design/screens/*.yml` + `src/main/resources/static/pages/**/*.html` + `src/main/resources/schema/04-pgm.sql`에서 해당 접두어의 최대 순번 확인 → **+10** 부여.
+`CLAUDE.md` 하단 **"PGM ID 접두어"** 테이블에서 모듈 접두어 확인 → `design/screens/*.yml` + `src/main/resources/static/pages/**/*.html` + 기존 `db/migration/V*__*.sql` 들에서 해당 접두어의 최대 순번 확인 → **+10** 부여.
 
 **금지**: `MMA010`·`SDA010`·`POA010` 같은 일반 예시 ID를 그대로 쓰는 것. 항상 프로젝트 접두어.
 
@@ -52,14 +52,14 @@ description: |
 1. `/new-screen {요구 요약}` 실행 → `design/screens/{PGMID}.yml` 생성
 2. 사용자 검토 단계: 생성된 YAML과 DDL 초안 제시, 수정 희망 항목 질문
 3. 승인 후:
-   - 새 테이블·코드 있으면 `schema/01-tables.sql`, `schema/02-codes.sql`, `schema/04-pgm.sql`에 INSERT 추가 (사용자에게 실행 방법 안내)
+   - 새 테이블/코드/PGM/메뉴는 **Flyway 신규 마이그레이션**: `src/main/resources/db/migration/V{N}__{기능}.sql` 한 파일에 묶어서 작성. 다음 기동에서 자동 적용.
    - 서버 가동 중이면 `POST /api/screen/_reload` 안내. 코드 컴파일 없이 즉시 반영.
 4. 프론트는 `/pages/screen.html?pgm={PGMID}` 로 접근.
 
 ### 방식 B 경로
 1. 먼저 YAML이 있는지 확인. 없으면 `/new-screen`으로 설계서부터.
 2. `/yaml-to-code design/screens/{PGMID}.yml` 실행 → 4파일 생성.
-3. `schema/04-pgm.sql`에 `tb_pgm_info` + `tb_menu` + `tb_role_menu` INSERT 추가.
+3. **Flyway 신규 마이그레이션**: `src/main/resources/db/migration/V{N}__{PGMID}.sql` 한 파일에 `tb_pgm_info` + `tb_menu` + `tb_role_auth` INSERT 추가 (ON CONFLICT DO NOTHING).
 4. 서버 재시작 필수 (신규 Controller 등록): `./gradlew --stop` → `sleep 2` → `./gradlew bootRun`. **`taskkill` 금지**.
 
 ### 공통 마무리
@@ -77,7 +77,7 @@ description: |
 방식 A로 시작했다가 계산·상태전이 요구가 추가되면:
 1. 기존 YAML은 **설계 문서로 보존** (삭제하지 말 것).
 2. `/yaml-to-code`로 4파일 생성.
-3. `schema/04-pgm.sql` PGM 정보가 YAML 엔진용으로 등록됐다면 업데이트 필요 없음 (same URL 경로).
+3. 기존 마이그레이션 V{N} 에 PGM 정보가 YAML 엔진용으로 등록됐다면 업데이트 필요 없음 (same URL 경로). 새 PGM/메뉴 추가 시에만 V{N+1} 마이그레이션 작성.
 
 ---
 

@@ -44,6 +44,10 @@ dependencies {
     // DB
     runtimeOnly 'org.postgresql:postgresql'
 
+    // Flyway DB migration (단일 SOT: src/main/resources/db/migration/V*__*.sql)
+    implementation 'org.flywaydb:flyway-core:10.20.1'
+    implementation 'org.flywaydb:flyway-database-postgresql:10.20.1'
+
     // OpenAPI / Swagger UI — application.yml 의 springdoc.api-docs.enabled 로 토글 (운영에선 false)
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 

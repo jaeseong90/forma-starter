@@ -11,14 +11,12 @@
 
 ## 출력물
 1. `design/screens/{화면ID}.yml` — 설계서 (YAML)
-2. DDL 초안 — CREATE TABLE 문 (schema/01-tables.sql에 추가용)
-3. 코드 데이터 초안 — INSERT INTO tb_code 문 (schema/02-codes.sql에 추가용)
+2. DDL/시드 초안 — `CREATE TABLE` + `INSERT INTO tb_code ... ON CONFLICT DO NOTHING` 등을 하나로 묶은 **신규 Flyway 마이그레이션** (`src/main/resources/db/migration/V{N}__{기능}.sql`)
 
 ## 참조 파일
 - `design/_schema_guide.yml` — YAML 스키마 규칙 (반드시 따를 것)
 - `design/screens/*.yml` — 기존 설계서 참고
-- `src/main/resources/schema/01-tables.sql` — 기존 테이블 구조
-- `src/main/resources/schema/02-codes.sql` — 기존 코드 데이터
+- `src/main/resources/db/migration/V*__*.sql` — 기존 테이블/시드 (Flyway 이력)
 - `CLAUDE.md` — 프레임워크 전체 규칙
 
 ---
@@ -112,7 +110,7 @@
        updated_at TIMESTAMP
    );
    ```
-3. 기존 테이블(`schema/01-tables.sql`)을 참조하여 중복 방지
+3. 기존 테이블(`db/migration/V*__*.sql`)을 참조하여 중복 방지
 4. 코드성 컬럼 → `tb_code` 그룹 추가 필요 여부 체크
 5. FK 관계가 있으면 명시 (FORMA는 FK 제약조건 없이 논리적 참조만 사용)
 
@@ -193,8 +191,10 @@ INSERT INTO tb_code (GRP_CODE, CODE, CODE_NM, SORT_SEQ, USE_YN) VALUES
 설계서를 생성했습니다.
 
 📋 설계서: design/screens/{화면ID}.yml
-📊 DDL 초안: (위 SQL을 schema/01-tables.sql에 추가)
-📝 코드 데이터: (위 SQL을 schema/02-codes.sql에 추가)
+📊 마이그레이션 초안 — `src/main/resources/db/migration/V{N}__{기능}.sql` 로 신규 파일 생성:
+  - 위 CREATE TABLE 문
+  - 위 INSERT INTO tb_code ... ON CONFLICT DO NOTHING 문
+  - 필요 시 tb_pgm_info / tb_menu / tb_role_auth INSERT 도 동일 파일에 함께
 
 검토해주세요:
 1. 필드 추가/삭제가 필요한가요?

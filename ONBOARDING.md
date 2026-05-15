@@ -52,22 +52,22 @@ FORMA 기반 ERP 스타터킷. 백엔드 코어(`frame/`, `login/`) + 표준 관
 
 ### 4. DB 스키마 적용
 
-저장소 기본값(`docker-compose.yml` + `application-local.yml.example`)을 그대로 쓰면 별도 DB 준비 없이 자동 부트스트랩된다.
+스키마/시드는 **Flyway** 가 앱 기동 시 자동 적용한다. 별도 작업 없이 빈 PostgreSQL 만 있으면 된다.
 
-- [ ] `docker compose up -d` — postgres 컨테이너 첫 기동 시 `src/main/resources/schema/*.sql` 가 `/docker-entrypoint-initdb.d` 로 마운트되어 자동 실행
-  - `01-tables.sql` — 프레임워크 공통 테이블(PostgreSQL DDL, FK 제약조건 포함)
-  - `02-codes.sql` — 공통 코드 그룹(직급)
-  - `03-menu.sql` — 표준 관리자 화면(FRM_*) + 개발자 가이드 데모 메뉴 트리
-  - `04-pgm.sql` — `tb_pgm_info` 12건(FRM_* 7 + DEMO 5)
-  - `05-admin-seed.sql` — 초기 조직(forma), ADMIN 역할 + 전체 FRM_* 권한, admin 사용자(홍길동)
+- [ ] `docker compose up -d` — 빈 PostgreSQL 컨테이너 기동 (호스트 15432 → 컨테이너 5432)
+- [ ] `./gradlew bootRun` — Spring 기동 시 Flyway 가 `src/main/resources/db/migration/V*__*.sql` 를 버전 순으로 자동 실행
+  - `V1__init.sql` — 프레임워크 코어 테이블(`tb_user`, `tb_dept`, ...) + 표준 시드(공통 코드, FRM_* 프로그램·메뉴, ADMIN 역할 + 권한, admin/홍길동 사용자, forma 조직).
+  - 신규 프레임워크 테이블/시드는 `V2__..., V3__...` 로 추가된다.
 
-기존 PostgreSQL 을 쓸 경우: 위 5개 SQL 을 순서대로 실행하고, `application-local.yml` 의 datasource 만 자기 DB 로 가리키면 된다.
+`flyway_schema_history` 테이블에 적용 이력이 기록되므로 기동 시마다 미적용 마이그레이션만 실행. 기존 DB(v0.5 이전 docker init 방식)도 `baseline-on-migrate=true` 로 자동 baseline 후 안전하게 다음 버전부터 적용된다.
+
+기존 운영 PostgreSQL 을 쓸 경우: `application-local.yml` 의 datasource 만 자기 DB 로 가리키면 된다. 빈 DB 라면 V1 부터, 기존 스키마가 있다면 baseline 후 V2 부터 적용된다.
 
 ### 5. 빌드 + 기동
 
 - [ ] `./gradlew bootRun` → http://localhost:18080
 - [ ] **admin / admin1!** 로 로그인 (최초 기동 시 `InitialAdminBootstrapRunner` 가 BCrypt 해시 채움)
-- [ ] 관리자 화면 동작 확인: `FRM_MENU` / `FRM_USER` / `FRM_ROLE` / `FRM_CODE` / `FRM_DEPT` / `FRM_PGM` / `FRM_AUDIT`
+- [ ] 관리자 화면 동작 확인: `FRM_MENU` / `FRM_USER` / `FRM_ROLE` / `FRM_CODE` / `FRM_DEPT` / `FRM_PGM` / `FRM_AUDIT` / `FRM_RLS`
 - [ ] 첫 로그인 후 비밀번호 변경 권장
 
 ### 6. (선택) 브랜딩 / SPI 교체

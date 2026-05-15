@@ -14,6 +14,16 @@ FORMA 는 **단방향(starter → 프로젝트)** 배포 정책을 따른다(`CL
 
 ## [Unreleased]
 
+### Changed
+- **Breaking: 스키마 관리를 Flyway 로 전환.** `src/main/resources/schema/*.sql` 5개 파일을 `src/main/resources/db/migration/V1__init.sql` 한 파일로 통합(idempotent). 신규 프레임워크 테이블/시드는 `V2__..., V3__...` 마이그레이션으로 누적. Spring Boot 가 기동 시 자동 적용 → 다운스트림이 starter 의 새 마이그레이션을 cherry-pick 만 하면 다음 기동에서 반영됨(매번 DB 볼륨 비울 필요 X).
+- **Breaking: `docker-compose.yml` 의 `/docker-entrypoint-initdb.d` 마운트 제거.** 스키마는 이제 Flyway 가 앱 기동 시 적용하므로 docker init 불필요. 컨테이너는 빈 PostgreSQL 만 제공.
+- `application.yml` 에 `spring.flyway.{enabled,locations,baseline-on-migrate=true,baseline-version=0,validate-on-migrate}` 추가. `baseline-on-migrate=true` 로 v0.5 이전 docker init 으로 이미 스키마가 있는 DB 도 baseline 후 안전.
+- 모든 문서/스킬/프롬프트에서 `schema/01-tables.sql`, `schema/02-codes.sql`, `schema/04-pgm.sql` 등의 참조를 `db/migration/V{N}__*.sql` 로 갱신. AI 가 신규 화면 생성 시 단일 마이그레이션 파일에 DDL + 시드 + PGM/메뉴/권한을 묶어서 작성하도록 안내.
+
+### Removed
+- `src/main/resources/schema/` 디렉토리 — V1__init.sql 로 흡수.
+- 직전 라운드에 추가하려던 `frame/migration/FrameworkSchemaUpgradeRunner` band-aid 코드 — Flyway 가 본 역할을 대신함.
+
 ### Added
 - `CHANGELOG.md` (Keep a Changelog 포맷) — starter→프로젝트 cherry-pick 판단 기준 문서.
 - `CLAUDE.md` 에 CHANGELOG 유지 규칙 섹션 — AI 가 프레임워크 자산 변경 시 자동으로 누적하도록 트리거 조건·분류·Breaking 라벨 판단 기준 명시.

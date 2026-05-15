@@ -80,5 +80,5 @@
 - [ ] HTML에서 `platform.startPage()`가 DOMContentLoaded에 있는가?
 - [ ] 검색 후 관련 그리드/폼이 초기화되는가?
 - [ ] 저장/삭제 후 조회가 자동 실행되는가?
-- [ ] schema/04-pgm.sql에 PGM_INFO INSERT가 추가되었는가?
+- [ ] 신규 `db/migration/V{N}__*.sql` 에 tb_pgm_info + tb_menu + tb_role_auth INSERT 가 추가되었는가?
 - [ ] index.html에 링크가 추가되었는가?

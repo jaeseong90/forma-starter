@@ -20,8 +20,8 @@ $ARGUMENTS — 화면 요구사항 (화면명, 필드, 검색조건, 특수 동�
 2. **스키마 엄수**: `@design/_schema_guide.yml` 키와 타입 그대로 따름. 샘플 참조: `@design/screens/DEMO_DEPT.yml`, `@design/screens/DEMO_CUSTOMER.yml`, `@design/screens/DEMO_BIZ.yml`.
 3. **화면 ID 채번**: `CLAUDE.md` 인스턴스 섹션 "PGM ID 접두어" 테이블에서 모듈 접두어를 찾고, `design/screens/*.yml` + `src/main/resources/static/pages/**/*.html` 기존 ID와 충돌하지 않는 순번 부여. 일반 예시(MMA/SDA 등) 사용 금지 — 반드시 프로젝트 접두어.
 4. **저장 위치**: `design/screens/{SCREEN_ID}.yml`. 다른 곳에 저장 금지.
-5. **DDL 초안**: 새 테이블이 필요하면 `CREATE TABLE` 문도 별도 제시(사용자가 `schema/01-tables.sql`에 추가). 기존 테이블 활용 시 컬럼 일치 검증.
-6. **코드 데이터 초안**: 새 코드 그룹이 필요하면 `INSERT INTO tb_code` 문도 제시 (사용자가 `schema/02-codes.sql`에 추가).
+5. **DDL 초안 (Flyway 마이그레이션)**: 새 테이블이 필요하면 `CREATE TABLE` 문을 별도 제시. **저장 위치**: `src/main/resources/db/migration/V{N}__{기능}.sql` (신규 파일, N = 마지막 V 번호 + 1). 기존 테이블 활용 시 컬럼 일치 검증.
+6. **코드 데이터 초안**: 새 코드 그룹이 필요하면 `INSERT INTO tb_code ... ON CONFLICT DO NOTHING` 문을 위 같은 마이그레이션 파일에 포함.
 
 ## 생성 후 사용자 안내 (고정 문구)
 

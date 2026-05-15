@@ -46,8 +46,8 @@ YAML의 `screen.id`(예: `ITM010`)와 `screen.module`(예: `material/item`) 기�
 - HTML:       src/main/resources/static/pages/{module}/{PGMID}.html
 
 다음 단계:
-1. schema/04-pgm.sql 에 tb_pgm_info + tb_menu + tb_role_menu INSERT 추가
-2. 서버 재시작: ./gradlew --stop → sleep 2 → ./gradlew bootRun (taskkill 금지)
+1. 신규 Flyway 마이그레이션 `src/main/resources/db/migration/V{N}__{PGMID}.sql` 에 tb_pgm_info + tb_menu + tb_role_auth INSERT 추가 (ON CONFLICT DO NOTHING)
+2. 서버 재시작: ./gradlew --stop → sleep 2 → ./gradlew bootRun (taskkill 금지). Flyway 가 다음 기동에서 자동 적용.
 3. /review-screen {PGMID} 로 체크리스트 검증
 ```
 

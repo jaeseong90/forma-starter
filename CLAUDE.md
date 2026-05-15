@@ -216,7 +216,7 @@ starter 는 단방향(starter → 프로젝트) 배포라 다운스트림이 che
 
 기록 대상 (해당하면 반드시 추가):
 - `frame/*`, `login/*` 의 Java 코드 변경 (특히 SPI 시그니처)
-- `src/main/resources/schema/*.sql` 의 DDL/시드 변경
+- `src/main/resources/db/migration/V*__*.sql` 의 DDL/시드 변경 (Flyway)
 - `src/main/resources/application*.yml*` 의 설정 키·기본값·환경변수 prefix 변경
 - `static/assets/js/framework/forma.*.js` / `static/assets/css/forma.css` 변경
 - 표준 관리자 화면(`static/pages/admin/FRM_*.html`) 변경

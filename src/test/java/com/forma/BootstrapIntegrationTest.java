@@ -36,7 +36,7 @@ class BootstrapIntegrationTest extends IntegrationTestBase {
         JdbcTemplate jdbc = new JdbcTemplate(dataSource);
         Integer count = jdbc.queryForObject(
                 "SELECT COUNT(*) FROM tb_user WHERE user_id = 'admin'", Integer.class);
-        assertEquals(1, count, "admin 사용자가 schema/05-admin-seed.sql 로 시드되어야 한다");
+        assertEquals(1, count, "admin 사용자가 db/migration/V1__init.sql 로 시드되어야 한다");
     }
 
     @Test

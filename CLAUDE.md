@@ -23,15 +23,15 @@ FORMA는 **AI(Claude Code/Codex)로 ERP·업무시스템을 바이브코딩**하
 
 ```bash
 ./gradlew build
-./gradlew bootRun    # http://localhost:8080
+./gradlew bootRun    # http://localhost:18080
 ```
 
 ## 서버 관리 규칙 (중요)
 
-- **포트 8080만 사용**. 다른 포트의 프로세스를 건드리지 말 것.
+- **포트 18080만 사용**. 다른 포트의 프로세스를 건드리지 말 것.
 - 서버 재시작은 `./gradlew --stop`만 사용. **`taskkill`이나 `pkill`로 java.exe 전체를 죽이지 말 것** — 다른 서비스가 영향받음.
 - 중지가 필요하면: `./gradlew --stop` → `sleep 2` → `./gradlew bootRun`.
-- 8080이 이미 사용 중이면 기존 Gradle 데몬만 정리.
+- 18080이 이미 사용 중이면 기존 Gradle 데몬만 정리.
 
 ## 기술 스택
 

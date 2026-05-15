@@ -20,7 +20,7 @@ cp src/main/resources/application-local.yml.example src/main/resources/applicati
 ./gradlew bootRun
 ```
 
-기동 후 http://localhost:8080 접속 → **admin / admin1!** 로 로그인. 최초 로그인 후 비밀번호 변경 권장.
+기동 후 http://localhost:18080 접속 → **admin / admin1!** 로 로그인. 최초 로그인 후 비밀번호 변경 권장.
 
 부트스트랩 전 과정은 [`ONBOARDING.md`](ONBOARDING.md) 참조.
 

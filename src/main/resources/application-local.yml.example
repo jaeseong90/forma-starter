@@ -9,7 +9,7 @@
 forma:
   primary:
     datasource:
-      jdbc-url: jdbc:postgresql://localhost:5432/forma
+      jdbc-url: jdbc:postgresql://localhost:15432/forma
       driver-class-name: org.postgresql.Driver
       username: forma
       password: forma

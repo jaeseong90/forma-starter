@@ -1,5 +1,10 @@
 # FORMA Starter
 
+[![CI](https://github.com/jaeseong90/forma-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/jaeseong90/forma-starter/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.3-6db33f)](https://spring.io/projects/spring-boot)
+[![Java](https://img.shields.io/badge/Java-21-orange)](https://openjdk.org/projects/jdk/21/)
+
 **AI 바이브코딩을 위한 ERP·업무시스템 스타터킷** (Spring Boot 3.4 + Java 21 + MyBatis + Vanilla JS)
 
 YAML 1파일로 CRUD 화면을 즉시 만들고, 복잡한 로직은 커스텀 코드로 확장하는 ERP 개발 프레임워크. Claude Code 와 같은 AI 코딩 도구로 신규 화면을 자연어 요청만으로 만들도록 설계되었다.

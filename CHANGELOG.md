@@ -14,7 +14,18 @@ FORMA 는 **단방향(starter → 프로젝트)** 배포 정책을 따른다(`CL
 
 ## [Unreleased]
 
-(이번 릴리즈에 들어갈 변경 사항이 누적되는 영역)
+### Added
+- `CHANGELOG.md` (Keep a Changelog 포맷) — starter→프로젝트 cherry-pick 판단 기준 문서.
+- `CLAUDE.md` 에 CHANGELOG 유지 규칙 섹션 — AI 가 프레임워크 자산 변경 시 자동으로 누적하도록 트리거 조건·분류·Breaking 라벨 판단 기준 명시.
+- `src/test/java` 신설 — `PasswordPolicyTest`, `BaseResponseTest` 로 핵심 유틸 검증.
+- `.github/workflows/ci.yml` — push/PR 시 build + test 자동 실행 (JDK 21 + gradle cache).
+
+### Removed
+- **Breaking: `login/UserSeedRunner`** 제거 — `seed/users.tsv`(존재하지 않고 `.gitignore` 처리됨) 를 읽는 SalesOn 전용 bulk import 코드였다. admin 시드는 `InitialAdminBootstrapRunner` 가 담당하므로 중복.
+- `mapper/common/admin.xml` 의 `updateUserEmpEmailPw`, `updateAdminPw` 매퍼 — `UserSeedRunner` 전용이라 동반 제거.
+
+### Changed
+- `application.yml` 의 `forma.security.*` 키 재정렬: `seed-users`/`seed-users-admin-pw` 제거, `initial-admin-pw` 추가(`InitialAdminBootstrapRunner` 의 BCrypt 대상값). `reset-all-passwords` 계열은 운영 도구로 유지.
 
 ## [0.5.0] - 2026-05-15
 

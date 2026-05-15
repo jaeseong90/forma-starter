@@ -63,11 +63,13 @@ AI(Claude Code / Codex 등)로 ERP·업무시스템을 **바이브코딩**하기
 
 ```
 {basePackage}.login/
-├── LoginController            # POST /api/login, /api/logout
-├── LoginService               # 사용자 검증, JWT 발급
-├── LoginUserVo                # ← SPI 후보 (doc/FORMA-SPI.md §3.1 LoginUser)
-├── PasswordBootstrapRunner    # 초기 비밀번호 시드/해시 마이그레이션
-├── UserSeedRunner             # 기본 사용자/역할 시드
+├── LoginController                # POST /api/login, /api/logout
+├── LoginService                   # 사용자 검증, JWT 발급
+├── LoginUserVo                    # ← SPI 후보 (doc/FORMA-SPI.md §3.1 LoginUser)
+├── JwtUserAuthProvider            # ← SPI 후보 (doc/FORMA-SPI.md §3.2 UserAuthProvider)
+├── AuthSpiConfig                  # SPI 빈 등록(ConditionalOnMissingBean)
+├── InitialAdminBootstrapRunner    # admin.user_pw NULL이면 BCrypt(initial-admin-pw) 채움
+├── PasswordBootstrapRunner        # 1회성 운영 도구: 전체 사용자 비밀번호 일괄 초기화
 └── dto/LoginUserResDto
 ```
 

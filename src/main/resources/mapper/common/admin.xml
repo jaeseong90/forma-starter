@@ -50,20 +50,6 @@
         WHERE user_id = #{userId}
     </update>
 
-    <update id="updateUserEmpEmailPw" parameterType="map">
-        UPDATE tb_user
-        SET emp_no = #{empNo},
-            email = #{email},
-            user_pw = #{userPw}
-        WHERE user_id = #{userId}
-    </update>
-
-    <update id="updateAdminPw" parameterType="map">
-        UPDATE tb_user
-        SET user_pw = #{userPw}
-        WHERE user_id = #{userId}
-    </update>
-
     <update id="resetPassword" parameterType="map">
         UPDATE tb_user SET user_pw = #{userPw} WHERE user_id = #{userId}
     </update>

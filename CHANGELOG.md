@@ -19,6 +19,9 @@ FORMA 는 **단방향(starter → 프로젝트)** 배포 정책을 따른다(`CL
 - `CLAUDE.md` 에 CHANGELOG 유지 규칙 섹션 — AI 가 프레임워크 자산 변경 시 자동으로 누적하도록 트리거 조건·분류·Breaking 라벨 판단 기준 명시.
 - `src/test/java` 신설 — `PasswordPolicyTest`, `BaseResponseTest` 로 핵심 유틸 검증.
 - `.github/workflows/ci.yml` — push/PR 시 build + test 자동 실행 (JDK 21 + gradle cache).
+- `SECURITY.md` — 취약점 비공개 보고 채널(GitHub Security Advisory) 안내, 알려진 보안 가정 명시(기본 JWT 시크릿/admin 비밀번호/postgres 비밀번호).
+- `.github/pull_request_template.md` — Breaking 영향·CHANGELOG 누적·검증 체크리스트.
+- `.github/ISSUE_TEMPLATE/{bug_report,feature_request,config}.yml` — 프레임워크 자산 한정 이슈 폼.
 
 ### Removed
 - **Breaking: `login/UserSeedRunner`** 제거 — `seed/users.tsv`(존재하지 않고 `.gitignore` 처리됨) 를 읽는 SalesOn 전용 bulk import 코드였다. admin 시드는 `InitialAdminBootstrapRunner` 가 담당하므로 중복.

@@ -1,0 +1,49 @@
+name: 버그 신고
+description: 기대 동작과 실제 동작이 다를 때
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        FORMA Starter 의 **프레임워크 자산** 에서 발생한 문제를 신고할 때 사용. 도메인 코드 이슈는 본 저장소가 아닌 자기 프로젝트 저장소에 등록할 것.
+  - type: textarea
+    id: summary
+    attributes:
+      label: 요약
+      description: 한두 문장으로 무엇이 잘못됐는지
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: 재현 절차
+      placeholder: |
+        1. docker compose up -d
+        2. ./gradlew bootRun
+        3. http://localhost:18080/... 접속
+        4. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대 동작
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 실제 동작
+      description: 에러 메시지/스택트레이스가 있으면 포함
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: starter 버전 / 커밋 해시
+      placeholder: "v0.5.0 또는 git rev-parse HEAD 결과"
+  - type: textarea
+    id: env
+    attributes:
+      label: 환경
+      placeholder: "OS, JDK 버전, Docker 버전, PostgreSQL 버전 등"

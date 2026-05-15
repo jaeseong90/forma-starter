@@ -91,7 +91,7 @@ src/main/resources/static/pages/{module}/{PGMID}.html
 3. **index.html 링크 추가** (개발자 포털): 선택.
 4. **리뷰**: `/review-screen`으로 체크리스트 자동 돌림.
 
-서버 재시작 규칙: **`taskkill` / `pkill`로 java.exe 전체를 죽이지 말 것**. 포트 8080만 쓰며, 다른 서비스가 영향받을 수 있다. `./gradlew --stop`만.
+서버 재시작 규칙: **`taskkill` / `pkill`로 java.exe 전체를 죽이지 말 것**. 포트 18080만 쓰며, 다른 서비스가 영향받을 수 있다. `./gradlew --stop`만.
 
 ---
 

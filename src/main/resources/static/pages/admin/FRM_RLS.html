@@ -1,0 +1,183 @@
+<div class="forma-page">
+    <div class="forma-page-header">
+        <h1 class="forma-page-title" id="title-FRM_RLS"></h1>
+        <div id="toolbar-FRM_RLS"></div>
+    </div>
+    <div class="forma-content">
+        <div id="search-FRM_RLS"></div>
+        <div class="forma-split-h" id="split-FRM_RLS" style="min-height:560px">
+            <div class="forma-split-panel" style="width:420px">
+                <div class="forma-section" style="height:100%">
+                    <div class="forma-section-title">릴리즈노트 목록</div>
+                    <div id="grid1-FRM_RLS"></div>
+                </div>
+            </div>
+            <div class="forma-split-handle"></div>
+            <div class="forma-split-panel" style="flex:1; display:flex; flex-direction:column; gap:8px;">
+                <div class="forma-section">
+                    <div class="forma-section-title" id="note-title-FRM_RLS">노트 정보</div>
+                    <div id="form-FRM_RLS"></div>
+                </div>
+                <div class="forma-section" style="flex:1">
+                    <div class="forma-section-title">항목 목록 (NEW / 개선 / FIX / 공지)</div>
+                    <div id="grid2-FRM_RLS"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+(async function() {
+    const PGM = 'FRM_RLS';
+    const S = PGM;
+    const listener = platform.initListener(PGM);
+    const ctx = { selectedSeq: null, isNew: false };
+
+    await platform.startPage(PGM, listener);
+    FormaUtil.initSplit('#split-' + S);
+
+    ctx.searchForm = new FormaForm('#search-' + S, {
+        search: true,
+        elements: [
+            { field: 'keyword', label: '검색어', placeholder: '버전 / 제목' },
+            { field: 'target',  label: '대상', widget: 'select',
+              options: [{ value:'', label:'전체' }, { value:'DESKTOP', label:'DESKTOP' }, { value:'MOBILE', label:'MOBILE' }, { value:'ALL', label:'ALL' }] },
+            { field: 'useYn',   label: '사용여부', widget: 'select',
+              options: [{ value:'', label:'전체' }, { value:'Y', label:'사용' }, { value:'N', label:'미사용' }] }
+        ]
+    });
+
+    ctx.grid1 = new FormaGrid('#grid1-' + S, {
+        rowNum: true,
+        columns: [
+            { field: 'version',     label: '버전',     width: 80 },
+            { field: 'title',       label: '제목',     width: 180 },
+            { field: 'target',      label: '대상',     width: 70, align: 'center' },
+            { field: 'releaseDate', label: '배포일',   width: 80, align: 'center' },
+            { field: 'useYn',       label: '사용',     width: 50, align: 'center' }
+        ],
+        onRowClick: function(row) {
+            if (!row || !row.noteSeq) return;
+            loadNote(row.noteSeq);
+        }
+    });
+
+    ctx.noteForm = new FormaForm('#form-' + S, {
+        columns: 2,
+        elements: [
+            { field: 'version',     label: '버전',   required: true, maxLength: 20, placeholder: '1.0.0' },
+            { field: 'releaseDate', label: '배포일', widget: 'date' },
+            { field: 'title',       label: '제목',   required: true, maxLength: 200, colspan: 2 },
+            { field: 'target',      label: '대상',   widget: 'select',
+              options: [{ value:'DESKTOP', label:'DESKTOP' }, { value:'MOBILE', label:'MOBILE' }, { value:'ALL', label:'ALL' }] },
+            { field: 'useYn',       label: '사용여부', widget: 'switch' },
+            { field: 'summary',     label: '요약',   widget: 'textarea', colspan: 2, rows: 3 }
+        ]
+    });
+
+    ctx.grid2 = new FormaGrid('#grid2-' + S, {
+        editable: true, checkable: true, rowNum: true,
+        columns: [
+            { field: 'category', label: '구분', width: 100, editor: 'select', align: 'center',
+              options: [
+                  { value:'NEW',     label:'NEW' },
+                  { value:'IMPROVE', label:'개선' },
+                  { value:'BUGFIX',  label:'FIX' },
+                  { value:'NOTICE',  label:'공지' }
+              ] },
+            { field: 'content', label: '내용', editor: 'text', required: true }
+        ]
+    });
+
+    function clearDetail() {
+        ctx.selectedSeq = null;
+        ctx.isNew = false;
+        ctx.noteForm.clear();
+        ctx.noteForm.setData({ target: 'DESKTOP', useYn: 'Y' });
+        ctx.grid2.clearData();
+        document.getElementById('note-title-' + S).textContent = '노트 정보';
+    }
+
+    function loadNote(noteSeq) {
+        platform.post('/frm_rls/selectOne', { noteSeq: noteSeq }, new Callback(function(result) {
+            if (result.resultCode !== RESULT_CODE.OK || !result.resultData) return;
+            var d = result.resultData;
+            ctx.selectedSeq = d.noteSeq;
+            ctx.isNew = false;
+            ctx.noteForm.setData({
+                version: d.version, title: d.title, summary: d.summary,
+                releaseDate: d.releaseDate, target: d.target, useYn: d.useYn
+            });
+            ctx.grid2.setData(d.items || []);
+            document.getElementById('note-title-' + S).textContent = '노트 정보 [v' + d.version + ']';
+        }));
+    }
+
+    // 조회
+    listener.button.search.click = function() {
+        clearDetail();
+        platform.post('/frm_rls/selectList', ctx.searchForm.getData(), new Callback(function(result) {
+            if (result.resultCode === RESULT_CODE.OK) ctx.grid1.setData(result.resultData);
+        }));
+    };
+
+    // 신규
+    listener.button.news.click = function() {
+        clearDetail();
+        ctx.isNew = true;
+        document.getElementById('note-title-' + S).textContent = '노트 정보 [신규]';
+        ctx.noteForm.focus('version');
+    };
+
+    // 항목 추가 (etc1 자리에 안 잡혔으니 그리드 우클릭 / 키보드 등으로 추가 가능. UX 보강은 후속.)
+
+    // 저장
+    listener.button.save.click = function() {
+        if (!ctx.isNew && !ctx.selectedSeq) {
+            FormaPopup.toast.info('수정할 노트를 선택하거나 신규를 누르세요.');
+            return;
+        }
+        if (!ctx.noteForm.validate()) return;
+        if (!ctx.grid2.checkGridValidation()) return;
+
+        var data = ctx.noteForm.getData();
+        data.noteSeq = ctx.selectedSeq;
+        data.gstat = ctx.isNew ? 'I' : 'U';
+        data.items = ctx.grid2.getData();
+
+        platform.post('/frm_rls/saveNote', data, new Callback(function(result) {
+            if (result.resultCode === RESULT_CODE.OK) {
+                FormaPopup.toast.success('저장되었습니다.');
+                ctx.isNew = false;
+                listener.button.search.click();
+            } else {
+                FormaPopup.toast.error(result.resultMsg || '저장 중 오류');
+            }
+        }));
+    };
+
+    // 삭제
+    listener.button.del.click = async function() {
+        if (!ctx.selectedSeq) { FormaPopup.alert.show('삭제할 노트를 선택하세요.'); return; }
+        var ok = await FormaPopup.confirm.show('선택한 릴리즈노트를 삭제하시겠습니까?');
+        if (!ok) return;
+        platform.post('/frm_rls/deleteNote', [{ noteSeq: ctx.selectedSeq }], new Callback(function(result) {
+            if (result.resultCode === RESULT_CODE.OK) {
+                FormaPopup.toast.success('삭제되었습니다.');
+                clearDetail();
+                listener.button.search.click();
+            }
+        }));
+    };
+
+    // 초기화
+    listener.button.init.click = function() {
+        ctx.searchForm.clear();
+        ctx.grid1.clearData();
+        clearDetail();
+    };
+
+    listener.button.search.click();
+    listener.initializedPgm = true;
+})();
+</script>

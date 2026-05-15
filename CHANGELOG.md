@@ -35,7 +35,7 @@ FORMA 는 **단방향(starter → 프로젝트)** 배포 정책을 따른다(`CL
 - `FRM_RLS` PGM + 시스템관리 메뉴 + ADMIN 권한 (PGM/메뉴 시드, role_auth 는 `LIKE 'FRM_%'` 자동 매칭).
 - `frame/releasenote/FrmRlsController` + `mapper/frame/releasenote/frm_rls.xml` — 관리자 CRUD(selectList/selectOne/saveNote/deleteNote) + 프론트용 `selectActiveByTarget`.
 - `static/assets/js/framework/forma.releasenote.js` 의 endpoint `/rls010/...` → `/frm_rls/...` 정렬. 기존엔 백엔드 부재로 silent fail 이었던 매 로그인 시 호출이 이제 정상 동작(현재는 빈 배열, 운영자가 화면에서 등록 시 모달 표시).
-- 관리 화면(`static/pages/admin/FRM_RLS.html`) 은 후속 라운드에서 추가 예정.
+- `static/pages/admin/FRM_RLS.html` 관리 화면 — 좌측 목록 + 우측 상단 노트 폼(버전·제목·요약·배포일·대상·사용여부) + 우측 하단 항목 그리드(NEW/개선/FIX/공지 4종 카테고리).
 
 ### Security
 - `JwtTokenProvider` 기동 시 `forma.jwt.secret` 가 starter 기본값으로 남아 있으면 로그 WARN(local/test) 또는 ERROR(그 외 프로파일) 출력. 운영 전환 시 시크릿 교체 강제하기 위한 안전장치.

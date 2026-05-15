@@ -1,5 +1,5 @@
 <style>
-    /* FORM_DEMO 전용 — 최소 추가만, 나머지는 forma.css 의 .demo-* / .forma-* 사용 */
+    /* FORM_DEMO 전용 — 위젯 개별 카탈로그 */
     .fd-code {
         background: var(--bg-alt);
         border: 1px solid var(--border-light);
@@ -15,24 +15,49 @@
     }
     details.fd-ref { margin-top: 8px; }
     details.fd-ref > summary {
-        padding: 7px 10px; font-weight: 600; font-size: 12px;
+        padding: 6px 10px; font-weight: 600; font-size: 11.5px;
         cursor: pointer; background: var(--bg-alt);
         border: 1px solid var(--border-light); border-radius: 3px;
-        user-select: none; list-style: none;
+        user-select: none; list-style: none; color: var(--text-muted);
     }
     details.fd-ref > summary::-webkit-details-marker { display: none; }
-    details.fd-ref > summary::before { content: "▸ "; display: inline-block; transition: transform 0.15s; }
+    details.fd-ref > summary::before { content: "▸ "; display: inline-block; }
     details.fd-ref[open] > summary::before { content: "▾ "; }
+
+    /* 위젯 섹션 그룹 헤더 */
+    .fd-group-hd {
+        margin: 24px 0 8px;
+        padding: 8px 12px;
+        background: var(--bg-header);
+        border-left: 4px solid #4f6cd9;
+        font-weight: 700;
+        font-size: 13px;
+        color: var(--text);
+    }
+    .fd-group-hd .fd-cnt { font-size: 11px; color: var(--text-muted); margin-left: 6px; }
+
+    /* 위젯 섹션 압축 — demo-section 보다 작게 */
+    .fd-widget {
+        margin-bottom: 14px;
+        padding: 10px 12px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-light);
+        border-radius: 4px;
+    }
+    .fd-widget-title {
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 13px; font-weight: 700; color: #4f6cd9;
+        margin-bottom: 2px;
+    }
+    .fd-widget-desc { font-size: 11.5px; color: var(--text-muted); margin-bottom: 8px; }
+
     .ref-tbl { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 6px; }
     .ref-tbl th {
-        background: var(--bg-alt);
-        padding: 7px 10px; text-align: left;
-        border-bottom: 1px solid var(--border);
-        font-weight: 600; color: var(--text); white-space: nowrap;
+        background: var(--bg-alt); padding: 7px 10px; text-align: left;
+        border-bottom: 1px solid var(--border); font-weight: 600; color: var(--text); white-space: nowrap;
     }
     .ref-tbl td {
-        padding: 6px 10px;
-        border-bottom: 1px solid var(--border-light);
+        padding: 6px 10px; border-bottom: 1px solid var(--border-light);
         color: var(--text); vertical-align: top;
     }
     .ref-tbl tr:hover td { background: var(--bg-alt); }
@@ -41,12 +66,8 @@
         font-weight: 700; font-size: 11px;
         color: var(--text-muted);
         letter-spacing: 0.4px; text-transform: uppercase;
-        padding: 6px 10px;
     }
-    .fd-mono {
-        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-        font-size: 11.5px;
-    }
+    .fd-mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 11.5px; }
     .fd-type { font-size: 11px; color: var(--text-muted); }
 </style>
 
@@ -56,124 +77,272 @@
     </div>
     <div class="forma-content">
 
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <!--  그룹 1. 텍스트 · 숫자 입력 (7종)                                 -->
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <div class="demo-section">
-            <div class="demo-title">1. 텍스트 · 숫자 입력 (7종)</div>
-            <div class="demo-desc"><code>text</code> · <code>textarea</code> · <code>password</code> · <code>hidden</code> · <code>currency</code> · <code>inputMask</code> · <code>address</code></div>
-            <div id="g1"></div>
-            <details class="fd-ref"><summary>코드 보기</summary>
-                <pre class="fd-code">new FormaForm('#g1', {
-    columns: 4, labelWidth: 110,
-    elements: [
-        { field: 'text',     label: 'text',      placeholder: '한 줄 텍스트' },
-        { field: 'number',   label: 'number',    type: 'number', suffix: '개' },
-        { field: 'currency', label: 'currency',  widget: 'currency', prefix: '₩', suffix: '원' },
-        { field: 'password', label: 'password',  widget: 'password' },
-        { field: 'textarea', label: 'textarea',  widget: 'textarea', colspan: 4, rows: 2 },
-        { field: 'mask',     label: 'inputMask', widget: 'inputMask', mask: '999-9999-9999' },
-        { field: 'address',  label: 'address',   widget: 'address', colspan: 3 },
-        { field: 'hidden',   widget: 'hidden' }
-    ]
-});</pre>
-            </details>
+        <!-- ═══════════════════════════ 1. 텍스트 · 숫자 (7) ═══════════════════════════ -->
+        <div class="fd-group-hd">1. 텍스트 · 숫자 <span class="fd-cnt">(7종)</span></div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">text</div>
+            <div class="fd-widget-desc">기본 텍스트 입력. <code>type: 'number'</code> 으로 숫자 모드, <code>prefix/suffix</code> 로 단위 표시.</div>
+            <div id="w-text"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'text', label: 'text', placeholder: '한 줄 텍스트', maxLength: 50 }
+{ field: 'num',  label: 'number', type: 'number', suffix: '개', min: 0, max: 999 }</pre></details>
         </div>
 
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <!--  그룹 2. 선택 (8종)                                               -->
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <div class="demo-section">
-            <div class="demo-title">2. 선택 (8종)</div>
-            <div class="demo-desc"><code>combo</code> · <code>select</code> · <code>radio</code> · <code>checkbox</code> · <code>switch</code> · <code>multiCombo</code> · <code>buttonGroup</code> · <code>autocomplete</code></div>
-            <div id="g2"></div>
-            <details class="fd-ref"><summary>코드 보기</summary>
-                <pre class="fd-code">new FormaForm('#g2', {
-    columns: 4, labelWidth: 110,
-    elements: [
-        { field: 'combo',  label: 'combo',  widget: 'combo',  options: [{value:'1',label:'옵션1'}, ...] },
-        { field: 'select', label: 'select', widget: 'select', options: [...] },
-        { field: 'radio',  label: 'radio',  widget: 'radio',  options: [{value:'M',label:'남'}, ...] },
-        { field: 'check',  label: 'checkbox', widget: 'checkbox', checkLabel: '동의' },
-        { field: 'switch', label: 'switch', widget: 'switch', onLabel: 'ON', offLabel: 'OFF' },
-        { field: 'multi',  label: 'multiCombo', widget: 'multiCombo', colspan: 2, options: [...] },
-        { field: 'btnGrp', label: 'buttonGroup', widget: 'buttonGroup', options: [...] },
-        { field: 'auto',   label: 'autocomplete', widget: 'autocomplete', colspan: 2, options: [...] }
-    ]
-});</pre>
-            </details>
+        <div class="fd-widget">
+            <div class="fd-widget-title">textarea</div>
+            <div class="fd-widget-desc">여러 줄 텍스트. <code>rows</code> 로 표시 높이 지정.</div>
+            <div id="w-textarea"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'memo', label: 'textarea', widget: 'textarea', rows: 3, placeholder: '여러 줄 입력' }</pre></details>
         </div>
 
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <!--  그룹 3. 날짜 · 기간 (7종)                                        -->
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <div class="demo-section">
-            <div class="demo-title">3. 날짜 · 기간 (7종)</div>
-            <div class="demo-desc"><code>date</code> · <code>dateRange</code> · <code>yearMonth</code> · <code>yearMonthRange</code> · <code>year</code> · <code>week</code> · <code>time</code></div>
-            <div id="g3"></div>
-            <details class="fd-ref"><summary>코드 보기</summary>
-                <pre class="fd-code">new FormaForm('#g3', {
-    columns: 4, labelWidth: 130,
-    elements: [
-        { field: 'date',    label: 'date',           widget: 'date', default: 'TODAY' },
-        { field: 'dateRng', label: 'dateRange',      widget: 'dateRange', colspan: 3, default: 'THIS_MONTH' },
-        { field: 'ym',      label: 'yearMonth',      widget: 'yearMonth', default: 'THIS_MONTH' },
-        { field: 'ymRng',   label: 'yearMonthRange', widget: 'yearMonthRange', colspan: 3, default: 'THIS_YEAR' },
-        { field: 'year',    label: 'year',           widget: 'year', default: 'THIS_YEAR' },
-        { field: 'week',    label: 'week',           widget: 'week' },
-        { field: 'time',    label: 'time',           widget: 'time', default: 'NOW' }
-    ]
-});</pre>
-            </details>
+        <div class="fd-widget">
+            <div class="fd-widget-title">password</div>
+            <div class="fd-widget-desc">비밀번호 입력 — 우측 눈 아이콘으로 표시/숨김 토글.</div>
+            <div id="w-password"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'pw', label: 'password', widget: 'password', placeholder: '8자 이상' }</pre></details>
         </div>
 
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <!--  그룹 4. 범위 · 평점 · 색 · 태그 (4종)                             -->
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <div class="demo-section">
-            <div class="demo-title">4. 범위 · 평점 · 색 · 태그 (4종)</div>
-            <div class="demo-desc"><code>slider</code> · <code>rating</code> · <code>colorPicker</code> · <code>tagInput</code></div>
-            <div id="g4"></div>
-            <details class="fd-ref"><summary>코드 보기</summary>
-                <pre class="fd-code">new FormaForm('#g4', {
-    columns: 4, labelWidth: 110,
-    elements: [
-        { field: 'slider', label: 'slider',      widget: 'slider', min: 0, max: 100, step: 5, default: 50 },
-        { field: 'rating', label: 'rating',      widget: 'rating', max: 5 },
-        { field: 'color',  label: 'colorPicker', widget: 'colorPicker', default: '#667eea' },
-        { field: 'tags',   label: 'tagInput',    widget: 'tagInput', colspan: 4, placeholder: '엔터로 태그 추가' }
-    ]
-});</pre>
-            </details>
+        <div class="fd-widget">
+            <div class="fd-widget-title">hidden</div>
+            <div class="fd-widget-desc">숨김 필드 — UI 에 노출되지 않지만 <code>getData()</code> 에는 포함. 화면 ID/PK 같은 값 유지에 사용.</div>
+            <div id="w-hidden"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'pk', widget: 'hidden' }
+// setData({ pk: 'ITM-001' }) 로 값 보존, getData() 에 포함</pre></details>
         </div>
 
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <!--  그룹 5. 팝업 · 파일 · 표시 (4종)                                  -->
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <div class="demo-section">
-            <div class="demo-title">5. 팝업 · 파일 · 표시 (4종)</div>
-            <div class="demo-desc"><code>codePopup</code> · <code>file</code> · <code>display</code> · <code>divider</code></div>
-            <div id="g5"></div>
-            <details class="fd-ref"><summary>코드 보기</summary>
-                <pre class="fd-code">new FormaForm('#g5', {
-    columns: 4, labelWidth: 110,
-    elements: [
-        { widget: 'divider', label: '거래처 정보', collapsible: true },
-        { field: 'popup', label: 'codePopup', widget: 'codePopup', colspan: 2,
-          popup: { url: '/pages/popup/CUS_P01.html', codeField: 'cust_cd', nameField: 'cust_nm' } },
-        { field: 'file',  label: 'file',      widget: 'file', colspan: 2, accept: '.pdf,.png,.jpg', multiple: true },
-        { field: 'badge', label: 'display',   widget: 'display', default: 'ACTIVE',
-          badge: true, badgeColors: { ACTIVE: '#10b981', INACTIVE: '#ef4444' } }
-    ]
-});</pre>
-            </details>
+        <div class="fd-widget">
+            <div class="fd-widget-title">currency</div>
+            <div class="fd-widget-desc">금액 — 천단위 콤마 자동 포맷. <code>prefix/suffix</code> 로 통화/단위.</div>
+            <div id="w-currency"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'amt', label: 'currency', widget: 'currency', prefix: '₩', suffix: '원' }</pre></details>
         </div>
 
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <!--  공통 기능 데모 (Public API 메서드 동작)                            -->
-        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div class="fd-widget">
+            <div class="fd-widget-title">inputMask</div>
+            <div class="fd-widget-desc">입력 마스크 — <code>9</code> 숫자, <code>a</code> 영문, <code>*</code> 영숫자.</div>
+            <div id="w-mask"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'tel', label: 'inputMask', widget: 'inputMask', mask: '999-9999-9999', placeholder: '010-1234-5678' }</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">address</div>
+            <div class="fd-widget-desc">카카오 주소 검색 — 검색 버튼 클릭 시 우편번호 / 주소 / 상세주소 분리 입력. <code>getData()</code> 에서 <code>field_zip / field_addr / field_detail</code> 로 분리 반환.</div>
+            <div id="w-address"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'addr', label: 'address', widget: 'address' }
+// getData() → { addr_zip: '06234', addr_addr: '...', addr_detail: '...' }</pre></details>
+        </div>
+
+        <!-- ═══════════════════════════ 2. 선택 (8) ═══════════════════════════ -->
+        <div class="fd-group-hd">2. 선택 <span class="fd-cnt">(8종)</span></div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">combo</div>
+            <div class="fd-widget-desc">검색 가능 드롭다운. <code>options</code> 인라인 또는 <code>code</code> 로 서버 코드 그룹 조회.</div>
+            <div id="w-combo"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'grade', label: 'combo', widget: 'combo', options: [
+    {value:'A',label:'A형'}, {value:'B',label:'B형'}, {value:'C',label:'C형'}
+]}
+// 서버 코드 그룹: { code: 'GRADE' }   ← tb_code 의 GRADE 그룹 자동 조회</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">select</div>
+            <div class="fd-widget-desc">단순 HTML <code>&lt;select&gt;</code>. combo 보다 가벼움. 적은 옵션·검색 불필요한 경우.</div>
+            <div id="w-select"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'use', label: 'select', widget: 'select', options: [
+    {value:'Y',label:'사용'}, {value:'N',label:'미사용'}
+]}</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">radio</div>
+            <div class="fd-widget-desc">라디오 버튼 — 2~4개 옵션의 즉시 선택에 적합.</div>
+            <div id="w-radio"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'gender', label: 'radio', widget: 'radio', options: [
+    {value:'M',label:'남'}, {value:'F',label:'여'}, {value:'O',label:'기타'}
+]}</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">checkbox</div>
+            <div class="fd-widget-desc">단일 체크 — <code>'Y' / 'N'</code> 값. <code>checkLabel</code> 로 옆 텍스트.</div>
+            <div id="w-checkbox"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'agree', label: 'checkbox', widget: 'checkbox', checkLabel: '이용약관 동의' }</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">switch</div>
+            <div class="fd-widget-desc">ON/OFF 토글 — <code>'Y' / 'N'</code> 값. <code>onLabel/offLabel</code> 로 텍스트 커스텀.</div>
+            <div id="w-switch"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'active', label: 'switch', widget: 'switch', onLabel: '사용', offLabel: '중지' }</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">multiCombo</div>
+            <div class="fd-widget-desc">복수 선택 — 콤마 구분 문자열 <code>'A,B,C'</code> 로 반환.</div>
+            <div id="w-multi"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'tags', label: 'multiCombo', widget: 'multiCombo', options: [
+    {value:'A',label:'항목 A'}, {value:'B',label:'항목 B'},
+    {value:'C',label:'항목 C'}, {value:'D',label:'항목 D'}
+]}
+// getData() → { tags: 'A,C' }</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">buttonGroup</div>
+            <div class="fd-widget-desc">버튼 그룹 단일 선택 — 좌/중/우, 일/주/월 같은 짧은 옵션에 적합.</div>
+            <div id="w-btnGrp"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'align', label: 'buttonGroup', widget: 'buttonGroup', options: [
+    {value:'L',label:'좌'}, {value:'C',label:'중'}, {value:'R',label:'우'}
+]}</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">autocomplete</div>
+            <div class="fd-widget-desc">자동완성 — 타이핑하면 옵션 필터. 인라인 <code>options</code> 또는 서버 <code>fetchUrl</code>.</div>
+            <div id="w-auto"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'fruit', label: 'autocomplete', widget: 'autocomplete', options: [
+    {value:'apple',label:'Apple'}, {value:'banana',label:'Banana'},
+    {value:'cherry',label:'Cherry'}, {value:'durian',label:'Durian'}
+]}</pre></details>
+        </div>
+
+        <!-- ═══════════════════════════ 3. 날짜 · 기간 (7) ═══════════════════════════ -->
+        <div class="fd-group-hd">3. 날짜 · 기간 <span class="fd-cnt">(7종)</span></div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">date</div>
+            <div class="fd-widget-desc">날짜 — 캘린더 팝업. <code>default: 'TODAY'</code> 로 오늘 자동 설정.</div>
+            <div id="w-date"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'reg', label: 'date', widget: 'date', default: 'TODAY' }
+// getData() → { reg: '2026-05-15' }</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">dateRange</div>
+            <div class="fd-widget-desc">기간 선택 — 시작/종료 두 캘린더 + 프리셋(오늘/이번주/이번달/지난달). <code>field_from / field_to</code> 로 분리 반환.</div>
+            <div id="w-dateRng"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'period', label: 'dateRange', widget: 'dateRange', default: 'THIS_MONTH' }
+// getData() → { period_from: '2026-05-01', period_to: '2026-05-31' }</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">yearMonth</div>
+            <div class="fd-widget-desc">년월 — <code>'YYYY-MM'</code>. 회계/매출 마감월 등에.</div>
+            <div id="w-ym"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'close', label: 'yearMonth', widget: 'yearMonth', default: 'THIS_MONTH' }
+// 'PREV_MONTH' / 'NEXT_MONTH' 도 지원</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">yearMonthRange</div>
+            <div class="fd-widget-desc">년월 기간 — 시작년월/종료년월. <code>field_from / field_to</code> 분리 반환.</div>
+            <div id="w-ymRng"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'fiscal', label: 'yearMonthRange', widget: 'yearMonthRange', default: 'THIS_YEAR' }
+// getData() → { fiscal_from: '2026-01', fiscal_to: '2026-12' }</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">year</div>
+            <div class="fd-widget-desc">년도 — 4자리. 연도별 보고서 등에.</div>
+            <div id="w-year"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'fy', label: 'year', widget: 'year', default: 'THIS_YEAR' }
+// getData() → { fy: '2026' }</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">week</div>
+            <div class="fd-widget-desc">주차 — <code>'YYYY-Www'</code> 형식 (ISO 8601).</div>
+            <div id="w-week"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'wk', label: 'week', widget: 'week' }
+// getData() → { wk: '2026-W20' }</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">time</div>
+            <div class="fd-widget-desc">시간 — <code>'HH:MM'</code>. <code>step</code> 으로 분 단위 조정.</div>
+            <div id="w-time"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'mtg', label: 'time', widget: 'time', default: 'NOW', step: 600 }
+// step: 600 = 10분 단위</pre></details>
+        </div>
+
+        <!-- ═══════════════════════════ 4. 범위 · 평점 · 색 · 태그 (4) ═══════════════════════════ -->
+        <div class="fd-group-hd">4. 범위 · 평점 · 색 · 태그 <span class="fd-cnt">(4종)</span></div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">slider</div>
+            <div class="fd-widget-desc">슬라이더 — <code>min / max / step</code> 으로 범위 지정. 0~100 진행률 등에.</div>
+            <div id="w-slider"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'prog', label: 'slider', widget: 'slider', min: 0, max: 100, step: 5, default: 50 }</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">rating</div>
+            <div class="fd-widget-desc">별점 — <code>max</code> 별 개수(기본 5). 만족도/평가에.</div>
+            <div id="w-rating"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'score', label: 'rating', widget: 'rating', max: 5 }
+// getData() → { score: 4 }</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">colorPicker</div>
+            <div class="fd-widget-desc">색상 선택 — <code>'#RRGGBB'</code> 반환.</div>
+            <div id="w-color"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'theme', label: 'colorPicker', widget: 'colorPicker', default: '#667eea' }</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">tagInput</div>
+            <div class="fd-widget-desc">태그 입력 — 엔터 또는 콤마로 추가. 콤마 구분 문자열로 반환.</div>
+            <div id="w-tags"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'keywords', label: 'tagInput', widget: 'tagInput', placeholder: '엔터로 태그 추가' }
+// getData() → { keywords: 'erp,saas,b2b' }</pre></details>
+        </div>
+
+        <!-- ═══════════════════════════ 5. 팝업 · 파일 · 표시 (4) ═══════════════════════════ -->
+        <div class="fd-group-hd">5. 팝업 · 파일 · 표시 <span class="fd-cnt">(4종)</span></div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">codePopup</div>
+            <div class="fd-widget-desc">코드 팝업 — 우측 버튼 클릭 시 모달로 검색. <code>popup.url</code> 지정. 모달에서 <code>FormaModal.current().ok({code, name})</code> 로 결과 반환.</div>
+            <div id="w-popup"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'cust', label: 'codePopup', widget: 'codePopup',
+  popup: { url: '/pages/popup/CUS_P01.html', codeField: 'cust_cd', nameField: 'cust_nm' } }
+// 팝업에서 더블클릭 → cust 필드에 코드, cust_nm 에 명칭 자동 채움</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">file</div>
+            <div class="fd-widget-desc">파일 업로드 — <code>accept</code> 확장자 제한, <code>multiple</code> 다중 선택. <code>getData()</code> 에서 <code>File[]</code> 반환.</div>
+            <div id="w-file"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'doc', label: 'file', widget: 'file', accept: '.pdf,.png,.jpg', multiple: true }
+// FormData 만들어서 multipart 전송: const fd = new FormData(); files.forEach(f => fd.append('files', f));</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">display</div>
+            <div class="fd-widget-desc">표시 전용 (읽기/뱃지) — 입력 불가. <code>badge: true</code> + <code>badgeColors</code> 로 컬러 뱃지.</div>
+            <div id="w-display"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">{ field: 'status', label: 'display', widget: 'display',
+  badge: true, badgeColors: { ACTIVE: '#10b981', INACTIVE: '#ef4444', PENDING: '#f59e0b' } }
+// setData({ status: 'ACTIVE' }) — 녹색 뱃지로 표시</pre></details>
+        </div>
+
+        <div class="fd-widget">
+            <div class="fd-widget-title">divider</div>
+            <div class="fd-widget-desc">구분선/섹션 — 폼을 시각적으로 분리. <code>collapsible: true</code> 로 접기/펼치기.</div>
+            <div id="w-divider"></div>
+            <details class="fd-ref"><summary>코드</summary><pre class="fd-code">elements: [
+    { field: 'name', label: '이름' },
+    { widget: 'divider', label: '추가 정보', collapsible: true },
+    { field: 'memo', label: '비고', widget: 'textarea', rows: 2 }
+]</pre></details>
+        </div>
+
+        <!-- ═══════════════════════════ 공통 기능 데모 ═══════════════════════════ -->
+        <div class="fd-group-hd">공통 기능 데모 <span class="fd-cnt">(Public API)</span></div>
+
         <div class="demo-section">
-            <div class="demo-title">공통 기능 데모</div>
             <div class="demo-desc">데이터 입출력 · 검증 · 동적 제어 · 더티 체크. 아래 버튼으로 메서드 호출 결과 즉시 확인.</div>
             <div id="api-form"></div>
             <div class="demo-btn-row">
@@ -191,12 +360,11 @@
             <pre class="demo-output" id="api-out">// 버튼을 클릭하면 결과가 여기 표시됩니다</pre>
         </div>
 
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <!--  검색폼 패턴 (search: true)                                       -->
-        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- ═══════════════════════════ 검색폼 패턴 ═══════════════════════════ -->
+        <div class="fd-group-hd">검색폼 패턴 <span class="fd-cnt">(search: true)</span></div>
+
         <div class="demo-section">
-            <div class="demo-title">검색폼 패턴</div>
-            <div class="demo-desc"><code>search: true</code> 옵션 — 목록 화면 상단에 가로 배치되는 형태. FormaGrid 와 함께 사용.</div>
+            <div class="demo-desc">목록 화면 상단에 가로 배치되는 형태. FormaGrid 와 함께 사용. 검색 입력 후 엔터 또는 <code>onEnter</code> 콜백으로 그리드 조회.</div>
             <div id="search-form"></div>
             <div class="demo-btn-row">
                 <button class="forma-btn forma-btn-primary" onclick="searchSubmit()">검색</button>
@@ -205,124 +373,69 @@
             <pre class="demo-output" id="search-out">// 검색 버튼을 누르면 폼 데이터가 표시됩니다</pre>
         </div>
 
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <!--  API 레퍼런스 (펼치면 표 노출)                                     -->
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <div class="demo-section">
-            <div class="demo-title">API 레퍼런스</div>
-            <div class="demo-desc">생성자 옵션 · 공통 필드 속성 · 위젯 카탈로그 · Public API 메서드.</div>
+        <!-- ═══════════════════════════ API 레퍼런스 ═══════════════════════════ -->
+        <div class="fd-group-hd">API 레퍼런스</div>
 
-            <details class="fd-ref"><summary>생성자 옵션 (7개)</summary>
-                <table class="ref-tbl">
-                    <thead><tr><th>옵션</th><th>타입</th><th>기본값</th><th>설명</th></tr></thead>
-                    <tbody>
-                        <tr><td class="fd-mono">search</td>     <td class="fd-type">Boolean</td>  <td><code>false</code></td> <td>true 면 검색폼 (가로 배치)</td></tr>
-                        <tr><td class="fd-mono">columns</td>    <td class="fd-type">Number</td>   <td><code>2</code></td>     <td>form 모드 컬럼 수</td></tr>
-                        <tr><td class="fd-mono">labelWidth</td> <td class="fd-type">Number</td>   <td><code>80</code></td>    <td>라벨 너비 (px)</td></tr>
-                        <tr><td class="fd-mono">elements</td>   <td class="fd-type">Array</td>    <td><code>[]</code></td>    <td>위젯 정의 배열</td></tr>
-                        <tr><td class="fd-mono">onChange</td>   <td class="fd-type">Function</td> <td>null</td>               <td>(field, value, oldValue)</td></tr>
-                        <tr><td class="fd-mono">onBlur</td>     <td class="fd-type">Function</td> <td>null</td>               <td>(field, value)</td></tr>
-                        <tr><td class="fd-mono">onEnter</td>    <td class="fd-type">Function</td> <td>null</td>               <td>(field, value)</td></tr>
-                    </tbody>
-                </table>
-            </details>
+        <details class="fd-ref"><summary>생성자 옵션 (7개)</summary>
+            <table class="ref-tbl">
+                <thead><tr><th>옵션</th><th>타입</th><th>기본값</th><th>설명</th></tr></thead>
+                <tbody>
+                    <tr><td class="fd-mono">search</td>     <td class="fd-type">Boolean</td>  <td><code>false</code></td> <td>true 면 검색폼 (가로 배치)</td></tr>
+                    <tr><td class="fd-mono">columns</td>    <td class="fd-type">Number</td>   <td><code>2</code></td>     <td>form 모드 컬럼 수</td></tr>
+                    <tr><td class="fd-mono">labelWidth</td> <td class="fd-type">Number</td>   <td><code>80</code></td>    <td>라벨 너비 (px)</td></tr>
+                    <tr><td class="fd-mono">elements</td>   <td class="fd-type">Array</td>    <td><code>[]</code></td>    <td>위젯 정의 배열</td></tr>
+                    <tr><td class="fd-mono">onChange</td>   <td class="fd-type">Function</td> <td>null</td>               <td>(field, value, oldValue)</td></tr>
+                    <tr><td class="fd-mono">onBlur</td>     <td class="fd-type">Function</td> <td>null</td>               <td>(field, value)</td></tr>
+                    <tr><td class="fd-mono">onEnter</td>    <td class="fd-type">Function</td> <td>null</td>               <td>(field, value)</td></tr>
+                </tbody>
+            </table>
+        </details>
 
-            <details class="fd-ref"><summary>공통 필드 속성 (9개, elements 항목)</summary>
-                <table class="ref-tbl">
-                    <thead><tr><th>속성</th><th>타입</th><th>설명</th></tr></thead>
-                    <tbody>
-                        <tr><td class="fd-mono">field</td>           <td class="fd-type">String</td>   <td>데이터 필드명 (필수)</td></tr>
-                        <tr><td class="fd-mono">label</td>           <td class="fd-type">String</td>   <td>라벨 텍스트</td></tr>
-                        <tr><td class="fd-mono">widget</td>          <td class="fd-type">String</td>   <td>위젯 타입 (기본 <code>'text'</code>)</td></tr>
-                        <tr><td class="fd-mono">required</td>        <td class="fd-type">Boolean</td>  <td>필수 여부 (* 표시, validate 대상)</td></tr>
-                        <tr><td class="fd-mono">readOnly</td>        <td class="fd-type">Boolean</td>  <td>읽기 전용</td></tr>
-                        <tr><td class="fd-mono">colspan</td>         <td class="fd-type">Number</td>   <td>차지할 컬럼 수</td></tr>
-                        <tr><td class="fd-mono">prefix / suffix</td> <td class="fd-type">String</td>   <td>입력 앞/뒤 텍스트 (<code>'₩'</code>, <code>'원'</code>, <code>'kg'</code>)</td></tr>
-                        <tr><td class="fd-mono">helpText</td>        <td class="fd-type">String</td>   <td>필드 아래 도움말</td></tr>
-                        <tr><td class="fd-mono">onChange</td>        <td class="fd-type">Function</td> <td>(value, oldValue) 개별 필드</td></tr>
-                    </tbody>
-                </table>
-            </details>
+        <details class="fd-ref"><summary>공통 필드 속성 (9개, elements 항목)</summary>
+            <table class="ref-tbl">
+                <thead><tr><th>속성</th><th>타입</th><th>설명</th></tr></thead>
+                <tbody>
+                    <tr><td class="fd-mono">field</td>           <td class="fd-type">String</td>   <td>데이터 필드명 (필수)</td></tr>
+                    <tr><td class="fd-mono">label</td>           <td class="fd-type">String</td>   <td>라벨 텍스트</td></tr>
+                    <tr><td class="fd-mono">widget</td>          <td class="fd-type">String</td>   <td>위젯 타입 (기본 <code>'text'</code>)</td></tr>
+                    <tr><td class="fd-mono">required</td>        <td class="fd-type">Boolean</td>  <td>필수 여부 (* 표시, validate 대상)</td></tr>
+                    <tr><td class="fd-mono">readOnly</td>        <td class="fd-type">Boolean</td>  <td>읽기 전용</td></tr>
+                    <tr><td class="fd-mono">colspan</td>         <td class="fd-type">Number</td>   <td>차지할 컬럼 수</td></tr>
+                    <tr><td class="fd-mono">prefix / suffix</td> <td class="fd-type">String</td>   <td>입력 앞/뒤 텍스트 (<code>'₩'</code>, <code>'원'</code>, <code>'kg'</code>)</td></tr>
+                    <tr><td class="fd-mono">helpText</td>        <td class="fd-type">String</td>   <td>필드 아래 도움말</td></tr>
+                    <tr><td class="fd-mono">onChange</td>        <td class="fd-type">Function</td> <td>(value, oldValue) 개별 필드</td></tr>
+                </tbody>
+            </table>
+        </details>
 
-            <details class="fd-ref"><summary>위젯 카탈로그 (30개)</summary>
-                <table class="ref-tbl">
-                    <thead><tr><th style="width:140px">widget</th><th>설명</th><th style="width:200px">getValue() 반환</th><th>주요 속성</th></tr></thead>
-                    <tbody>
-                        <tr class="fd-group"><td colspan="4">텍스트 · 숫자 (7)</td></tr>
-                        <tr><td class="fd-mono">text</td>           <td>텍스트 입력 (기본)</td>          <td class="fd-type">String / Number</td> <td class="fd-type">placeholder, maxLength, type, min, max, step</td></tr>
-                        <tr><td class="fd-mono">textarea</td>       <td>여러 줄 텍스트</td>              <td class="fd-type">String</td>          <td class="fd-type">rows, placeholder</td></tr>
-                        <tr><td class="fd-mono">password</td>       <td>비밀번호 (눈 토글)</td>           <td class="fd-type">String</td>          <td class="fd-type">placeholder</td></tr>
-                        <tr><td class="fd-mono">hidden</td>         <td>숨김 필드</td>                  <td class="fd-type">String</td>          <td class="fd-type">—</td></tr>
-                        <tr><td class="fd-mono">currency</td>       <td>금액 (콤마 포맷)</td>             <td class="fd-type">Number</td>          <td class="fd-type">prefix, suffix</td></tr>
-                        <tr><td class="fd-mono">inputMask</td>      <td>입력 마스크</td>                 <td class="fd-type">String</td>          <td class="fd-type">mask</td></tr>
-                        <tr><td class="fd-mono">address</td>        <td>카카오 주소검색</td>              <td class="fd-type">field_zip / _addr / _detail</td> <td class="fd-type">—</td></tr>
-
-                        <tr class="fd-group"><td colspan="4">선택 (8)</td></tr>
-                        <tr><td class="fd-mono">combo</td>          <td>검색 드롭다운 (+popup)</td>      <td class="fd-type">String</td>          <td class="fd-type">options, code, popup, dependsOn</td></tr>
-                        <tr><td class="fd-mono">select</td>         <td>단순 드롭다운</td>               <td class="fd-type">String</td>          <td class="fd-type">options, code</td></tr>
-                        <tr><td class="fd-mono">radio</td>          <td>라디오</td>                    <td class="fd-type">String</td>          <td class="fd-type">options</td></tr>
-                        <tr><td class="fd-mono">checkbox</td>       <td>체크박스</td>                   <td class="fd-type">'Y' / 'N'</td>        <td class="fd-type">checkLabel</td></tr>
-                        <tr><td class="fd-mono">switch</td>         <td>ON/OFF 토글</td>                <td class="fd-type">'Y' / 'N'</td>        <td class="fd-type">onLabel, offLabel</td></tr>
-                        <tr><td class="fd-mono">multiCombo</td>     <td>복수 선택</td>                  <td class="fd-type">'A,B,C'</td>         <td class="fd-type">options</td></tr>
-                        <tr><td class="fd-mono">buttonGroup</td>    <td>버튼 그룹 선택</td>              <td class="fd-type">String</td>          <td class="fd-type">options</td></tr>
-                        <tr><td class="fd-mono">autocomplete</td>   <td>자동완성</td>                   <td class="fd-type">String</td>          <td class="fd-type">options, fetchUrl</td></tr>
-
-                        <tr class="fd-group"><td colspan="4">날짜 · 기간 (7)</td></tr>
-                        <tr><td class="fd-mono">date</td>           <td>날짜 (캘린더)</td>               <td class="fd-type">'YYYY-MM-DD'</td>    <td class="fd-type">default: 'TODAY'</td></tr>
-                        <tr><td class="fd-mono">dateRange</td>      <td>기간 (프리셋)</td>               <td class="fd-type">field_from / _to</td><td class="fd-type">default, presets</td></tr>
-                        <tr><td class="fd-mono">yearMonth</td>      <td>년월</td>                      <td class="fd-type">'YYYY-MM'</td>        <td class="fd-type">default</td></tr>
-                        <tr><td class="fd-mono">yearMonthRange</td> <td>년월 기간</td>                   <td class="fd-type">field_from / _to</td><td class="fd-type">default: 'THIS_YEAR'</td></tr>
-                        <tr><td class="fd-mono">year</td>           <td>년도</td>                      <td class="fd-type">String</td>          <td class="fd-type">default: 'THIS_YEAR'</td></tr>
-                        <tr><td class="fd-mono">week</td>           <td>주차</td>                      <td class="fd-type">'YYYY-Www'</td>      <td class="fd-type">—</td></tr>
-                        <tr><td class="fd-mono">time</td>           <td>시간</td>                      <td class="fd-type">'HH:MM'</td>          <td class="fd-type">default: 'NOW', step</td></tr>
-
-                        <tr class="fd-group"><td colspan="4">범위 · 평점 · 색 · 태그 (4)</td></tr>
-                        <tr><td class="fd-mono">slider</td>         <td>슬라이더 (범위)</td>             <td class="fd-type">Number</td>          <td class="fd-type">min, max, step</td></tr>
-                        <tr><td class="fd-mono">rating</td>         <td>별점</td>                      <td class="fd-type">Number</td>          <td class="fd-type">max (기본 5)</td></tr>
-                        <tr><td class="fd-mono">colorPicker</td>    <td>색상 선택</td>                  <td class="fd-type">'#RRGGBB'</td>       <td class="fd-type">default</td></tr>
-                        <tr><td class="fd-mono">tagInput</td>       <td>태그 입력</td>                  <td class="fd-type">'tag1,tag2'</td>     <td class="fd-type">placeholder</td></tr>
-
-                        <tr class="fd-group"><td colspan="4">팝업 · 파일 · 표시 (4)</td></tr>
-                        <tr><td class="fd-mono">codePopup</td>      <td>코드 검색 팝업</td>              <td class="fd-type">String</td>          <td class="fd-type">popup: {url, codeField, nameField}</td></tr>
-                        <tr><td class="fd-mono">file</td>           <td>파일 업로드</td>                 <td class="fd-type">File[]</td>          <td class="fd-type">accept, multiple, buttonLabel</td></tr>
-                        <tr><td class="fd-mono">display</td>        <td>읽기전용 / 뱃지</td>             <td class="fd-type">String</td>          <td class="fd-type">badge, badgeColors, options</td></tr>
-                        <tr><td class="fd-mono">divider</td>        <td>구분선 / 섹션</td>               <td class="fd-type">—</td>                <td class="fd-type">label, collapsible</td></tr>
-                    </tbody>
-                </table>
-            </details>
-
-            <details class="fd-ref"><summary>Public API 메서드 (18개)</summary>
-                <table class="ref-tbl">
-                    <thead><tr><th style="width:280px">메서드</th><th>설명</th></tr></thead>
-                    <tbody>
-                        <tr class="fd-group"><td colspan="2">데이터 입출력</td></tr>
-                        <tr><td class="fd-mono">getData()</td>                              <td>폼 전체 데이터 반환</td></tr>
-                        <tr><td class="fd-mono">setData(obj)</td>                           <td>폼 데이터 세팅 + 원본 스냅샷 저장</td></tr>
-                        <tr><td class="fd-mono">getField(field) / setField(field, value)</td><td>개별 필드 읽기/쓰기</td></tr>
-                        <tr><td class="fd-mono">clear()</td>                                <td>전체 초기화</td></tr>
-                        <tr><td class="fd-mono">resetToOriginal()</td>                     <td>마지막 setData 의 원본으로 복원</td></tr>
-
-                        <tr class="fd-group"><td colspan="2">검증 · 상태</td></tr>
-                        <tr><td class="fd-mono">validate()</td>                             <td>required 필드 검증 (false 면 에러 표시)</td></tr>
-                        <tr><td class="fd-mono">isDirty()</td>                              <td>원본 대비 변경 여부</td></tr>
-                        <tr><td class="fd-mono">getChangedFields()</td>                    <td>변경된 필드명 배열</td></tr>
-
-                        <tr class="fd-group"><td colspan="2">동적 제어</td></tr>
-                        <tr><td class="fd-mono">setOptions(field, options)</td>             <td>combo / multiCombo / select 옵션 교체</td></tr>
-                        <tr><td class="fd-mono">setRequired(field, boolean)</td>            <td>필수 여부 동적 변경</td></tr>
-                        <tr><td class="fd-mono">setReadonly(field, boolean)</td>            <td>개별 readOnly 토글</td></tr>
-                        <tr><td class="fd-mono">setDisabled(field, boolean)</td>            <td>개별 disabled 토글</td></tr>
-                        <tr><td class="fd-mono">setLabel(field, text)</td>                  <td>라벨 텍스트 변경</td></tr>
-                        <tr><td class="fd-mono">formReadonly(boolean)</td>                  <td>전체 읽기전용 토글</td></tr>
-                        <tr><td class="fd-mono">showField(field) / hideField(field)</td>   <td>필드 표시 / 숨김</td></tr>
-
-                        <tr class="fd-group"><td colspan="2">포커스 · 라이프사이클</td></tr>
-                        <tr><td class="fd-mono">focus(field)</td>                           <td>특정 필드 포커스</td></tr>
-                        <tr><td class="fd-mono">destroy()</td>                              <td>위젯 정리 (document 리스너 해제)</td></tr>
-                    </tbody>
-                </table>
-            </details>
-        </div>
+        <details class="fd-ref"><summary>Public API 메서드 (18개)</summary>
+            <table class="ref-tbl">
+                <thead><tr><th style="width:280px">메서드</th><th>설명</th></tr></thead>
+                <tbody>
+                    <tr class="fd-group"><td colspan="2">데이터 입출력</td></tr>
+                    <tr><td class="fd-mono">getData()</td>                              <td>폼 전체 데이터 반환</td></tr>
+                    <tr><td class="fd-mono">setData(obj)</td>                           <td>폼 데이터 세팅 + 원본 스냅샷 저장</td></tr>
+                    <tr><td class="fd-mono">getField(field) / setField(field, value)</td><td>개별 필드 읽기/쓰기</td></tr>
+                    <tr><td class="fd-mono">clear()</td>                                <td>전체 초기화</td></tr>
+                    <tr><td class="fd-mono">resetToOriginal()</td>                     <td>마지막 setData 의 원본으로 복원</td></tr>
+                    <tr class="fd-group"><td colspan="2">검증 · 상태</td></tr>
+                    <tr><td class="fd-mono">validate()</td>                             <td>required 필드 검증 (false 면 에러 표시)</td></tr>
+                    <tr><td class="fd-mono">isDirty()</td>                              <td>원본 대비 변경 여부</td></tr>
+                    <tr><td class="fd-mono">getChangedFields()</td>                    <td>변경된 필드명 배열</td></tr>
+                    <tr class="fd-group"><td colspan="2">동적 제어</td></tr>
+                    <tr><td class="fd-mono">setOptions(field, options)</td>             <td>combo / multiCombo / select 옵션 교체</td></tr>
+                    <tr><td class="fd-mono">setRequired(field, boolean)</td>            <td>필수 여부 동적 변경</td></tr>
+                    <tr><td class="fd-mono">setReadonly(field, boolean)</td>            <td>개별 readOnly 토글</td></tr>
+                    <tr><td class="fd-mono">setDisabled(field, boolean)</td>            <td>개별 disabled 토글</td></tr>
+                    <tr><td class="fd-mono">setLabel(field, text)</td>                  <td>라벨 텍스트 변경</td></tr>
+                    <tr><td class="fd-mono">formReadonly(boolean)</td>                  <td>전체 읽기전용 토글</td></tr>
+                    <tr><td class="fd-mono">showField(field) / hideField(field)</td>   <td>필드 표시 / 숨김</td></tr>
+                    <tr class="fd-group"><td colspan="2">포커스 · 라이프사이클</td></tr>
+                    <tr><td class="fd-mono">focus(field)</td>                           <td>특정 필드 포커스</td></tr>
+                    <tr><td class="fd-mono">destroy()</td>                              <td>위젯 정리 (document 리스너 해제)</td></tr>
+                </tbody>
+            </table>
+        </details>
 
     </div>
 </div>
@@ -331,93 +444,129 @@
 (function() {
     'use strict';
 
-    // ─── 그룹 1. 텍스트 · 숫자 ──────────────────────────────────
-    const g1 = new FormaForm('#g1', {
-        columns: 4, labelWidth: 110,
-        elements: [
-            { field: 'text',     label: 'text',      placeholder: '한 줄 텍스트', value: 'FORMA' },
-            { field: 'number',   label: 'number',    type: 'number', suffix: '개', value: 10 },
-            { field: 'currency', label: 'currency',  widget: 'currency', prefix: '₩', suffix: '원' },
-            { field: 'password', label: 'password',  widget: 'password' },
-            { field: 'textarea', label: 'textarea',  widget: 'textarea', colspan: 4, rows: 2, placeholder: '여러 줄 입력' },
-            { field: 'mask',     label: 'inputMask', widget: 'inputMask', mask: '999-9999-9999', placeholder: '010-1234-5678' },
-            { field: 'address',  label: 'address',   widget: 'address', colspan: 3 },
-            { field: 'hidden',   widget: 'hidden' }
-        ]
-    });
-    g1.setData({ text: 'FORMA', number: 10, currency: 50000, mask: '010-1234-5678' });
+    // ─── 1. 텍스트 · 숫자 ──────────────────────────────────────
+    new FormaForm('#w-text', { columns: 2, labelWidth: 90, elements: [
+        { field: 'text', label: 'text', placeholder: '한 줄 텍스트', maxLength: 50, value: 'FORMA' },
+        { field: 'num',  label: 'number', type: 'number', suffix: '개', min: 0, max: 999, value: 10 }
+    ]});
+    new FormaForm('#w-textarea', { columns: 1, labelWidth: 90, elements: [
+        { field: 'memo', label: 'textarea', widget: 'textarea', rows: 3, placeholder: '여러 줄 입력' }
+    ]});
+    new FormaForm('#w-password', { columns: 2, labelWidth: 90, elements: [
+        { field: 'pw', label: 'password', widget: 'password', placeholder: '8자 이상' }
+    ]});
+    const fHidden = new FormaForm('#w-hidden', { columns: 2, labelWidth: 90, elements: [
+        { field: 'pk', widget: 'hidden' },
+        { field: 'name', label: 'name', value: '홍길동' }
+    ]});
+    fHidden.setData({ pk: 'ITM-001', name: '홍길동' });
+    new FormaForm('#w-currency', { columns: 2, labelWidth: 90, elements: [
+        { field: 'amt', label: 'currency', widget: 'currency', prefix: '₩', suffix: '원' }
+    ]});
+    new FormaForm('#w-mask', { columns: 2, labelWidth: 90, elements: [
+        { field: 'tel', label: 'inputMask', widget: 'inputMask', mask: '999-9999-9999', placeholder: '010-1234-5678' }
+    ]});
+    new FormaForm('#w-address', { columns: 1, labelWidth: 90, elements: [
+        { field: 'addr', label: 'address', widget: 'address' }
+    ]});
 
-    // ─── 그룹 2. 선택 ──────────────────────────────────────────
-    const g2 = new FormaForm('#g2', {
-        columns: 4, labelWidth: 110,
-        elements: [
-            { field: 'combo',  label: 'combo',  widget: 'combo',  options: [
-                {value:'1',label:'옵션1'}, {value:'2',label:'옵션2'}, {value:'3',label:'옵션3'}
-            ]},
-            { field: 'select', label: 'select', widget: 'select', options: [
-                {value:'1',label:'옵션1'}, {value:'2',label:'옵션2'}, {value:'3',label:'옵션3'}
-            ]},
-            { field: 'radio',  label: 'radio',  widget: 'radio',  options: [
-                {value:'M',label:'남'}, {value:'F',label:'여'}, {value:'O',label:'기타'}
-            ]},
-            { field: 'check',  label: 'checkbox', widget: 'checkbox', checkLabel: '동의합니다' },
-            { field: 'switch', label: 'switch', widget: 'switch', onLabel: 'ON', offLabel: 'OFF' },
-            { field: 'multi',  label: 'multiCombo', widget: 'multiCombo', colspan: 2, options: [
-                {value:'A',label:'항목 A'}, {value:'B',label:'항목 B'},
-                {value:'C',label:'항목 C'}, {value:'D',label:'항목 D'}
-            ]},
-            { field: 'btnGrp', label: 'buttonGroup', widget: 'buttonGroup', options: [
-                {value:'L',label:'좌'}, {value:'C',label:'중'}, {value:'R',label:'우'}
-            ]},
-            { field: 'auto',   label: 'autocomplete', widget: 'autocomplete', colspan: 2, options: [
-                {value:'apple',label:'Apple'}, {value:'banana',label:'Banana'},
-                {value:'cherry',label:'Cherry'}, {value:'durian',label:'Durian'}
-            ]}
-        ]
-    });
-    g2.setData({ combo: '1', select: '2', radio: 'M', check: 'Y', switch: 'Y', multi: 'A,C', btnGrp: 'C', auto: 'banana' });
+    // ─── 2. 선택 ──────────────────────────────────────────────
+    new FormaForm('#w-combo', { columns: 2, labelWidth: 90, elements: [
+        { field: 'grade', label: 'combo', widget: 'combo', options: [
+            {value:'A',label:'A형'}, {value:'B',label:'B형'}, {value:'C',label:'C형'}
+        ]}
+    ]});
+    new FormaForm('#w-select', { columns: 2, labelWidth: 90, elements: [
+        { field: 'use', label: 'select', widget: 'select', options: [
+            {value:'Y',label:'사용'}, {value:'N',label:'미사용'}
+        ]}
+    ]});
+    new FormaForm('#w-radio', { columns: 1, labelWidth: 90, elements: [
+        { field: 'gender', label: 'radio', widget: 'radio', options: [
+            {value:'M',label:'남'}, {value:'F',label:'여'}, {value:'O',label:'기타'}
+        ]}
+    ]});
+    new FormaForm('#w-checkbox', { columns: 1, labelWidth: 90, elements: [
+        { field: 'agree', label: 'checkbox', widget: 'checkbox', checkLabel: '이용약관에 동의합니다' }
+    ]});
+    new FormaForm('#w-switch', { columns: 2, labelWidth: 90, elements: [
+        { field: 'active', label: 'switch', widget: 'switch', onLabel: '사용', offLabel: '중지' }
+    ]});
+    new FormaForm('#w-multi', { columns: 1, labelWidth: 90, elements: [
+        { field: 'tags', label: 'multiCombo', widget: 'multiCombo', options: [
+            {value:'A',label:'항목 A'}, {value:'B',label:'항목 B'},
+            {value:'C',label:'항목 C'}, {value:'D',label:'항목 D'}
+        ]}
+    ]});
+    new FormaForm('#w-btnGrp', { columns: 2, labelWidth: 90, elements: [
+        { field: 'align', label: 'buttonGroup', widget: 'buttonGroup', options: [
+            {value:'L',label:'좌'}, {value:'C',label:'중'}, {value:'R',label:'우'}
+        ]}
+    ]});
+    new FormaForm('#w-auto', { columns: 1, labelWidth: 90, elements: [
+        { field: 'fruit', label: 'autocomplete', widget: 'autocomplete', options: [
+            {value:'apple',label:'Apple'}, {value:'banana',label:'Banana'},
+            {value:'cherry',label:'Cherry'}, {value:'durian',label:'Durian'}
+        ]}
+    ]});
 
-    // ─── 그룹 3. 날짜 · 기간 ───────────────────────────────────
-    const g3 = new FormaForm('#g3', {
-        columns: 4, labelWidth: 130,
-        elements: [
-            { field: 'date',    label: 'date',           widget: 'date', default: 'TODAY' },
-            { field: 'dateRng', label: 'dateRange',      widget: 'dateRange', colspan: 3, default: 'THIS_MONTH' },
-            { field: 'ym',      label: 'yearMonth',      widget: 'yearMonth', default: 'THIS_MONTH' },
-            { field: 'ymRng',   label: 'yearMonthRange', widget: 'yearMonthRange', colspan: 3, default: 'THIS_YEAR' },
-            { field: 'year',    label: 'year',           widget: 'year', default: 'THIS_YEAR' },
-            { field: 'week',    label: 'week',           widget: 'week' },
-            { field: 'time',    label: 'time',           widget: 'time', default: 'NOW' }
-        ]
-    });
+    // ─── 3. 날짜 · 기간 ───────────────────────────────────────
+    new FormaForm('#w-date',    { columns: 2, labelWidth: 110, elements: [
+        { field: 'reg', label: 'date', widget: 'date', default: 'TODAY' }
+    ]});
+    new FormaForm('#w-dateRng', { columns: 1, labelWidth: 110, elements: [
+        { field: 'period', label: 'dateRange', widget: 'dateRange', default: 'THIS_MONTH' }
+    ]});
+    new FormaForm('#w-ym',      { columns: 2, labelWidth: 110, elements: [
+        { field: 'close', label: 'yearMonth', widget: 'yearMonth', default: 'THIS_MONTH' }
+    ]});
+    new FormaForm('#w-ymRng',   { columns: 1, labelWidth: 110, elements: [
+        { field: 'fiscal', label: 'yearMonthRange', widget: 'yearMonthRange', default: 'THIS_YEAR' }
+    ]});
+    new FormaForm('#w-year',    { columns: 2, labelWidth: 110, elements: [
+        { field: 'fy', label: 'year', widget: 'year', default: 'THIS_YEAR' }
+    ]});
+    new FormaForm('#w-week',    { columns: 2, labelWidth: 110, elements: [
+        { field: 'wk', label: 'week', widget: 'week' }
+    ]});
+    new FormaForm('#w-time',    { columns: 2, labelWidth: 110, elements: [
+        { field: 'mtg', label: 'time', widget: 'time', default: 'NOW', step: 600 }
+    ]});
 
-    // ─── 그룹 4. 범위 · 평점 · 색 · 태그 ──────────────────────
-    const g4 = new FormaForm('#g4', {
-        columns: 4, labelWidth: 110,
-        elements: [
-            { field: 'slider', label: 'slider',      widget: 'slider', min: 0, max: 100, step: 5, default: 50 },
-            { field: 'rating', label: 'rating',      widget: 'rating', max: 5 },
-            { field: 'color',  label: 'colorPicker', widget: 'colorPicker', default: '#667eea' },
-            { field: 'tags',   label: 'tagInput',    widget: 'tagInput', colspan: 4, placeholder: '엔터로 태그 추가' }
-        ]
-    });
-    g4.setData({ slider: 70, rating: 4, color: '#764ba2', tags: 'forma,demo,ai' });
+    // ─── 4. 범위 · 평점 · 색 · 태그 ──────────────────────────
+    new FormaForm('#w-slider', { columns: 2, labelWidth: 90, elements: [
+        { field: 'prog', label: 'slider', widget: 'slider', min: 0, max: 100, step: 5, default: 50 }
+    ]});
+    new FormaForm('#w-rating', { columns: 2, labelWidth: 90, elements: [
+        { field: 'score', label: 'rating', widget: 'rating', max: 5 }
+    ]});
+    new FormaForm('#w-color',  { columns: 2, labelWidth: 90, elements: [
+        { field: 'theme', label: 'colorPicker', widget: 'colorPicker', default: '#667eea' }
+    ]});
+    new FormaForm('#w-tags',   { columns: 1, labelWidth: 90, elements: [
+        { field: 'keywords', label: 'tagInput', widget: 'tagInput', placeholder: '엔터로 태그 추가' }
+    ]});
 
-    // ─── 그룹 5. 팝업 · 파일 · 표시 ───────────────────────────
-    const g5 = new FormaForm('#g5', {
-        columns: 4, labelWidth: 110,
-        elements: [
-            { widget: 'divider', label: '거래처 정보', collapsible: true },
-            { field: 'popup', label: 'codePopup', widget: 'codePopup', colspan: 2,
-              popup: { url: '/pages/popup/CUS_P01.html', codeField: 'cust_cd', nameField: 'cust_nm' } },
-            { field: 'file',  label: 'file',      widget: 'file', colspan: 2, accept: '.pdf,.png,.jpg', multiple: true },
-            { field: 'badge', label: 'display',   widget: 'display', default: 'ACTIVE',
-              badge: true, badgeColors: { ACTIVE: '#10b981', INACTIVE: '#ef4444' } }
-        ]
-    });
-    g5.setData({ badge: 'ACTIVE' });
+    // ─── 5. 팝업 · 파일 · 표시 ───────────────────────────────
+    new FormaForm('#w-popup', { columns: 1, labelWidth: 90, elements: [
+        { field: 'cust', label: 'codePopup', widget: 'codePopup',
+          popup: { url: '/pages/popup/CUS_P01.html', codeField: 'cust_cd', nameField: 'cust_nm' } }
+    ]});
+    new FormaForm('#w-file', { columns: 1, labelWidth: 90, elements: [
+        { field: 'doc', label: 'file', widget: 'file', accept: '.pdf,.png,.jpg', multiple: true }
+    ]});
+    const fDisplay = new FormaForm('#w-display', { columns: 2, labelWidth: 90, elements: [
+        { field: 'status', label: 'display', widget: 'display',
+          badge: true, badgeColors: { ACTIVE: '#10b981', INACTIVE: '#ef4444', PENDING: '#f59e0b' } }
+    ]});
+    fDisplay.setData({ status: 'ACTIVE' });
+    new FormaForm('#w-divider', { columns: 1, labelWidth: 90, elements: [
+        { field: 'name', label: '이름', value: '홍길동' },
+        { widget: 'divider', label: '추가 정보', collapsible: true },
+        { field: 'memo', label: '비고', widget: 'textarea', rows: 2 }
+    ]});
 
-    // ─── 공통 기능 데모 (Public API) ─────────────────────────
+    // ─── 공통 기능 데모 ───────────────────────────────────────
     const apiForm = new FormaForm('#api-form', {
         columns: 3, labelWidth: 90,
         elements: [

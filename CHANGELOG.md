@@ -24,6 +24,10 @@ FORMA 는 **단방향(starter → 프로젝트)** 배포 정책을 따른다(`CL
 - `src/main/resources/schema/` 디렉토리 — V1__init.sql 로 흡수.
 - 직전 라운드에 추가하려던 `frame/migration/FrameworkSchemaUpgradeRunner` band-aid 코드 — Flyway 가 본 역할을 대신함.
 
+### Changed (FORM_DEMO 30개 개별 위젯 섹션 + FW_DEMO 파일명 정합)
+- `FORM_DEMO.html` 재작성 (419 → 643 줄): 5개 그룹 폼 → **30개 위젯 개별 섹션** 으로 분리. 위젯 이름·설명·라이브 미니폼·코드 스니펫 1세트씩. 도입 평가자/온보딩이 위젯별로 "이게 뭐고 어떻게 쓰는지" 한 화면에 보기 쉬움.
+- `FRAMEWORK_DEMO.html` → `FW_DEMO.html` 파일명 변경. 메뉴 URL(`/pages/dev/FW_DEMO.html`) 과 파일명 불일치로 404 이던 문제 해결. 내용(테마·다국어·차트·엑셀임포트·인쇄 데모)은 그대로.
+
 ### Changed (FORM_DEMO / GRID_DEMO 재작성 — 데모 대상 명확화)
 대상: **온보딩 개발자 / 수행개발자 / 프레임워크 도입 평가자**. 평가용 데모 시 외부에 보여줄 수 있도록 정리.
 

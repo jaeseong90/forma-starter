@@ -1,123 +1,41 @@
 <style>
-        .ref-tbl { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 4px; }
-        .ref-tbl th { background: var(--bg-group); padding: 4px 8px; text-align: left; border: 1px solid var(--border-group); font-weight: 600; white-space: nowrap; color: var(--text); }
-        .ref-tbl td { padding: 3px 8px; border: 1px solid var(--border-light); white-space: nowrap; color: var(--text); }
-        .ref-tbl tr:hover td { background: var(--bg-alt); }
-        details summary { outline: none; }
-        details summary::-webkit-details-marker { color: var(--primary); }
-    </style>
+    /* GRID_DEMO 전용 — 최소 추가만, 나머지는 forma.css 의 .demo-* / .forma-* 사용 */
+    details.fd-ref { margin-top: 8px; }
+    details.fd-ref > summary {
+        padding: 7px 10px; font-weight: 600; font-size: 12px;
+        cursor: pointer; background: var(--bg-alt);
+        border: 1px solid var(--border-light); border-radius: 3px;
+        user-select: none; list-style: none;
+    }
+    details.fd-ref > summary::-webkit-details-marker { display: none; }
+    details.fd-ref > summary::before { content: "▸ "; display: inline-block; }
+    details.fd-ref[open] > summary::before { content: "▾ "; }
+    .ref-tbl { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 6px; }
+    .ref-tbl th {
+        background: var(--bg-alt); padding: 7px 10px; text-align: left;
+        border-bottom: 1px solid var(--border); font-weight: 600; color: var(--text);
+    }
+    .ref-tbl td {
+        padding: 6px 10px; border-bottom: 1px solid var(--border-light);
+        color: var(--text); vertical-align: top;
+    }
+    .ref-tbl tr:hover td { background: var(--bg-alt); }
+    .ref-tbl tr.fd-group td {
+        background: var(--bg-header);
+        font-weight: 700; font-size: 11px;
+        color: var(--text-muted);
+        letter-spacing: 0.4px; text-transform: uppercase;
+    }
+    .fd-mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 11.5px; }
+    .fd-type { font-size: 11px; color: var(--text-muted); }
+    .fd-kbd-tbl td { padding: 4px 10px; font-size: 12px; }
+    .fd-kbd-tbl td:first-child { font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; color: #4f6cd9; white-space: nowrap; width: 200px; }
+</style>
 <div class="forma-page" style="max-width:1400px">
     <div class="forma-page-header">
-        <h1 class="forma-page-title">FormaGrid API 레퍼런스 &amp; 데모</h1>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:4px">1,838줄 | 19개 데모 섹션 | <a href="/pages/dev/FORM_DEMO.html">FormaForm 데모 &rarr;</a> | <a href="/">홈 &rarr;</a></div>
+        <h1 class="forma-page-title">FormaGrid 데모</h1>
     </div>
     <div class="forma-content">
-
-        <!-- API 레퍼런스 -->
-        <div class="demo-section" style="background:var(--bg-card);border:1px solid var(--border-group);border-radius:6px;padding:16px;">
-            <details open>
-                <summary style="font-weight:700;font-size:14px;cursor:pointer;margin-bottom:10px">생성자 옵션 (Constructor Options)</summary>
-                <table class="ref-tbl">
-                    <tr><th>옵션</th><th>타입</th><th>기본값</th><th>설명</th></tr>
-                    <tr><td>columns</td><td>Array</td><td>[]</td><td>컬럼 정의 배열</td></tr>
-                    <tr><td>editable</td><td>Boolean</td><td>false</td><td>인라인 편집 활성화 (더블클릭/Enter/F2)</td></tr>
-                    <tr><td>checkable</td><td>Boolean</td><td>false</td><td>체크박스 컬럼 표시</td></tr>
-                    <tr><td>sortable</td><td>Boolean</td><td>false</td><td>헤더 클릭 정렬 (asc→desc→해제)</td></tr>
-                    <tr><td>rowNum</td><td>Boolean</td><td>false</td><td>행번호 컬럼</td></tr>
-                    <tr><td>reorderable</td><td>Boolean</td><td>false</td><td>드래그&amp;드롭 행 순서 변경 (≡ 핸들)</td></tr>
-                    <tr><td>filterable</td><td>Boolean</td><td>false</td><td>헤더 아래 필터 입력행 표시</td></tr>
-                    <tr><td>paging</td><td>Boolean</td><td>false</td><td>페이징 바 표시</td></tr>
-                    <tr><td>pageSize</td><td>Number</td><td>50</td><td>페이지당 행 수</td></tr>
-                    <tr><td>virtualScroll</td><td>Boolean</td><td>false</td><td>가상 스크롤 (대량 데이터 최적화)</td></tr>
-                    <tr><td>height</td><td>Number</td><td>400</td><td>virtualScroll 시 그리드 높이 (px)</td></tr>
-                    <tr><td>rowHeight</td><td>Number</td><td>30</td><td>virtualScroll 시 행 높이 (px)</td></tr>
-                    <tr><td>groupBy</td><td>String</td><td>null</td><td>그룹핑 필드명</td></tr>
-                    <tr><td>groupFooter</td><td>Boolean</td><td>false</td><td>그룹별 소계 행 표시</td></tr>
-                    <tr><td>treeField</td><td>String</td><td>null</td><td>트리 표시 컬럼 필드명</td></tr>
-                    <tr><td>treeIdField</td><td>String</td><td>'id'</td><td>트리 노드 ID 필드명</td></tr>
-                    <tr><td>treeParentField</td><td>String</td><td>'parent_id'</td><td>트리 부모 ID 필드명</td></tr>
-                    <tr><td>rowDetail</td><td>Function</td><td>null</td><td>멀티행 서브행 정의 (row, idx) → Array</td></tr>
-                    <tr><td>detailGrid</td><td>Function</td><td>null</td><td>마스터-디테일 (row, container, idx)</td></tr>
-                </table>
-            </details>
-
-            <details>
-                <summary style="font-weight:700;font-size:14px;cursor:pointer;margin:12px 0 10px">컬럼 속성 (Column Options)</summary>
-                <table class="ref-tbl">
-                    <tr><th>속성</th><th>타입</th><th>설명</th></tr>
-                    <tr><td>field</td><td>String</td><td>데이터 필드명 (필수)</td></tr>
-                    <tr><td>label</td><td>String/Array</td><td>헤더 텍스트. 멀티헤더: [{text, colspan}, ...]</td></tr>
-                    <tr><td>width</td><td>Number</td><td>컬럼 너비 (px)</td></tr>
-                    <tr><td>type</td><td>String</td><td>'number' 등</td></tr>
-                    <tr><td>format</td><td>String</td><td>'currency', 'date'</td></tr>
-                    <tr><td>editor</td><td>String</td><td>'text','select','combo','date','currency','check','switch','textarea'</td></tr>
-                    <tr><td>options</td><td>Array</td><td>select/combo용 [{value, label}]</td></tr>
-                    <tr><td>code</td><td>String</td><td>select/combo용 코드 그룹 (서버 조회)</td></tr>
-                    <tr><td>frozen</td><td>Boolean</td><td>고정 컬럼 (좌측 sticky)</td></tr>
-                    <tr><td>readOnly</td><td>Boolean</td><td>편집 불가</td></tr>
-                    <tr><td>required</td><td>Boolean</td><td>checkGridValidation 필수</td></tr>
-                    <tr><td>footer</td><td>String</td><td>'sum', 'count', 'avg'</td></tr>
-                    <tr><td>align</td><td>String</td><td>'left', 'center', 'right'</td></tr>
-                    <tr><td>merge</td><td>Boolean</td><td>같은 값 연속 행 자동 rowspan 병합</td></tr>
-                    <tr><td>renderer</td><td>Function</td><td>(val, row, col, idx) → HTML string / Element</td></tr>
-                </table>
-            </details>
-
-            <details>
-                <summary style="font-weight:700;font-size:14px;cursor:pointer;margin:12px 0 10px">Public API 메서드</summary>
-                <table class="ref-tbl">
-                    <tr><th>메서드</th><th>설명</th></tr>
-                    <tr><td>setData(data, totalCount?)</td><td>데이터 세팅</td></tr>
-                    <tr><td>getData()</td><td>전체 데이터 반환</td></tr>
-                    <tr><td>getCheckedData()</td><td>체크된 행 반환</td></tr>
-                    <tr><td>getModifiedData()</td><td>gstat='I'/'U' 행 반환</td></tr>
-                    <tr><td>getItem(idx) / getSelectedItem()</td><td>특정/선택 행 반환</td></tr>
-                    <tr><td>addRow(defaults?)</td><td>행 추가 (gstat='I')</td></tr>
-                    <tr><td>deleteRow()</td><td>체크/선택 행 삭제</td></tr>
-                    <tr><td>updateItem(idx, data)</td><td>특정 행 업데이트</td></tr>
-                    <tr><td>clearData()</td><td>전체 초기화</td></tr>
-                    <tr><td>clearSelect()</td><td>선택 해제</td></tr>
-                    <tr><td>eachRow(callback)</td><td>전체 행 순회</td></tr>
-                    <tr><td>checkGridValidation()</td><td>required 검증</td></tr>
-                    <tr><td>exportCsv(filename?)</td><td>CSV 다운로드</td></tr>
-                    <tr><td>exportXlsx(filename?)</td><td>XLSX 다운로드 (서식 포함)</td></tr>
-                    <tr><td>undo() / redo()</td><td>실행 취소 / 다시 실행</td></tr>
-                    <tr><td>moveRow(from, to)</td><td>행 이동</td></tr>
-                    <tr><td>hideColumn(field) / showColumn(field)</td><td>컬럼 숨기기/표시</td></tr>
-                    <tr><td>autoFitAllColumns()</td><td>전체 컬럼 자동 너비</td></tr>
-                    <tr><td>mergeCells(row, col, rowspan, colspan)</td><td>수동 셀 병합</td></tr>
-                    <tr><td>toggleGroup(key)</td><td>그룹 접기/펼치기</td></tr>
-                    <tr><td>expandAllGroups() / collapseAllGroups()</td><td>그룹 전체 펼치기/접기</td></tr>
-                    <tr><td>toggleTreeNode(id)</td><td>트리 노드 접기/펼치기</td></tr>
-                    <tr><td>expandAllTree() / collapseAllTree()</td><td>트리 전체 펼치기/접기</td></tr>
-                    <tr><td>toggleDetail(rowIdx)</td><td>마스터-디테일 토글</td></tr>
-                    <tr><td>addCellCss/removeCellCss(row,field,css)</td><td>셀 CSS 추가/제거</td></tr>
-                    <tr><td>addCss/removeCss(row, css)</td><td>행 CSS 추가/제거</td></tr>
-                </table>
-            </details>
-
-            <details>
-                <summary style="font-weight:700;font-size:14px;cursor:pointer;margin:12px 0 10px">콜백 이벤트</summary>
-                <table class="ref-tbl">
-                    <tr><th>이벤트</th><th>파라미터</th><th>설명</th></tr>
-                    <tr><td>onRowClick</td><td>(row, idx)</td><td>행 클릭</td></tr>
-                    <tr><td>onRowDblClick</td><td>(row, idx)</td><td>행 더블클릭</td></tr>
-                    <tr><td>onCellChange</td><td>(row, field, idx)</td><td>셀 값 변경 후</td></tr>
-                    <tr><td>onPageChange</td><td>(page, size)</td><td>페이지 변경</td></tr>
-                    <tr><td>onRowReorder</td><td>(from, to, row)</td><td>행 순서 변경 후</td></tr>
-                </table>
-            </details>
-
-            <details>
-                <summary style="font-weight:700;font-size:14px;cursor:pointer;margin:12px 0 10px">키보드 &amp; 마우스</summary>
-                <div style="font-size:11px;color:var(--text-sub);line-height:2;padding:4px 0;">
-                    <b>Arrow</b> 셀 이동 &nbsp; <b>Tab/Shift+Tab</b> 다음/이전 셀 &nbsp; <b>Enter/F2</b> 편집 시작 &nbsp; <b>Escape</b> 편집 취소 &nbsp; <b>Delete</b> 셀 지우기 &nbsp;
-                    <b>Space</b> 체크/스위치 토글 &nbsp; <b>Home/End</b> 행 처음/끝 &nbsp; <b>Ctrl+Home/End</b> 첫/마지막 행 &nbsp; <b>PageUp/Down</b> 20행 이동<br>
-                    <b>Ctrl+C</b> 행 복사(TSV) &nbsp; <b>Ctrl+V</b> 붙여넣기 &nbsp; <b>Ctrl+Z</b> 실행취소 &nbsp; <b>Ctrl+Y</b> 다시실행<br>
-                    편집 중 <b>Tab</b> 다음셀 편집 &nbsp; <b>Enter</b> 아래행 편집 &nbsp; 리사이즈 핸들 <b>더블클릭</b> 자동맞춤 &nbsp; <b>우클릭</b> 컨텍스트 메뉴 (정렬/숨기기/행추가삭제)
-                </div>
-            </details>
-        </div>
 
         <!-- 1. 셀 병합 (merge) -->
         <div class="demo-section">
@@ -330,7 +248,7 @@
 
         <!-- 18. N단 멀티헤더 (4단) -->
         <div class="demo-section">
-            <div class="demo-title">16. N단 멀티헤더 (4단) — 상용 그리드 수준</div>
+            <div class="demo-title">18. N단 멀티헤더 (4단) — 상용 그리드 수준</div>
             <div class="demo-desc">4단 헤더: 전체 → 지역 → 분류 → 항목. 중간 레벨 colspan/rowspan 자동 조합. 단일 컬럼은 4행 rowspan.</div>
             <div id="grid-multi4"></div>
             <div class="demo-btn-row">
@@ -387,6 +305,149 @@
                 <button class="forma-btn" onclick="document.getElementById('out-events').textContent=''">로그 초기화</button>
             </div>
             <div class="demo-output" id="out-events" style="max-height:200px"></div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!--  API 레퍼런스                                                     -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div class="demo-section">
+            <div class="demo-title">API 레퍼런스</div>
+            <div class="demo-desc">생성자 옵션 · 컬럼 속성 · Public API 메서드 · 콜백 이벤트 · 키보드/마우스 단축키.</div>
+
+            <details class="fd-ref"><summary>생성자 옵션 (Constructor Options, 19개)</summary>
+                <table class="ref-tbl">
+                    <thead><tr><th>옵션</th><th>타입</th><th>기본값</th><th>설명</th></tr></thead>
+                    <tbody>
+                        <tr class="fd-group"><td colspan="4">데이터 / 표시</td></tr>
+                        <tr><td class="fd-mono">columns</td>         <td class="fd-type">Array</td>    <td><code>[]</code></td>    <td>컬럼 정의 배열 (필수)</td></tr>
+                        <tr><td class="fd-mono">rowNum</td>          <td class="fd-type">Boolean</td>  <td><code>false</code></td> <td>행번호 컬럼</td></tr>
+                        <tr><td class="fd-mono">checkable</td>       <td class="fd-type">Boolean</td>  <td><code>false</code></td> <td>체크박스 컬럼</td></tr>
+                        <tr class="fd-group"><td colspan="4">편집 / 인터랙션</td></tr>
+                        <tr><td class="fd-mono">editable</td>        <td class="fd-type">Boolean</td>  <td><code>false</code></td> <td>인라인 편집 활성화 (더블클릭 / Enter / F2)</td></tr>
+                        <tr><td class="fd-mono">sortable</td>        <td class="fd-type">Boolean</td>  <td><code>false</code></td> <td>헤더 클릭 정렬 (asc → desc → 해제)</td></tr>
+                        <tr><td class="fd-mono">reorderable</td>     <td class="fd-type">Boolean</td>  <td><code>false</code></td> <td>드래그&amp;드롭 행 순서 변경 (≡ 핸들)</td></tr>
+                        <tr><td class="fd-mono">filterable</td>      <td class="fd-type">Boolean</td>  <td><code>false</code></td> <td>헤더 아래 필터 입력행 표시</td></tr>
+                        <tr class="fd-group"><td colspan="4">대량 데이터</td></tr>
+                        <tr><td class="fd-mono">paging</td>          <td class="fd-type">Boolean</td>  <td><code>false</code></td> <td>페이징 바 표시</td></tr>
+                        <tr><td class="fd-mono">pageSize</td>        <td class="fd-type">Number</td>   <td><code>50</code></td>    <td>페이지당 행 수</td></tr>
+                        <tr><td class="fd-mono">virtualScroll</td>   <td class="fd-type">Boolean</td>  <td><code>false</code></td> <td>가상 스크롤 (대량 데이터 최적화)</td></tr>
+                        <tr><td class="fd-mono">height</td>          <td class="fd-type">Number</td>   <td><code>400</code></td>   <td>virtualScroll 시 그리드 높이 (px)</td></tr>
+                        <tr><td class="fd-mono">rowHeight</td>       <td class="fd-type">Number</td>   <td><code>30</code></td>    <td>virtualScroll 시 행 높이 (px)</td></tr>
+                        <tr class="fd-group"><td colspan="4">계층 / 그룹 / 디테일</td></tr>
+                        <tr><td class="fd-mono">groupBy</td>         <td class="fd-type">String</td>   <td>null</td>               <td>그룹핑 필드명</td></tr>
+                        <tr><td class="fd-mono">groupFooter</td>     <td class="fd-type">Boolean</td>  <td><code>false</code></td> <td>그룹별 소계 행 표시</td></tr>
+                        <tr><td class="fd-mono">treeField</td>       <td class="fd-type">String</td>   <td>null</td>               <td>트리 표시 컬럼 필드명</td></tr>
+                        <tr><td class="fd-mono">treeIdField</td>     <td class="fd-type">String</td>   <td><code>'id'</code></td>  <td>트리 노드 ID 필드명</td></tr>
+                        <tr><td class="fd-mono">treeParentField</td> <td class="fd-type">String</td>   <td><code>'parent_id'</code></td> <td>트리 부모 ID 필드명</td></tr>
+                        <tr><td class="fd-mono">rowDetail</td>       <td class="fd-type">Function</td> <td>null</td>               <td>멀티행 서브행 정의 <code>(row, idx) → Array</code></td></tr>
+                        <tr><td class="fd-mono">detailGrid</td>      <td class="fd-type">Function</td> <td>null</td>               <td>마스터-디테일 <code>(row, container, idx)</code></td></tr>
+                    </tbody>
+                </table>
+            </details>
+
+            <details class="fd-ref"><summary>컬럼 속성 (Column Options, 15개)</summary>
+                <table class="ref-tbl">
+                    <thead><tr><th>속성</th><th>타입</th><th>설명</th></tr></thead>
+                    <tbody>
+                        <tr class="fd-group"><td colspan="3">기본</td></tr>
+                        <tr><td class="fd-mono">field</td>     <td class="fd-type">String</td>        <td>데이터 필드명 (필수)</td></tr>
+                        <tr><td class="fd-mono">label</td>     <td class="fd-type">String / Array</td><td>헤더 텍스트. 멀티헤더: <code>[{text, colspan}, ...]</code></td></tr>
+                        <tr><td class="fd-mono">width</td>     <td class="fd-type">Number</td>        <td>컬럼 너비 (px)</td></tr>
+                        <tr><td class="fd-mono">align</td>     <td class="fd-type">String</td>        <td><code>'left' / 'center' / 'right'</code></td></tr>
+                        <tr><td class="fd-mono">frozen</td>    <td class="fd-type">Boolean</td>       <td>고정 컬럼 (좌측 sticky)</td></tr>
+                        <tr><td class="fd-mono">type</td>      <td class="fd-type">String</td>        <td><code>'number'</code> 등</td></tr>
+                        <tr><td class="fd-mono">format</td>    <td class="fd-type">String</td>        <td><code>'currency' / 'date'</code></td></tr>
+                        <tr><td class="fd-mono">footer</td>    <td class="fd-type">String</td>        <td><code>'sum' / 'count' / 'avg'</code></td></tr>
+                        <tr class="fd-group"><td colspan="3">편집</td></tr>
+                        <tr><td class="fd-mono">editor</td>    <td class="fd-type">String</td>        <td><code>'text' / 'select' / 'combo' / 'date' / 'currency' / 'check' / 'switch' / 'textarea'</code></td></tr>
+                        <tr><td class="fd-mono">options</td>   <td class="fd-type">Array</td>         <td>select/combo 용 <code>[{value, label}]</code></td></tr>
+                        <tr><td class="fd-mono">code</td>      <td class="fd-type">String</td>        <td>select/combo 용 코드 그룹 (서버 조회)</td></tr>
+                        <tr><td class="fd-mono">readOnly</td>  <td class="fd-type">Boolean</td>       <td>편집 불가</td></tr>
+                        <tr><td class="fd-mono">required</td>  <td class="fd-type">Boolean</td>       <td>checkGridValidation 필수</td></tr>
+                        <tr class="fd-group"><td colspan="3">표시 커스텀</td></tr>
+                        <tr><td class="fd-mono">merge</td>     <td class="fd-type">Boolean</td>       <td>같은 값 연속 행 자동 rowspan 병합</td></tr>
+                        <tr><td class="fd-mono">renderer</td>  <td class="fd-type">Function</td>      <td><code>(val, row, col, idx) → HTML string / Element</code></td></tr>
+                    </tbody>
+                </table>
+            </details>
+
+            <details class="fd-ref"><summary>Public API 메서드 (25개+)</summary>
+                <table class="ref-tbl">
+                    <thead><tr><th style="width:300px">메서드</th><th>설명</th></tr></thead>
+                    <tbody>
+                        <tr class="fd-group"><td colspan="2">데이터 입출력</td></tr>
+                        <tr><td class="fd-mono">setData(data, totalCount?)</td>          <td>데이터 세팅. 서버 페이징 시 totalCount 필수.</td></tr>
+                        <tr><td class="fd-mono">getData()</td>                            <td>전체 데이터 반환</td></tr>
+                        <tr><td class="fd-mono">getCheckedData()</td>                     <td>체크된 행 반환</td></tr>
+                        <tr><td class="fd-mono">getModifiedData()</td>                    <td><code>gstat='I'/'U'</code> 행 반환 (saveGrid 호출용)</td></tr>
+                        <tr><td class="fd-mono">getItem(idx) / getSelectedItem()</td>     <td>특정/선택 행 반환</td></tr>
+                        <tr><td class="fd-mono">clearData() / clearSelect()</td>          <td>전체 초기화 / 선택 해제</td></tr>
+                        <tr><td class="fd-mono">eachRow(callback)</td>                    <td>전체 행 순회</td></tr>
+                        <tr class="fd-group"><td colspan="2">행 조작</td></tr>
+                        <tr><td class="fd-mono">addRow(defaults?)</td>                    <td>행 추가 (<code>gstat='I'</code> 자동)</td></tr>
+                        <tr><td class="fd-mono">deleteRow()</td>                          <td>체크/선택 행 삭제</td></tr>
+                        <tr><td class="fd-mono">updateItem(idx, data)</td>                <td>특정 행 업데이트</td></tr>
+                        <tr><td class="fd-mono">moveRow(from, to)</td>                    <td>행 이동</td></tr>
+                        <tr><td class="fd-mono">undo() / redo()</td>                      <td>실행 취소 / 다시 실행 (Ctrl+Z / Ctrl+Y)</td></tr>
+                        <tr class="fd-group"><td colspan="2">검증 · 내보내기</td></tr>
+                        <tr><td class="fd-mono">checkGridValidation()</td>                <td>required 검증 (false 면 셀 에러 표시)</td></tr>
+                        <tr><td class="fd-mono">exportCsv(filename?)</td>                 <td>CSV 다운로드</td></tr>
+                        <tr><td class="fd-mono">exportXlsx(filename?)</td>                <td>XLSX 다운로드 (서식 포함)</td></tr>
+                        <tr class="fd-group"><td colspan="2">컬럼 · 셀</td></tr>
+                        <tr><td class="fd-mono">hideColumn(field) / showColumn(field)</td><td>컬럼 숨김/표시</td></tr>
+                        <tr><td class="fd-mono">autoFitAllColumns()</td>                  <td>전체 컬럼 자동 너비 (리사이즈 더블클릭과 동일)</td></tr>
+                        <tr><td class="fd-mono">mergeCells(row, col, rowspan, colspan)</td><td>수동 셀 병합</td></tr>
+                        <tr><td class="fd-mono">addCellCss / removeCellCss(row, field, css)</td><td>셀 CSS 추가/제거</td></tr>
+                        <tr><td class="fd-mono">addCss / removeCss(row, css)</td>         <td>행 CSS 추가/제거</td></tr>
+                        <tr class="fd-group"><td colspan="2">그룹 · 트리 · 디테일</td></tr>
+                        <tr><td class="fd-mono">toggleGroup(key)</td>                     <td>그룹 접기/펼치기</td></tr>
+                        <tr><td class="fd-mono">expandAllGroups() / collapseAllGroups()</td><td>그룹 전체 펼치기/접기</td></tr>
+                        <tr><td class="fd-mono">toggleTreeNode(id)</td>                   <td>트리 노드 접기/펼치기</td></tr>
+                        <tr><td class="fd-mono">expandAllTree() / collapseAllTree()</td>  <td>트리 전체 펼치기/접기</td></tr>
+                        <tr><td class="fd-mono">toggleDetail(rowIdx)</td>                 <td>마스터-디테일 토글</td></tr>
+                    </tbody>
+                </table>
+            </details>
+
+            <details class="fd-ref"><summary>콜백 이벤트 (5개)</summary>
+                <table class="ref-tbl">
+                    <thead><tr><th>이벤트</th><th>파라미터</th><th>설명</th></tr></thead>
+                    <tbody>
+                        <tr><td class="fd-mono">onRowClick</td>    <td class="fd-type">(row, idx)</td>        <td>행 클릭</td></tr>
+                        <tr><td class="fd-mono">onRowDblClick</td> <td class="fd-type">(row, idx)</td>        <td>행 더블클릭</td></tr>
+                        <tr><td class="fd-mono">onCellChange</td>  <td class="fd-type">(row, field, idx)</td> <td>셀 값 변경 후</td></tr>
+                        <tr><td class="fd-mono">onPageChange</td>  <td class="fd-type">(page, size)</td>      <td>페이지 변경</td></tr>
+                        <tr><td class="fd-mono">onRowReorder</td>  <td class="fd-type">(from, to, row)</td>   <td>행 순서 변경 후</td></tr>
+                    </tbody>
+                </table>
+            </details>
+
+            <details class="fd-ref"><summary>키보드 / 마우스 단축키</summary>
+                <table class="ref-tbl fd-kbd-tbl">
+                    <tbody>
+                        <tr class="fd-group"><td colspan="2">셀 이동 / 편집</td></tr>
+                        <tr><td>Arrow ↑↓←→</td>      <td>셀 이동</td></tr>
+                        <tr><td>Tab / Shift+Tab</td>  <td>다음 / 이전 셀</td></tr>
+                        <tr><td>Enter / F2</td>       <td>편집 시작</td></tr>
+                        <tr><td>Escape</td>           <td>편집 취소</td></tr>
+                        <tr><td>Delete</td>           <td>셀 지우기</td></tr>
+                        <tr><td>Space</td>            <td>체크 / 스위치 토글</td></tr>
+                        <tr><td>Home / End</td>       <td>행 처음 / 끝</td></tr>
+                        <tr><td>Ctrl+Home / End</td>  <td>첫 / 마지막 행</td></tr>
+                        <tr><td>PageUp / PageDown</td><td>20행 이동</td></tr>
+                        <tr class="fd-group"><td colspan="2">편집 중</td></tr>
+                        <tr><td>Tab</td>              <td>다음 셀 편집 모드로</td></tr>
+                        <tr><td>Enter</td>            <td>아래 행 편집 모드로</td></tr>
+                        <tr class="fd-group"><td colspan="2">클립보드 / 히스토리</td></tr>
+                        <tr><td>Ctrl+C</td>           <td>행 복사 (TSV 포맷)</td></tr>
+                        <tr><td>Ctrl+V</td>           <td>붙여넣기</td></tr>
+                        <tr><td>Ctrl+Z / Ctrl+Y</td>  <td>실행취소 / 다시실행</td></tr>
+                        <tr class="fd-group"><td colspan="2">마우스</td></tr>
+                        <tr><td>리사이즈 핸들 더블클릭</td><td>컬럼 자동맞춤</td></tr>
+                        <tr><td>우클릭</td>           <td>컨텍스트 메뉴 (정렬 / 숨기기 / 행 추가·삭제)</td></tr>
+                    </tbody>
+                </table>
+            </details>
         </div>
 
     </div>
